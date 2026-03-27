@@ -1,6 +1,6 @@
 # What2Cook
 
-Cátedra: Progrmación en Ambiente Web
+Cátedra: Programación en Ambiente Web
 
 Alumnos:
 * Gustavo Andres Contardi
