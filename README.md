@@ -1,5 +1,4 @@
 # What2Cook
----
 
 Cátedra: Progrmación en Ambiente Web
 
