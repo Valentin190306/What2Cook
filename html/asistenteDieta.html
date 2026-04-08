@@ -33,6 +33,7 @@
         <form action="/generar-plan" method="POST">
             <label for="duracion">Duración del plan</label>
             <select id="duracion" name="duracion" required>
+                <option value="">Seleccioná una duración</option>
                 <option value="7">7 días (1 semana)</option>
                 <option value="14">14 días (2 semanas)</option>
                 <option value="30">30 días (1 mes)</option>
@@ -40,7 +41,7 @@
 
             <label for="dieta">Tipo de dieta (opcional)</label>
             <select id="dieta" name="dieta">
-                <option value="">Selecciona una dieta</option>
+                <option value="">Seleccioná una dieta</option>
                 <option value="vegetariana">Vegetariana</option>
                 <option value="vegana">Vegana</option>
                 <option value="keto">Keto</option>
