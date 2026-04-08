@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Recetas</title>
+</head>
+<body>
+    <header>
+        <!-- aca iria el logo -->
+        <a href="index.html"><img src="#"></a>
+        <h2>What2Cook</h2>
+
+        <!-- Menu Hamburguesa -->
+        <nav>
+            <ul>
+                <li><a href="#">Opciones</a></li>
+                <li><a href="#">Opciones</a></li>
+                <li><a href="#">Opciones</a></li>
+                <li><a href="#">Opciones</a></li>
+            </ul>
+        </nav>
+        
+    </header>
+    
+    <main>
+
+        <h1>Asistente de Dietas</h1>
+        <p>Creá un plan de comidas personalizado según tus objetivos nutricionales</p>
+
+        <section>
+        <h2>Asistente de Dietas</h2>
+        <form action="/generar-plan" method="POST">
+            <label for="duracion">Duración del plan</label>
+            <select id="duracion" name="duracion" required>
+                <option value="7">7 días (1 semana)</option>
+                <option value="14">14 días (2 semanas)</option>
+                <option value="30">30 días (1 mes)</option>
+            </select>
+
+            <label for="dieta">Tipo de dieta (opcional)</label>
+            <select id="dieta" name="dieta">
+                <option value="">Selecciona una dieta</option>
+                <option value="vegetariana">Vegetariana</option>
+                <option value="vegana">Vegana</option>
+                <option value="keto">Keto</option>
+            </select>
+
+            <fieldset>
+                <legend>Configuración del Plan</legend>
+                <p>Definí tus objetivos nutricionales diarios</p>
+
+                <label for="calorias">Calorías diarias (kcal)</label>
+                <input type="number" id="calorias" name="calorias" placeholder="ej: 2000">
+
+                <label for="proteinas">Proteínas (g)</label>
+                <input type="number" id="proteinas" name="proteinas" placeholder="ej: 150">
+
+                <label for="carbohidratos">Carbohidratos (g)</label>
+                <input type="number" id="carbohidratos" name="carbohidratos" placeholder="ej: 200">
+
+                <label for="grasas">Grasas (g)</label>
+                <input type="number" id="grasas" name="grasas" placeholder="ej: 70">
+            </fieldset>
+
+            <button type="submit">Generar Plan</button>
+        </form>
+    </section>
+
+    </main>
+
+
+    <footer>
+        <img src="logoW2C">
+        <h3>What2Cook</h3>
+        <p>Tu plataforma de recetas y planificación de comidas</p>
+
+        <h3>Explorar</h3>
+        <address>
+            <!-- Explorar -->
+            <ul>
+                <li><a href="#">Asistente de Cocina</a></li>
+                <li><a href="#">Asistente de Dietas</a></li>
+                <li><a href="#">Catálogo de Recetas</a></li>
+                <li><a href="#">Información de Dietas</a></li>
+            </ul>
+        </address>
+
+        <h3>Mi cuenta</h3>
+        <address>
+            <!-- Mi cuenta -->
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Mis favoritos</a></li>
+                <li><a href="#">Mis planes</a></li>
+                <li><a href="#">Perfil</a></li>
+            </ul>
+        </address>
+
+        <h3>Sobre What2Cook</h3>
+        <address>
+            <p>Desarrollado en Buenos Aires, Argentina</p>
+            <p>Datos de Spoonacular API</p>
+            <p>&copy; 2026 What2Cook</p>
+        </address>
+    </footer>
+</body>
+</html>
