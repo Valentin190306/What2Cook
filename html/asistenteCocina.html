@@ -38,6 +38,26 @@
             <label for="mealPrep">Meal Prep</label>
         </div>
 
+        <section>
+            <h3>Encontrá la receta perfecta</h3>
+            <p>
+                Ingresá los ingredientes que tenés 
+                y te sugerimos recetas que puedas preparar.
+            </p>
+
+            <form action="/buscar-recetas" method="GET">
+                <ul>
+                    <li>Huevos x3<button type="button">x</button></li>
+                </ul>
+
+                <input type="text" name="ingrediente" placeholder="Ej: pollo, arroz, tomate...">
+                <button type="button">+</button>
+
+                <button type="submit">Buscar Recetas</button>
+                <button type="submit">Las más rápidas</button>
+                <button type="submit">Las más saludables</button>
+            </form>
+        </section>
         
 
     </main>
