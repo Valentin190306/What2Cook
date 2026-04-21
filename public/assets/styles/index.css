@@ -1,0 +1,344 @@
+/* ============================================================
+   What2Cook — index.css
+   Capa 4: Pantalla específica - Página de Inicio (index.html)
+   Depende de: base.css → layout.css → components.css
+
+   Selectores usados:
+     .hero          → section del hero (clase mínima para distinguirla)
+     .hero > a      → botones CTA sin wrapper div
+     .features nav  → nav de features dentro de su section
+     .features nav a > span → subtítulos de cada feature
+     .cta-banner > a → botón CTA de la sección de registro
+     dl.stats       → lista de definición de estadísticas
+     dl.stats dt/dd → términos y valores de cada estadística
+     footer > p:first-child → bloque de marca en el footer
+   ============================================================ */
+
+/* ============================================================
+   SECCIÓN HERO
+   ============================================================ */
+.hero {
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+  border-bottom: 3px double var(--color-black);
+}
+
+.hero h1 {
+  font-size: clamp(2.8rem, 10vw, 5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+}
+
+.hero > p {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  max-width: 480px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+
+/* Estilo base compartido por los dos <a> hijos directos */
+.hero > a {
+  display: inline-block;
+  padding: 0.75rem 1.75rem;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid var(--color-black);
+  margin: 0.35rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Primer botón: outline */
+.hero > a:first-of-type {
+  background: transparent;
+  color: var(--color-black);
+}
+
+.hero > a:first-of-type:hover {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+/* Segundo botón: relleno negro */
+.hero > a:last-of-type {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+.hero > a:last-of-type:hover {
+  background: var(--color-carrot);
+  border-color: var(--color-carrot);
+}
+
+/* ============================================================
+   SECCIÓN FEATURES ("¿Qué podés hacer?")
+   ============================================================ */
+.features {
+  padding: 2.5rem 1.5rem;
+  border-bottom: 3px double var(--color-black);
+}
+
+.features > h2 {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+  text-align: center;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+/* Mobile: columna vertical con separadores tipo diario */
+.features nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.features nav a {
+  display: block;
+  padding: 1.25rem 0;
+  font-family: var(--font-title);
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--color-black);
+  border-bottom: 1px solid var(--color-border);
+  transition: color 0.2s, padding-left 0.2s;
+}
+
+.features nav a:first-child {
+  border-top: 1px solid var(--color-border);
+}
+
+.features nav a:hover {
+  color: var(--color-carrot);
+  padding-left: 0.75rem;
+}
+
+/* Subtítulo dentro de cada enlace */
+.features nav a > span {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 0.9rem;
+  text-transform: none;
+  color: var(--color-text-muted);
+  letter-spacing: 0;
+  margin-top: 0.3rem;
+}
+
+/* ============================================================
+   SECCIÓN CTA ("¿Listo/a para empezar?")
+   ============================================================ */
+.cta-banner {
+  margin: 2.5rem 1.5rem;
+  padding: 2.5rem 1.5rem;
+  border: 2px solid var(--color-black);
+  text-align: center;
+  background: var(--color-cream);
+  box-shadow: 6px 6px 0px var(--color-black);
+}
+
+.cta-banner h2 {
+  font-size: clamp(1.6rem, 6vw, 2.5rem);
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.cta-banner > p {
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1.75rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-banner > a {
+  display: inline-block;
+  background: transparent;
+  border: 2px solid var(--color-black);
+  color: var(--color-black);
+  padding: 0.75rem 2rem;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: background 0.2s, color 0.2s;
+}
+
+.cta-banner > a:hover {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+/* ============================================================
+   ESTADÍSTICAS — <dl> semántico
+   dt = el número grande, dd = la etiqueta descriptiva
+   ============================================================ */
+dl.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: row;
+  padding: 0;
+  border-top: 3px double var(--color-black);
+  border-bottom: 3px double var(--color-black);
+}
+
+dl.stats dt {
+  display: block;
+  padding: 1.5rem 1rem 0.25rem;
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: clamp(2.2rem, 8vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: var(--color-black);
+  border-right: 1px solid var(--color-border);
+}
+
+dl.stats dd {
+  display: block;
+  padding: 0.25rem 1rem 1.5rem;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  margin: 0;
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* 2da columna (pares 2 y 4): sin borde derecho */
+dl.stats dt:nth-child(4n+3),
+dl.stats dd:nth-child(4n+4) {
+  border-right: none;
+}
+
+/* Últimos dos dd: sin borde inferior */
+dl.stats dd:nth-last-child(-n+2) {
+  border-bottom: none;
+}
+
+/* ============================================================
+   DESKTOP (min-width: 900px)
+   ============================================================ */
+@media (min-width: 900px) {
+
+  /* --- Hero --- */
+  .hero {
+    padding: 6rem 2rem 5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(4rem, 6vw, 6.5rem);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero > p {
+    font-size: 1.15rem;
+    max-width: 620px;
+  }
+
+  .hero > a {
+    margin: 0 0.5rem;
+  }
+
+  /* --- Features --- */
+  .features {
+    padding: 5rem 4rem;
+  }
+
+  .features > h2 {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .features nav {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+
+  .features nav a {
+    flex: 1;
+    border: 1px solid var(--color-black);
+    border-bottom: 1px solid var(--color-black);
+    padding: 2rem 1.5rem;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-height: 160px;
+    box-shadow: 4px 4px 0px var(--color-black);
+    transition: box-shadow 0.2s, transform 0.2s, color 0.2s;
+  }
+
+  .features nav a:first-child {
+    border-top: 1px solid var(--color-black);
+  }
+
+  .features nav a:hover {
+    color: var(--color-black);
+    padding-left: 1.5rem;
+    box-shadow: 8px 8px 0px var(--color-carrot);
+    transform: translate(-2px, -2px);
+  }
+
+  /* --- CTA --- */
+  .cta-banner {
+    margin: 4rem;
+    padding: 4rem 3rem;
+  }
+
+  .cta-banner h2 {
+    font-size: 3rem;
+  }
+
+  /* --- Stats: 4 columnas × 2 filas (dt arriba, dd abajo) --- */
+  dl.stats {
+    /*
+      8 celdas: col1-dt col2-dt col3-dt col4-dt
+                col1-dd col2-dd col3-dd col4-dd
+      grid-auto-flow: column hace que el orden del DOM
+      (dt dd dt dd…) se coloque columna a columna.
+    */
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    padding: 3rem 4rem;
+    border-bottom: none;
+  }
+
+  /* Resetear bordes de mobile */
+  dl.stats dt,
+  dl.stats dd {
+    border-right: 1px solid var(--color-border);
+    border-bottom: none;
+  }
+
+  /* Resetear nth-child de mobile que quitaba bordes en col par */
+  dl.stats dt:nth-child(4n+3),
+  dl.stats dd:nth-child(4n+4) {
+    border-right: 1px solid var(--color-border);
+  }
+
+  /* Último par (col 4): sin borde derecho */
+  dl.stats dt:nth-child(7),
+  dl.stats dd:nth-child(8) {
+    border-right: none;
+  }
+
+  dl.stats dt {
+    font-size: 4rem;
+    padding-bottom: 0.25rem;
+  }
+
+  dl.stats dd {
+    padding-top: 0.25rem;
+  }
+}

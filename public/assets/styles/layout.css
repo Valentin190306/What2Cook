@@ -24,7 +24,7 @@ header > a:first-child img {
   margin: 0 auto;
 }
 
-/* Nav Mobile (Simplified) */
+/* Nav Mobile */
 header nav ul {
   display: flex;
   justify-content: center;
@@ -92,6 +92,25 @@ footer p {
   opacity: 0.8;
 }
 
+/* Bloque de marca: <section> hijo directo del footer */
+footer > section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 2rem;
+}
+
+footer > section img {
+  max-width: 48px;
+}
+
+footer > section strong {
+  font-family: var(--font-title);
+  font-size: 1.1rem;
+  color: var(--color-white);
+  display: block;
+}
+
 /* ============================================================
    Media Queries (Desktop)
    ============================================================ */
@@ -117,6 +136,10 @@ footer p {
     grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
     gap: 2rem;
     padding: 4rem;
+  }
+
+  footer > section {
+    margin-bottom: 0;
   }
 
   footer address {
