@@ -1,0 +1,86 @@
+/* ============================================================
+   What2Cook — nosotros.css
+   Capa 4: Pantalla específica - Acerca de Nosotros.
+   Depende de: base.css → layout.css → components.css
+   ============================================================ */
+
+/* ---------- Sección Hero / Título ---------- */
+main h1 {
+  text-align: center;
+  font-size: 3.5rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 5px solid var(--color-black);
+  display: inline-block;
+  width: 100%;
+}
+
+main h2 {
+  text-align: center;
+  font-style: italic;
+  font-weight: 400;
+  text-transform: none;
+  font-size: 1.5rem;
+  margin-bottom: 3rem;
+  color: var(--color-text-muted);
+}
+
+/* ---------- Secciones de Historia / Misión ---------- */
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 4rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+section:last-of-type {
+  border-bottom: none;
+}
+
+section img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border: 1px solid var(--color-black);
+  box-shadow: 10px 10px 0px var(--color-spinach);
+}
+
+section h3 {
+  font-size: 2rem;
+  color: var(--color-carrot);
+  margin-bottom: 1rem;
+}
+
+section p {
+  font-size: 1.1rem;
+  text-align: justify;
+  column-count: 1; /* Estilo periodístico columnas */
+}
+
+/* ---------- Distribución Desktop ---------- */
+@media (min-width: 900px) {
+  section {
+    flex-direction: row;
+    align-items: center;
+    gap: 4rem;
+  }
+
+  section:nth-of-type(even) {
+    flex-direction: row-reverse;
+  }
+
+  section img {
+    flex: 1;
+    height: 400px;
+  }
+
+  section div.content {
+    flex: 1.2;
+  }
+
+  section p {
+    column-count: 2;
+    column-gap: 2rem;
+  }
+}

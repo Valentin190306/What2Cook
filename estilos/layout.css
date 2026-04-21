@@ -1,0 +1,125 @@
+/* ============================================================
+   What2Cook — layout.css
+   Capa 2: Estructura, Header (Masthead), Footer.
+   Depende de: base.css
+   ============================================================ */
+
+/* ---------- Header / Masthead ---------- */
+header {
+  background-color: var(--color-cream);
+  border-bottom: 3px double var(--color-black);
+  padding: 1rem;
+  text-align: center;
+  position: relative;
+}
+
+header h2 {
+  font-size: 2.5rem;
+  margin: 0.5rem 0;
+  letter-spacing: 0.05em;
+}
+
+header > a:first-child img {
+  max-width: 80px;
+  margin: 0 auto;
+}
+
+/* Nav Mobile (Simplified) */
+header nav ul {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+header nav ul li a {
+  font-family: var(--font-title);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-black);
+}
+
+header nav ul li a:hover {
+  color: var(--color-carrot);
+}
+
+/* ---------- Main Container ---------- */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+/* ---------- Footer ---------- */
+footer {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  padding: 3rem 1rem;
+  text-align: left;
+  border-top: 5px solid var(--color-spinach);
+}
+
+footer h3 {
+  color: var(--color-carrot);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.5rem;
+}
+
+footer address {
+  font-style: normal;
+  margin-bottom: 2rem;
+}
+
+footer address ul li {
+  margin-bottom: 0.5rem;
+}
+
+footer address ul li a:hover {
+  color: var(--color-carrot);
+}
+
+footer p {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+/* ============================================================
+   Media Queries (Desktop)
+   ============================================================ */
+@media (min-width: 900px) {
+  header {
+    padding: 2rem;
+  }
+
+  header h2 {
+    font-size: 4rem;
+  }
+
+  header nav ul {
+    gap: 2.5rem;
+  }
+
+  header nav ul li a {
+    font-size: 0.9rem;
+  }
+
+  footer {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+    gap: 2rem;
+    padding: 4rem;
+  }
+
+  footer address {
+    margin-bottom: 0;
+  }
+}

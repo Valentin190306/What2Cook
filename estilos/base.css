@@ -1,0 +1,91 @@
+/* ============================================================
+   What2Cook — base.css
+   Capa 1: Reset, variables globales, tipografía base.
+   Estética: Diario/Periódico Gastronómico.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+
+/* ---------- CSS Reset ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---------- Variables globales ---------- */
+:root {
+  /* Paleta de colores */
+  --color-carrot:      #e67e22;
+  --color-spinach:     #27ae60;
+  --color-black:       #1a1a1a;
+  --color-white:       #ffffff;
+  --color-cream:       #f9f7f2; /* Color hueso/papel periódico */
+  --color-text:        #2c2c2c;
+  --color-text-muted:  #555555;
+  --color-border:      #333333; /* Bordes negros/fuertes para estilo diario */
+
+  /* Tokens de UI */
+  --radius:            0px; /* Estilo periódico suele ser rectangular */
+  --font-title:        'Playfair Display', serif;
+  --font-body:         'Lora', serif;
+  --header-h:          80px;
+
+  /* Media Queries (Referencia)
+     Mobile First: 
+     - Default: Mobile
+     - Tablet: min-width: 768px
+     - Desktop: min-width: 1024px
+  */
+}
+
+/* ---------- Documento ---------- */
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-cream);
+  color: var(--color-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Tipografía Newspaper ---------- */
+h1, h2, h3, h4 {
+  font-family: var(--font-title);
+  color: var(--color-black);
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+p {
+  margin-bottom: 1rem;
+}
+
+/* ---------- Elementos base ---------- */
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  filter: grayscale(20%); /* Toque vintage */
+}
+
+input, button, textarea, select {
+  font-family: inherit;
+}
