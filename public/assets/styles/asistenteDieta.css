@@ -1,0 +1,612 @@
+/* ============================================================
+   What2Cook — asistenteDieta.css
+   Capa 4: Pantalla específica - Asistente de Dietas.
+   Depende de: base.css → layout.css → components.css
+
+   Estructura:
+     .dieta-hero      → bloque crema con título y subtítulo
+     .config-panel    → panel blanco con sombra (form de configuración)
+     .plan-panel      → panel blanco con sombra (plan semanal)
+     .tabs-dias       → tabs horizontales (scroll en mobile)
+     .comidas-grid    → grilla de 4 comidas del día
+   ============================================================ */
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ============================================================
+   HERO — bloque crema
+   ============================================================ */
+.dieta-hero {
+  margin: -2rem -1rem 2rem;
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+  background-color: #efede8;
+  border-bottom: 3px double var(--color-black);
+  animation: fadeUp 0.45s ease both;
+}
+
+.dieta-hero .hero-logo {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  animation: popIn 0.5s ease both;
+}
+
+.dieta-hero .hero-logo img {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-black);
+  border: 2px solid var(--color-black);
+  object-fit: cover;
+}
+
+.dieta-hero h1 {
+  font-size: clamp(2.2rem, 9vw, 3.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.75rem;
+}
+
+.dieta-hero > p {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  max-width: 500px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   PANELES GENÉRICOS (config + plan)
+   ============================================================ */
+.config-panel,
+.plan-panel {
+  border: 2px solid var(--color-black);
+  background: var(--color-white);
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 6px 6px 0 var(--color-black);
+  animation: fadeUp 0.45s 0.08s ease both;
+}
+
+.plan-panel {
+  animation-delay: 0.16s;
+}
+
+.config-panel > h2,
+.plan-panel > .plan-header h2 {
+  font-size: 1.2rem;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem;
+}
+
+/* ============================================================
+   CAMPOS DE FORMULARIO (label + select/input)
+   ============================================================ */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.form-field label {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-text);
+  margin-bottom: 0.4rem;
+}
+
+.form-field input[type="number"],
+.form-field input[type="text"],
+.form-field select {
+  width: 100%;
+  padding: 0.65rem 0.85rem !important;
+  margin-bottom: 0 !important;
+  border: 1.5px solid var(--color-black) !important;
+  background: var(--color-cream);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+  outline: none;
+  transition: background 0.2s, border-color 0.2s;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  background: #fffdfa;
+  border-color: var(--color-carrot) !important;
+  border-width: 2px !important;
+}
+
+/* Flecha custom para selects */
+.form-field select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-color: var(--color-cream);
+  padding-right: 2.3rem !important;
+  cursor: pointer;
+}
+
+.form-field input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+/* ============================================================
+   GRIDS DE FORMULARIO
+   ============================================================ */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Fieldset con título "Configuración del Plan" */
+.nutri-fieldset {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 0 1.5rem !important;
+  border-top: 2px solid var(--color-black) !important;
+  padding-top: 1.25rem !important;
+}
+
+.nutri-fieldset legend {
+  padding: 0 !important;
+  font-family: var(--font-title);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--color-black);
+  margin-bottom: 0.25rem;
+  float: none;
+  width: auto;
+}
+
+.fieldset-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem !important;
+}
+
+.nutri-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+}
+
+/* ============================================================
+   BOTONES DE ACCIÓN
+   ============================================================ */
+.form-actions,
+.plan-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
+.plan-actions {
+  margin-top: 1.5rem;
+}
+
+.config-form .btn-primary,
+.plan-panel .btn-save {
+  width: 100%;
+  padding: 0.8rem 2rem !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.05em;
+  background: var(--color-black) !important;
+  color: var(--color-white) !important;
+  border: 2px solid var(--color-black) !important;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+}
+
+.config-form .btn-primary:hover,
+.plan-panel .btn-save:hover {
+  background: var(--color-carrot) !important;
+  border-color: var(--color-carrot) !important;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--color-black);
+}
+
+/* ============================================================
+   PLAN PANEL — Selector de semana + tabs de días
+   ============================================================ */
+.plan-header {
+  margin-bottom: 1.25rem;
+  max-width: 200px;
+}
+
+/* Tabs de días — scroll horizontal en mobile */
+.tabs-dias {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--color-black);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabs-dias::-webkit-scrollbar { display: none; }
+
+.tabs-dias input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tabs-dias label {
+  flex-shrink: 0;
+  padding: 0.7rem 1rem;
+  margin: 0 !important;
+  font-family: var(--font-title);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px !important;
+  transition: color 0.2s, border-color 0.2s;
+  user-select: none;
+}
+
+.tabs-dias label:hover {
+  color: var(--color-black);
+}
+
+.tabs-dias input[type="radio"]:checked + label {
+  color: var(--color-black);
+  border-bottom-color: var(--color-carrot);
+}
+
+.tabs-dias input[type="radio"]:focus-visible + label {
+  outline: 2px solid var(--color-carrot);
+  outline-offset: -2px;
+}
+
+/* ============================================================
+   COMIDAS GRID + TARJETAS
+   ============================================================ */
+.comidas-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+.comida {
+  animation: fadeUp 0.4s ease both;
+}
+
+.comida:nth-child(1) { animation-delay: 0.05s; }
+.comida:nth-child(2) { animation-delay: 0.12s; }
+.comida:nth-child(3) { animation-delay: 0.19s; }
+.comida:nth-child(4) { animation-delay: 0.26s; }
+
+.comida-header {
+  text-align: center;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.65rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.comida-header h3 {
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+/* La tarjeta de comida usa el mismo layout horizontal de .recipe-grid article en mobile */
+.comida-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  grid-template-rows: auto auto auto auto;
+  column-gap: 1rem;
+  padding: 0 1rem 0 0;
+  border: 2px solid var(--color-black);
+  background: var(--color-cream);
+  box-shadow: 5px 5px 0 var(--color-black);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.2s;
+}
+
+.comida-card:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0 var(--color-carrot);
+  background: rgba(230, 126, 34, 0.04);
+}
+
+.comida-card > img {
+  grid-column: 1;
+  grid-row: 1 / 4;
+  width: 130px;
+  height: 130px;
+  object-fit: cover;
+  border-right: 2px solid var(--color-black);
+  filter: grayscale(20%);
+  align-self: start;
+  transition: filter 0.3s;
+}
+
+.comida-card:hover > img { filter: grayscale(0%); }
+
+.comida-card > button {
+  position: absolute !important;
+  top: 0.6rem !important;
+  left: calc(130px - 14px) !important;
+  width: 28px !important;
+  height: 28px !important;
+  padding: 0 !important;
+  z-index: 2;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-black) !important;
+  background-color: var(--color-white) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.15s;
+  overflow: hidden;
+  text-indent: -9999px;
+}
+
+.comida-card > button:hover {
+  background-color: var(--color-carrot) !important;
+  border-color: var(--color-carrot) !important;
+  transform: scale(1.15);
+}
+
+.comida-card > button img { display: none; }
+
+.comida-card > h4 {
+  grid-column: 2; grid-row: 1;
+  font-family: var(--font-title);
+  font-size: 1rem;
+  color: var(--color-black);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0 0 0.25rem;
+  align-self: end;
+  padding-top: 0.5rem;
+}
+
+.comida-card .recipe-meta {
+  grid-column: 2; grid-row: 2;
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.comida-card .recipe-tags {
+  grid-column: 2; grid-row: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.comida-card .recipe-tags span {
+  font-family: var(--font-title);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--color-black);
+  padding: 0.1rem 0.45rem;
+}
+
+.comida-card table {
+  grid-column: 1 / -1; grid-row: 4;
+  width: 100%;
+  border-collapse: collapse;
+  border-top: 2px solid var(--color-black);
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.comida-card table th,
+.comida-card table td {
+  text-align: center;
+  padding: 0.3rem 0.4rem;
+  border-right: 1px solid var(--color-border);
+}
+
+.comida-card table th:last-child,
+.comida-card table td:last-child { border-right: none; }
+
+.comida-card table th {
+  font-family: var(--font-title);
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.comida-card table td { font-weight: 700; }
+.comida-card table td:first-child { color: var(--color-carrot); }
+
+/* ============================================================
+   DESKTOP (min-width: 900px)
+   ============================================================ */
+@media (min-width: 900px) {
+
+  /* --- Hero --- */
+  .dieta-hero {
+    margin: -2rem -1rem 3rem;
+    padding: 4rem 2rem 3rem;
+  }
+
+  .dieta-hero .hero-logo { display: none; }
+
+  .dieta-hero h1 {
+    font-size: clamp(3.5rem, 6vw, 5rem);
+  }
+
+  .dieta-hero > p {
+    font-size: 1.1rem;
+  }
+
+  /* --- Paneles --- */
+  .config-panel {
+    max-width: 860px;
+    margin: 0 auto 3rem;
+    padding: 2rem 2.25rem;
+  }
+
+  .plan-panel {
+    max-width: 1100px;
+    margin: 0 auto 3rem;
+    padding: 2rem 2.25rem;
+  }
+
+  .config-panel > h2 {
+    font-size: 1.4rem;
+  }
+
+  /* --- Grids del form en 2 y 4 columnas --- */
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+
+  .nutri-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+  }
+
+  /* Botón generar plan: centrado con ancho máximo */
+  .config-form .btn-primary {
+    width: auto;
+    min-width: 220px;
+  }
+
+  .plan-panel .btn-save {
+    width: auto;
+    min-width: 260px;
+  }
+
+  /* --- Tabs de días: distribución uniforme --- */
+  .tabs-dias {
+    justify-content: space-between;
+    overflow-x: visible;
+  }
+
+  .tabs-dias label {
+    flex: 1;
+    text-align: center;
+    padding: 0.85rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  /* --- Grilla de comidas 4 col --- */
+  .comidas-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.25rem;
+  }
+
+  .comida-header h3 {
+    font-size: 1rem;
+  }
+
+  /* --- Tarjeta de comida: layout vertical (como recipe-grid desktop) --- */
+  .comida-card {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+    grid-template-rows: none;
+    column-gap: 0;
+    padding: 0;
+    box-shadow: 5px 5px 0 var(--color-black);
+  }
+
+  .comida-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: 9px 9px 0 var(--color-carrot);
+  }
+
+  .comida-card > img {
+    display: block;
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border: none;
+    border-bottom: 2px solid var(--color-black);
+    grid-column: auto;
+    grid-row: auto;
+    filter: grayscale(20%);
+    flex-shrink: 0;
+    transition: filter 0.3s, border-color 0.25s;
+  }
+
+  .comida-card:hover > img {
+    filter: grayscale(0%);
+    border-bottom-color: var(--color-carrot);
+  }
+
+  .comida-card > button {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    left: unset !important;
+    background-color: rgba(249, 247, 242, 0.92) !important;
+  }
+
+  .comida-card > h4 {
+    grid-column: auto;
+    grid-row: auto;
+    align-self: auto;
+    padding: 0.8rem 0.9rem 0.25rem;
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    text-align: left;
+  }
+
+  .comida-card .recipe-meta {
+    grid-column: auto;
+    grid-row: auto;
+    padding: 0 0.9rem;
+    margin-bottom: 0.35rem;
+    gap: 0.7rem;
+    font-size: 0.72rem;
+  }
+
+  .comida-card .recipe-tags {
+    grid-column: auto;
+    grid-row: auto;
+    padding: 0 0.9rem;
+    margin-bottom: 0;
+    flex-grow: 1;
+    align-content: flex-start;
+  }
+
+  .comida-card table {
+    grid-column: auto;
+    grid-row: auto;
+    margin-top: auto;
+    border-top: 2px solid var(--color-black);
+    font-size: 0.72rem;
+  }
+}
