@@ -181,8 +181,7 @@
    ============================================================ */
 dl.stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-auto-flow: row;
+  grid-template-columns: 1fr; /* una sola columna */
   padding: 0;
   border-top: 3px double var(--color-black);
   border-bottom: 3px double var(--color-black);
@@ -197,7 +196,6 @@ dl.stats dt {
   font-weight: 900;
   line-height: 1;
   color: var(--color-black);
-  border-right: 1px solid var(--color-border);
 }
 
 dl.stats dd {
@@ -208,18 +206,11 @@ dl.stats dd {
   font-size: 0.9rem;
   color: var(--color-text-muted);
   margin: 0;
-  border-right: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
 }
 
-/* 2da columna (pares 2 y 4): sin borde derecho */
-dl.stats dt:nth-child(4n+3),
-dl.stats dd:nth-child(4n+4) {
-  border-right: none;
-}
-
-/* Últimos dos dd: sin borde inferior */
-dl.stats dd:nth-last-child(-n+2) {
+/* último elemento sin borde inferior */
+dl.stats dd:last-child {
   border-bottom: none;
 }
 
@@ -317,20 +308,8 @@ dl.stats dd:nth-last-child(-n+2) {
   /* Resetear bordes de mobile */
   dl.stats dt,
   dl.stats dd {
-    border-right: 1px solid var(--color-border);
-    border-bottom: none;
-  }
-
-  /* Resetear nth-child de mobile que quitaba bordes en col par */
-  dl.stats dt:nth-child(4n+3),
-  dl.stats dd:nth-child(4n+4) {
-    border-right: 1px solid var(--color-border);
-  }
-
-  /* Último par (col 4): sin borde derecho */
-  dl.stats dt:nth-child(7),
-  dl.stats dd:nth-child(8) {
     border-right: none;
+    border-bottom: none;
   }
 
   dl.stats dt {
