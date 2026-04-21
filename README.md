@@ -92,7 +92,7 @@ DB_PASSWORD=what2cook
 Solo es necesario la primera vez, o cuando se modifica el `backend.Dockerfile`:
 
 ```bash
-docker compose build php
+docker compose build backend
 ```
 
 ### 4. Levantar los contenedores
@@ -106,7 +106,7 @@ docker compose up -d
 Solo es necesario la primera vez, o cuando se modifica `composer.json`:
 
 ```bash
-docker compose exec php composer install
+docker compose exec backend composer install
 ```
 
 ### 6. Verificar que todo levantó
