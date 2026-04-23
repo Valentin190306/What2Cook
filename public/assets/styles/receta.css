@@ -6,14 +6,21 @@
 
 /* Animación inicial */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ============================================================
    MOBILE FIRST
    ============================================================ */
-main > article {
+main>article {
   animation: fadeIn 0.4s ease-out forwards;
   padding: 1rem 0;
   display: flex;
@@ -22,7 +29,7 @@ main > article {
   position: relative;
 }
 
-main > article > img {
+main>article>img {
   width: 100%;
   aspect-ratio: 1;
   object-fit: cover;
@@ -32,12 +39,12 @@ main > article > img {
   transition: filter 0.3s ease;
 }
 
-main > article > img:hover {
+main>article>img:hover {
   filter: grayscale(0%);
 }
 
 /* Botón Favorito */
-main > article > button {
+main>article>button {
   position: absolute;
   top: 2rem;
   right: 1rem;
@@ -57,7 +64,7 @@ main > article > button {
   z-index: 2;
 }
 
-main > article > button:hover {
+main>article>button:hover {
   background-color: var(--color-carrot);
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0 var(--color-black);
@@ -65,7 +72,7 @@ main > article > button:hover {
 }
 
 /* Título */
-main > article > h1 {
+main>article>h1 {
   font-size: 2.2rem;
   line-height: 1.1;
   margin-top: 0.5rem;
@@ -136,7 +143,7 @@ main > article > h1 {
 }
 
 /* Descripción (Section) */
-main > article > section.descripcion {
+main>article>section.descripcion {
   border: 2px solid var(--color-black);
   padding: 1.5rem;
   background-color: var(--color-white);
@@ -144,7 +151,7 @@ main > article > section.descripcion {
   margin-top: 1rem;
 }
 
-main > article > section.descripcion h2 {
+main>article>section.descripcion h2 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
   border-bottom: 2px solid var(--color-black);
@@ -152,7 +159,7 @@ main > article > section.descripcion h2 {
   display: inline-block;
 }
 
-main > article > section.descripcion p {
+main>article>section.descripcion p {
   font-size: 1.05rem;
   line-height: 1.7;
   color: var(--color-text);
@@ -160,7 +167,7 @@ main > article > section.descripcion p {
 }
 
 /* Preparación */
-main > article > section.preparacion {
+main>article>section.preparacion {
   border: 2px solid var(--color-black);
   padding: 1.5rem;
   background-color: var(--color-white);
@@ -168,7 +175,7 @@ main > article > section.preparacion {
   margin-top: 1rem;
 }
 
-main > article > section.preparacion h2 {
+main>article>section.preparacion h2 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
   border-bottom: 2px solid var(--color-black);
@@ -176,14 +183,14 @@ main > article > section.preparacion h2 {
   display: inline-block;
 }
 
-main > article > section.preparacion ol {
+main>article>section.preparacion ol {
   padding-left: 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-main > article > section.preparacion li {
+main>article>section.preparacion li {
   font-size: 1rem;
   line-height: 1.65;
   color: var(--color-text);
@@ -191,13 +198,13 @@ main > article > section.preparacion li {
   border-bottom: 1px dashed var(--color-border);
 }
 
-main > article > section.preparacion li:last-child {
+main>article>section.preparacion li:last-child {
   border-bottom: none;
   padding-bottom: 0;
 }
 
 /* Ingredientes */
-main > article > section.ingredientes {
+main>article>section.ingredientes {
   border: 2px solid var(--color-black);
   padding: 1.5rem;
   background-color: var(--color-white);
@@ -205,7 +212,7 @@ main > article > section.ingredientes {
   margin-top: 1rem;
 }
 
-main > article > section.ingredientes h2 {
+main>article>section.ingredientes h2 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
   border-bottom: 2px solid var(--color-black);
@@ -322,7 +329,7 @@ section.ingredientes ul li .cantidad {
 }
 
 /* Fuente (Footer de la receta) */
-main > article > footer.receta-fuente {
+main>article>footer.receta-fuente {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 2px dashed var(--color-black);
@@ -330,13 +337,13 @@ main > article > footer.receta-fuente {
   color: var(--color-text);
 }
 
-main > article > footer.receta-fuente h2 {
+main>article>footer.receta-fuente h2 {
   font-size: 1rem;
   color: var(--color-text-muted);
   margin-bottom: 0.5rem;
 }
 
-main > article > footer.receta-fuente p {
+main>article>footer.receta-fuente p {
   font-family: var(--font-title);
   font-weight: 700;
   font-size: 1.1rem;
@@ -345,7 +352,7 @@ main > article > footer.receta-fuente p {
   margin-bottom: 0.25rem;
 }
 
-main > article > footer.receta-fuente a {
+main>article>footer.receta-fuente a {
   font-size: 0.85rem;
   color: var(--color-carrot);
   word-break: break-all;
@@ -355,7 +362,7 @@ main > article > footer.receta-fuente a {
   transition: opacity 0.2s;
 }
 
-main > article > footer.receta-fuente a:hover {
+main>article>footer.receta-fuente a:hover {
   opacity: 1;
 }
 
@@ -363,7 +370,7 @@ main > article > footer.receta-fuente a:hover {
    DESKTOP
    ============================================================ */
 @media (min-width: 900px) {
-  main > article {
+  main>article {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
     gap: 2rem 4rem;
@@ -372,7 +379,7 @@ main > article > footer.receta-fuente a:hover {
   }
 
   /* La imagen ocupa col 1, filas 1 a 5 (junto al título, meta, tags, y descripción) */
-  main > article > img {
+  main>article>img {
     grid-column: 1;
     grid-row: 1 / 5;
     max-height: 70vh;
@@ -382,7 +389,7 @@ main > article > footer.receta-fuente a:hover {
 
   /* Botón favorito: se superpone a la imagen con position absolute en mobile;
      en desktop lo colocamos en la misma celda que la imagen */
-  main > article > button {
+  main>article>button {
     grid-column: 1;
     grid-row: 1;
     position: relative;
@@ -393,48 +400,49 @@ main > article > footer.receta-fuente a:hover {
     margin: 0;
   }
 
-  main > article > h1 {
+  main>article>h1 {
     grid-column: 2;
     grid-row: 1;
     font-size: 3rem;
     margin-top: 0;
   }
 
-  main > article > .receta-meta {
+  main>article>.receta-meta {
     grid-column: 2;
     grid-row: 2;
     align-self: start;
   }
 
-  main > article > .receta-tags {
+  main>article>.receta-tags {
     grid-column: 2;
     grid-row: 3;
     align-self: start;
   }
 
-  main > article > section.descripcion {
+  main>article>section.descripcion {
     grid-column: 2;
     grid-row: 4;
     margin-top: 0;
   }
 
-  /* Preparación e Ingredientes: en desktop van lado a lado
-     en una fila que ocupa las 2 columnas del grid */
-  main > article > section.preparacion {
+
+  main>article>section.ingredientes {
     grid-column: 1;
-    grid-row: 5;
-    margin-top: 0;
-  }
-
-  main > article > section.ingredientes {
-    grid-column: 2;
-    grid-row: 5;
-    margin-top: 0;
-  }
-
-  main > article > footer.receta-fuente {
-    grid-column: 1 / -1;
     grid-row: 6;
+    margin-top: 0;
+  }
+
+
+  main>article>section.preparacion {
+    grid-column: 2;
+    grid-row: 6;
+    margin-top: 0;
+  }
+
+
+  main>article>footer.receta-fuente {
+    grid-column: 1 / -1;
+    grid-row: 5;
     margin-top: 1rem;
     border-top: none;
     padding-top: 0;
