@@ -1,0 +1,385 @@
+/* ============================================================
+   What2Cook — receta.css
+   Capa 4: Pantalla específica - Receta Individual
+   Depende de: base.css → layout.css → components.css
+   ============================================================ */
+
+/* Animación inicial */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   MOBILE FIRST
+   ============================================================ */
+main > article {
+  animation: fadeIn 0.4s ease-out forwards;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: relative;
+}
+
+main > article > img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border: 2px solid var(--color-black);
+  box-shadow: 6px 6px 0 var(--color-black);
+  filter: grayscale(15%);
+  transition: filter 0.3s ease;
+}
+
+main > article > img:hover {
+  filter: grayscale(0%);
+}
+
+/* Botón Favorito */
+main > article > button {
+  position: absolute;
+  top: 2rem;
+  right: 1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--color-black);
+  background-color: var(--color-white);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%231a1a1a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-indent: -9999px;
+  overflow: hidden;
+  box-shadow: 3px 3px 0 var(--color-black);
+  z-index: 2;
+}
+
+main > article > button:hover {
+  background-color: var(--color-carrot);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 var(--color-black);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E");
+}
+
+/* Título */
+main > article > h1 {
+  font-size: 2.2rem;
+  line-height: 1.1;
+  margin-top: 0.5rem;
+}
+
+/* Tags / Atributos */
+main > article > ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+main > article > ul li {
+  font-family: var(--font-title);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.3rem 0.8rem;
+  border: 1.5px solid var(--color-black);
+  background-color: var(--color-cream);
+  color: var(--color-black);
+  box-shadow: 2px 2px 0 var(--color-spinach);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+main > article > ul li:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--color-spinach);
+}
+
+/* Descripción (Section) */
+main > article > section.descripcion {
+  border: 2px solid var(--color-black);
+  padding: 1.5rem;
+  background-color: var(--color-white);
+  box-shadow: 5px 5px 0 var(--color-black);
+  margin-top: 1rem;
+}
+
+main > article > section.descripcion h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--color-black);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+main > article > section.descripcion p {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--color-text);
+  margin-bottom: 0;
+}
+
+/* Preparación */
+main > article > section.preparacion {
+  border: 2px solid var(--color-black);
+  padding: 1.5rem;
+  background-color: var(--color-white);
+  box-shadow: 5px 5px 0 var(--color-black);
+  margin-top: 1rem;
+}
+
+main > article > section.preparacion h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--color-black);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+main > article > section.preparacion ol {
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+main > article > section.preparacion li {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--color-text);
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+main > article > section.preparacion li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* Ingredientes */
+main > article > section.ingredientes {
+  border: 2px solid var(--color-black);
+  padding: 1.5rem;
+  background-color: var(--color-white);
+  box-shadow: 5px 5px 0 var(--color-black);
+  margin-top: 1rem;
+}
+
+main > article > section.ingredientes h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--color-black);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+/* Contador de porciones */
+.porciones {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: none;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+.porciones legend {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  float: left;
+  margin-right: 0.75rem;
+  line-height: 2;
+}
+
+.porciones button {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--color-black);
+  background-color: var(--color-black);
+  color: var(--color-white);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 2px 2px 0 var(--color-spinach);
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.porciones button:hover {
+  background-color: var(--color-carrot);
+  border-color: var(--color-carrot);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--color-black);
+}
+
+.porciones output {
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  font-weight: 900;
+  min-width: 2ch;
+  text-align: center;
+}
+
+/* Lista de ingredientes */
+section.ingredientes ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+section.ingredientes ul li {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 1rem;
+  align-items: center;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.2s;
+}
+
+section.ingredientes ul li:last-child {
+  border-bottom: none;
+}
+
+section.ingredientes ul li:hover {
+  background-color: var(--color-cream);
+}
+
+section.ingredientes ul li img {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border: 1.5px solid var(--color-black);
+  box-shadow: 2px 2px 0 var(--color-black);
+  align-self: center;
+}
+
+section.ingredientes ul li .nombre {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+section.ingredientes ul li .cantidad {
+  grid-column: 2;
+  grid-row: 2;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  opacity: 0.75;
+}
+
+/* Fuente (Footer de la receta) */
+main > article > footer {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed var(--color-black);
+  background: transparent;
+  color: var(--color-text);
+}
+
+main > article > footer h2 {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+main > article > footer p {
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-carrot);
+  text-transform: uppercase;
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   DESKTOP
+   ============================================================ */
+@media (min-width: 900px) {
+  main > article {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem 4rem;
+    align-items: start;
+    padding: 3rem 0;
+  }
+
+  /* La imagen ocupa col 1, filas 1 y 2 (junto al título/tags y descripción) */
+  main > article > img {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    max-height: 70vh;
+    box-shadow: 10px 10px 0 var(--color-black);
+    position: static;
+  }
+
+  /* Botón favorito: se superpone a la imagen con position absolute en mobile;
+     en desktop lo colocamos en la misma celda que la imagen */
+  main > article > button {
+    grid-column: 1;
+    grid-row: 1;
+    position: relative;
+    justify-self: end;
+    align-self: start;
+    top: 0.75rem;
+    right: 0.75rem;
+    margin: 0;
+  }
+
+  main > article > h1 {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 3rem;
+    margin-top: 0;
+  }
+
+  main > article > ul {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  main > article > section.descripcion {
+    grid-column: 2;
+    grid-row: 3;
+    margin-top: 0;
+  }
+
+  /* Preparación e Ingredientes: en desktop van lado a lado
+     en una fila que ocupa las 2 columnas del grid */
+  main > article > section.preparacion {
+    grid-column: 1;
+    grid-row: 4;
+    margin-top: 0;
+  }
+
+  main > article > section.ingredientes {
+    grid-column: 2;
+    grid-row: 4;
+    margin-top: 0;
+  }
+
+  main > article > footer {
+    grid-column: 1 / -1;
+    grid-row: 5;
+    margin-top: 1rem;
+    border-top: none;
+    padding-top: 0;
+  }
+}
