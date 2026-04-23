@@ -4,8 +4,8 @@
    Depende de: base.css → layout.css → components.css
    ============================================================ */
 
-/* ---------- Sección Hero / Título ---------- */
-main h1 {
+/* ---------- Títulos de página ---------- */
+main > h1 {
   text-align: center;
   font-size: 3.5rem;
   margin-bottom: 0.5rem;
@@ -14,7 +14,7 @@ main h1 {
   width: 100%;
 }
 
-main h2 {
+main > h2 {
   text-align: center;
   font-style: italic;
   font-weight: 400;
@@ -24,8 +24,8 @@ main h2 {
   color: var(--color-text-muted);
 }
 
-/* ---------- Secciones de Historia / Misión ---------- */
-section {
+/* ---------- Secciones Historia / Misión ---------- */
+main > section {
   display: flex;
   flex-direction: column;
   gap: 2rem;
@@ -34,52 +34,58 @@ section {
   border-bottom: 1px solid var(--color-border);
 }
 
-section:last-of-type {
+main > section:last-of-type {
   border-bottom: none;
 }
 
-section img {
+main > section > img {
   width: 100%;
   height: 300px;
   object-fit: cover;
   border: 1px solid var(--color-black);
   box-shadow: 10px 10px 0px var(--color-spinach);
+  /*
+    flex-shrink: 0 evita que el flex comprima la imagen
+    en desktop cuando comparte fila con div.content
+  */
+  flex-shrink: 0;
 }
 
-section h3 {
+main > section h3 {
   font-size: 2rem;
   color: var(--color-carrot);
   margin-bottom: 1rem;
 }
 
-section p {
+main > section p {
   font-size: 1.1rem;
   text-align: justify;
-  column-count: 1; /* Estilo periodístico columnas */
 }
 
 /* ---------- Distribución Desktop ---------- */
 @media (min-width: 900px) {
-  section {
+  main > section {
     flex-direction: row;
     align-items: center;
     gap: 4rem;
   }
 
-  section:nth-of-type(even) {
+  /* Secciones pares: imagen a la derecha */
+  main > section:nth-of-type(even) {
     flex-direction: row-reverse;
   }
 
-  section img {
+  main > section > img {
     flex: 1;
     height: 400px;
   }
 
-  section div.content {
+  /* div.content ocupa el resto del ancho */
+  main > section > div.content {
     flex: 1.2;
   }
 
-  section p {
+  main > section p {
     column-count: 2;
     column-gap: 2rem;
   }

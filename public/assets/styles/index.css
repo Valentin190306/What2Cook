@@ -292,12 +292,6 @@ dl.stats dd:last-child {
 
   /* --- Stats: 4 columnas × 2 filas (dt arriba, dd abajo) --- */
   dl.stats {
-    /*
-      8 celdas: col1-dt col2-dt col3-dt col4-dt
-                col1-dd col2-dd col3-dd col4-dd
-      grid-auto-flow: column hace que el orden del DOM
-      (dt dd dt dd…) se coloque columna a columna.
-    */
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: auto auto;
     grid-auto-flow: column;

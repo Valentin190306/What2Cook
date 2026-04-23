@@ -13,10 +13,21 @@ header {
   position: relative;
 }
 
-header h2 {
+/*
+  El nombre del sitio en el header es identidad de marca, no un heading
+  de contenido. Usamos <strong> para no romper la jerarquía h1→h2→h3
+  de cada página.
+*/
+header > strong {
+  display: block;
+  font-family: var(--font-title);
   font-size: 2.5rem;
-  margin: 0.5rem 0;
+  font-weight: 900;
+  text-transform: uppercase;
   letter-spacing: 0.05em;
+  color: var(--color-black);
+  margin: 0.5rem 0;
+  line-height: 1.1;
 }
 
 header > a:first-child img {
@@ -119,7 +130,7 @@ footer > section strong {
     padding: 2rem;
   }
 
-  header h2 {
+  header > strong {
     font-size: 4rem;
   }
 
