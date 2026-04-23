@@ -30,7 +30,7 @@
   margin-bottom: 1.25rem;
 }
 
-.hero > p {
+.hero>p {
   font-size: 1rem;
   color: var(--color-text-muted);
   max-width: 480px;
@@ -39,7 +39,7 @@
 }
 
 /* Estilo base compartido por los dos <a> hijos directos */
-.hero > a {
+.hero>a {
   display: inline-block;
   padding: 0.75rem 1.75rem;
   font-family: var(--font-title);
@@ -53,23 +53,23 @@
 }
 
 /* Primer botón: outline */
-.hero > a:first-of-type {
+.hero>a:first-of-type {
   background: transparent;
   color: var(--color-black);
 }
 
-.hero > a:first-of-type:hover {
+.hero>a:first-of-type:hover {
   background: var(--color-black);
   color: var(--color-white);
 }
 
 /* Segundo botón: relleno negro */
-.hero > a:last-of-type {
+.hero>a:last-of-type {
   background: var(--color-black);
   color: var(--color-white);
 }
 
-.hero > a:last-of-type:hover {
+.hero>a:last-of-type:hover {
   background: var(--color-carrot);
   border-color: var(--color-carrot);
 }
@@ -82,7 +82,7 @@
   border-bottom: 3px double var(--color-black);
 }
 
-.features > h2 {
+.features>h2 {
   font-size: clamp(1.4rem, 5vw, 2rem);
   text-align: center;
   margin-bottom: 2rem;
@@ -118,7 +118,7 @@
 }
 
 /* Subtítulo dentro de cada enlace */
-.features nav a > span {
+.features nav a>span {
   display: block;
   font-family: var(--font-body);
   font-weight: 400;
@@ -147,7 +147,7 @@
   margin-bottom: 1rem;
 }
 
-.cta-banner > p {
+.cta-banner>p {
   color: var(--color-text-muted);
   font-size: 0.95rem;
   margin-bottom: 1.75rem;
@@ -156,7 +156,7 @@
   margin-right: auto;
 }
 
-.cta-banner > a {
+.cta-banner>a {
   display: inline-block;
   background: transparent;
   border: 2px solid var(--color-black);
@@ -170,7 +170,7 @@
   transition: background 0.2s, color 0.2s;
 }
 
-.cta-banner > a:hover {
+.cta-banner>a:hover {
   background: var(--color-black);
   color: var(--color-white);
 }
@@ -181,7 +181,8 @@
    ============================================================ */
 dl.stats {
   display: grid;
-  grid-template-columns: 1fr; /* una sola columna */
+  grid-template-columns: 1fr;
+  /* una sola columna */
   padding: 0;
   border-top: 3px double var(--color-black);
   border-bottom: 3px double var(--color-black);
@@ -219,7 +220,6 @@ dl.stats dd:last-child {
    ============================================================ */
 @media (min-width: 900px) {
 
-  /* --- Hero --- */
   .hero {
     padding: 6rem 2rem 5rem;
   }
@@ -231,21 +231,20 @@ dl.stats dd:last-child {
     margin-right: auto;
   }
 
-  .hero > p {
+  .hero>p {
     font-size: 1.15rem;
     max-width: 620px;
   }
 
-  .hero > a {
+  .hero>a {
     margin: 0 0.5rem;
   }
 
-  /* --- Features --- */
   .features {
     padding: 5rem 4rem;
   }
 
-  .features > h2 {
+  .features>h2 {
     font-size: 2.5rem;
     margin-bottom: 3rem;
   }
