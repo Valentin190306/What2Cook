@@ -71,15 +71,52 @@ main > article > h1 {
   margin-top: 0.5rem;
 }
 
+/* Metadatos: Tiempo y Porciones */
+.receta-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+.receta-meta dt {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-title);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.receta-meta dt svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.receta-meta dd {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: var(--color-black);
+  margin: 0 0.75rem 0 0;
+}
+
 /* Tags / Atributos */
-main > article > ul {
+.receta-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
 }
 
-main > article > ul li {
+.receta-tags li {
   font-family: var(--font-title);
   font-size: 0.75rem;
   font-weight: 700;
@@ -93,7 +130,7 @@ main > article > ul li {
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-main > article > ul li:hover {
+.receta-tags li:hover {
   transform: translate(-1px, -1px);
   box-shadow: 3px 3px 0 var(--color-spinach);
 }
@@ -285,7 +322,7 @@ section.ingredientes ul li .cantidad {
 }
 
 /* Fuente (Footer de la receta) */
-main > article > footer {
+main > article > footer.receta-fuente {
   margin-top: 1.5rem;
   padding-top: 1.5rem;
   border-top: 2px dashed var(--color-black);
@@ -293,19 +330,33 @@ main > article > footer {
   color: var(--color-text);
 }
 
-main > article > footer h2 {
+main > article > footer.receta-fuente h2 {
   font-size: 1rem;
   color: var(--color-text-muted);
   margin-bottom: 0.5rem;
 }
 
-main > article > footer p {
+main > article > footer.receta-fuente p {
   font-family: var(--font-title);
   font-weight: 700;
   font-size: 1.1rem;
-  color: var(--color-carrot);
+  color: var(--color-black);
   text-transform: uppercase;
-  margin-bottom: 0;
+  margin-bottom: 0.25rem;
+}
+
+main > article > footer.receta-fuente a {
+  font-size: 0.85rem;
+  color: var(--color-carrot);
+  word-break: break-all;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+main > article > footer.receta-fuente a:hover {
+  opacity: 1;
 }
 
 /* ============================================================
@@ -320,10 +371,10 @@ main > article > footer p {
     padding: 3rem 0;
   }
 
-  /* La imagen ocupa col 1, filas 1 y 2 (junto al título/tags y descripción) */
+  /* La imagen ocupa col 1, filas 1 a 5 (junto al título, meta, tags, y descripción) */
   main > article > img {
     grid-column: 1;
-    grid-row: 1 / 3;
+    grid-row: 1 / 5;
     max-height: 70vh;
     box-shadow: 10px 10px 0 var(--color-black);
     position: static;
@@ -349,15 +400,21 @@ main > article > footer p {
     margin-top: 0;
   }
 
-  main > article > ul {
+  main > article > .receta-meta {
     grid-column: 2;
     grid-row: 2;
     align-self: start;
   }
 
-  main > article > section.descripcion {
+  main > article > .receta-tags {
     grid-column: 2;
     grid-row: 3;
+    align-self: start;
+  }
+
+  main > article > section.descripcion {
+    grid-column: 2;
+    grid-row: 4;
     margin-top: 0;
   }
 
@@ -365,19 +422,19 @@ main > article > footer p {
      en una fila que ocupa las 2 columnas del grid */
   main > article > section.preparacion {
     grid-column: 1;
-    grid-row: 4;
+    grid-row: 5;
     margin-top: 0;
   }
 
   main > article > section.ingredientes {
     grid-column: 2;
-    grid-row: 4;
+    grid-row: 5;
     margin-top: 0;
   }
 
-  main > article > footer {
+  main > article > footer.receta-fuente {
     grid-column: 1 / -1;
-    grid-row: 5;
+    grid-row: 6;
     margin-top: 1rem;
     border-top: none;
     padding-top: 0;
