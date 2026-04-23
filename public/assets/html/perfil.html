@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil — What2Cook</title>
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/components.css">
+    <link rel="stylesheet" href="../styles/perfil.css">
+</head>
+
+<body>
+    <header>
+        <a href="index.html"><img src="../img/logoW2C.png" alt="Logo W2C"></a>
+        <strong>What2Cook</strong>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="asistenteCocina.html">Asistente de Cocina</a></li>
+                <li><a href="asistenteDieta.html">Asistente de Dietas</a></li>
+                <li><a href="catalogoRecetas.html">Recetas</a></li>
+                <li><a href="informacionDietas.html">Dietas</a></li>
+                <li><a href="login.html">Iniciar sesión</a></li>
+                <li><a href="register.html">Registrarse</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="profile-hero">
+            <img src="../img/avatar_placeholder.jpg" alt="Avatar de Usuario" class="avatar">
+            <p>Bienvenido</p>
+            <h1>Usuario</h1>
+            <button class="btn-edit" type="button">Editar Perfil</button>
+        </section>
+
+        <section id="dashboard" class="profile-section">
+            <h2>Dashboard</h2>
+            <div class="grid-container">
+                <article class="stat-card">
+                    <h3>Recetas Favoritas</h3>
+                    <span class="stat-number">0</span>
+                    <span class="stat-icon" aria-hidden="true"></span>
+                </article>
+                <article class="stat-card">
+                    <h3>Planes Creados</h3>
+                    <span class="stat-number">0</span>
+                    <span class="stat-icon" aria-hidden="true"></span>
+                </article>
+                <article class="stat-card">
+                    <h3>Listas de Compras</h3>
+                    <span class="stat-number">0</span>
+                    <span class="stat-icon" aria-hidden="true"></span>
+                </article>
+            </div>
+        </section>
+
+        <section id="quick-actions" class="profile-section">
+            <h2>Acciones Rápidas</h2>
+            <div class="grid-container">
+                <article class="action-card">
+                    <span class="action-icon" aria-hidden="true"></span>
+                    <h3>Explorar Recetas</h3>
+                    <p>Descubrí qué cocinar hoy con nuestro catálogo</p>
+                </article>
+                <article class="action-card">
+                    <span class="action-icon" aria-hidden="true"></span>
+                    <h3>Crear un Plan</h3>
+                    <p>Organizá tus comidas de la semana</p>
+                </article>
+                <article class="action-card">
+                    <span class="action-icon" aria-hidden="true"></span>
+                    <h3>Consultar al Asistente</h3>
+                    <p>Obtené sugerencias personalizadas de cocina y dieta</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="recent-recipes" class="profile-section">
+            <h2>Recetas Recientes</h2>
+            <p>Tus últimas recetas favoritas</p>
+            <article class="empty-state">
+                <span class="empty-icon" aria-hidden="true"></span>
+                <p>Aún no tenés recetas favoritas</p>
+                <a href="catalogoRecetas.html" class="btn-link">Explorar recetas</a>
+            </article>
+        </section>
+
+        <section id="meal-plans" class="profile-section">
+            <h2>Planes de Comidas</h2>
+            <p>Tus planificaciones semanales</p>
+            <article class="empty-state">
+                <span class="empty-icon" aria-hidden="true"></span>
+                <p>Aún no tenés planes creados</p>
+                <a href="asistenteDieta.html" class="btn-link">Crear plan</a>
+            </article>
+        </section>
+
+        <section id="shopping-lists" class="profile-section">
+            <h2>Listas de Compras</h2>
+            <p>Tus listas de ingredientes a comprar</p>
+            <article class="empty-state">
+                <span class="empty-icon" aria-hidden="true"></span>
+                <p>Aún no tenés listas de compras</p>
+                <a href="asistenteCocina.html" class="btn-link">Crear lista</a>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <section>
+            <img src="../img/logoW2C.png" alt="Logo W2C">
+            <strong>What2Cook</strong>
+            <p>Tu plataforma de recetas y planificación de comidas</p>
+        </section>
+
+        <h3>Explorar</h3>
+        <address>
+            <ul>
+                <li><a href="asistenteCocina.html">Asistente de Cocina</a></li>
+                <li><a href="asistenteDieta.html">Asistente de Dietas</a></li>
+                <li><a href="catalogoRecetas.html">Catálogo de Recetas</a></li>
+                <li><a href="informacionDietas.html">Información de Dietas</a></li>
+            </ul>
+        </address>
+
+        <h3>Mi cuenta</h3>
+        <address>
+            <ul>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="#">Mis favoritos</a></li>
+                <li><a href="#">Mis planes</a></li>
+                <li><a href="perfil.html">Perfil</a></li>
+            </ul>
+        </address>
+
+        <h3>Sobre What2Cook</h3>
+        <address>
+            <p>Desarrollado en Buenos Aires, Argentina</p>
+            <p>Datos de Spoonacular API</p>
+            <p>&copy; 2026 What2Cook</p>
+        </address>
+
+        <nav class="social" aria-label="Redes sociales">
+            <a href="#" aria-label="X (Twitter)">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.264 5.638 5.9-5.638Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+            </a>
+            <a href="#" aria-label="Instagram">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                </svg>
+            </a>
+            <a href="#" aria-label="YouTube">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+            </a>
+        </nav>
+    </footer>
+</body>
+
+</html>
