@@ -113,7 +113,7 @@ footer > section {
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 1px solid #333;
+  /*border-bottom: 1px solid #333;*/
 }
 
 footer > section img {
@@ -243,9 +243,10 @@ footer > nav.social svg {
   footer > nav.social {
     grid-column: 1;
     grid-row: 3;
-    margin-top: 0.25rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid #333;
+    margin-top: 0.1rem;
+    padding-top: 0.1rem;
+    border-top: none;
+    /*border-top: 1px solid #333;*/
     align-self: flex-start;
   }
 }
