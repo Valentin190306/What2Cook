@@ -1,8 +1,9 @@
+
 /* ============================================================
    What2Cook — index.css
    Capa 4: Pantalla específica - Página de Inicio (index.html)
    Depende de: base.css → layout.css → components.css
-
+ 
    Selectores usados:
      .hero          → section del hero (clase mínima para distinguirla)
      .hero > a      → botones CTA sin wrapper div
@@ -13,7 +14,7 @@
      dl.stats dt/dd → términos y valores de cada estadística
      footer > p:first-child → bloque de marca en el footer
    ============================================================ */
-
+ 
 /* ============================================================
    SECCIÓN HERO
    ============================================================ */
@@ -22,24 +23,24 @@
   padding: 3rem 1.5rem 2.5rem;
   border-bottom: 3px double var(--color-black);
 }
-
+ 
 .hero h1 {
   font-size: clamp(2.8rem, 10vw, 5rem);
   line-height: 1.05;
   letter-spacing: -0.03em;
   margin-bottom: 1.25rem;
 }
-
-.hero>p {
+ 
+.hero > p {
   font-size: 1rem;
   color: var(--color-text-muted);
   max-width: 480px;
   margin: 0 auto 2rem;
   line-height: 1.7;
 }
-
+ 
 /* Estilo base compartido por los dos <a> hijos directos */
-.hero>a {
+.hero > a {
   display: inline-block;
   padding: 0.75rem 1.75rem;
   font-family: var(--font-title);
@@ -51,29 +52,29 @@
   margin: 0.35rem;
   transition: background 0.2s, color 0.2s;
 }
-
+ 
 /* Primer botón: outline */
-.hero>a:first-of-type {
+.hero > a:first-of-type {
   background: transparent;
   color: var(--color-black);
 }
-
-.hero>a:first-of-type:hover {
+ 
+.hero > a:first-of-type:hover {
   background: var(--color-black);
   color: var(--color-white);
 }
-
+ 
 /* Segundo botón: relleno negro */
-.hero>a:last-of-type {
+.hero > a:last-of-type {
   background: var(--color-black);
   color: var(--color-white);
 }
-
-.hero>a:last-of-type:hover {
+ 
+.hero > a:last-of-type:hover {
   background: var(--color-carrot);
   border-color: var(--color-carrot);
 }
-
+ 
 /* ============================================================
    SECCIÓN FEATURES ("¿Qué podés hacer?")
    ============================================================ */
@@ -81,44 +82,45 @@
   padding: 2.5rem 1.5rem;
   border-bottom: 3px double var(--color-black);
 }
-
-.features>h2 {
+ 
+.features > h2 {
   font-size: clamp(1.4rem, 5vw, 2rem);
   text-align: center;
   margin-bottom: 2rem;
   letter-spacing: -0.02em;
 }
-
-/* Mobile: columna vertical con separadores tipo diario */
+ 
+/* Mobile: lista vertical, cada item como card con sombra */
 .features nav {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 }
-
+ 
 .features nav a {
-  display: block;
-  padding: 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 1.25rem 1.25rem;
   font-family: var(--font-title);
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: -0.01em;
   color: var(--color-black);
-  border-bottom: 1px solid var(--color-border);
-  transition: color 0.2s, padding-left 0.2s;
+  border: 1px solid var(--color-black);
+  box-shadow: 4px 4px 0 var(--color-black);
+  transition: box-shadow 0.2s, transform 0.2s;
 }
-
-.features nav a:first-child {
-  border-top: 1px solid var(--color-border);
+ 
+.features nav a:hover,
+.features nav a:active {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-carrot);
 }
-
-.features nav a:hover {
-  color: var(--color-carrot);
-  padding-left: 0.75rem;
-}
-
+ 
 /* Subtítulo dentro de cada enlace */
-.features nav a>span {
+.features nav a > span {
   display: block;
   font-family: var(--font-body);
   font-weight: 400;
@@ -126,9 +128,8 @@
   text-transform: none;
   color: var(--color-text-muted);
   letter-spacing: 0;
-  margin-top: 0.3rem;
 }
-
+ 
 /* ============================================================
    SECCIÓN CTA ("¿Listo/a para empezar?")
    ============================================================ */
@@ -140,14 +141,14 @@
   background: var(--color-cream);
   box-shadow: 6px 6px 0px var(--color-black);
 }
-
+ 
 .cta-banner h2 {
   font-size: clamp(1.6rem, 6vw, 2.5rem);
   line-height: 1.1;
   margin-bottom: 1rem;
 }
-
-.cta-banner>p {
+ 
+.cta-banner > p {
   color: var(--color-text-muted);
   font-size: 0.95rem;
   margin-bottom: 1.75rem;
@@ -155,8 +156,8 @@
   margin-left: auto;
   margin-right: auto;
 }
-
-.cta-banner>a {
+ 
+.cta-banner > a {
   display: inline-block;
   background: transparent;
   border: 2px solid var(--color-black);
@@ -169,8 +170,8 @@
   letter-spacing: 0.05em;
   transition: background 0.2s, color 0.2s;
 }
-
-.cta-banner>a:hover {
+ 
+.cta-banner > a:hover {
   background: var(--color-black);
   color: var(--color-white);
 }
