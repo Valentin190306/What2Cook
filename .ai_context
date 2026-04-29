@@ -1,0 +1,46 @@
+Aquí tenés el archivo de contexto para **Antigravity** actualizado, incorporando la obligatoriedad de seguir las convenciones de PHP especificadas en los **PSR** (PHP Standards Recommendations):
+
+---
+
+# Antigravity Context: What2Cook (Updated)
+
+## 1. Visión General del Proyecto
+[cite_start]**What2Cook** es una aplicación web de tres capas orientada a la gastronomía y nutrición, diseñada para permitir el descubrimiento de recetas y la planificación de dietas personalizadas[cite: 8, 121].
+
+* [cite_start]**Stack Tecnológico:** Desarrollo "Vanilla" sin frameworks[cite: 121].
+    * [cite_start]**Frontend:** HTML5, CSS3, JavaScript (ES6+)[cite: 123].
+    * [cite_start]**Backend:** PHP 8.x puro utilizando cURL para integración externa[cite: 124, 126].
+    * **Estándares de Código:** Es obligatorio seguir las convenciones de PHP especificadas en los **PSR** (como PSR-1, PSR-4 para autoloader y PSR-12 para estilo de código) para garantizar la interoperabilidad y legibilidad.
+    * [cite_start]**Base de Datos:** PostgreSQL[cite: 125].
+    * [cite_start]**Infraestructura:** Docker y Docker Compose[cite: 129].
+
+## 2. Arquitectura del Sistema
+[cite_start]El sistema sigue un patrón **MVC simplificado** con lógica de negocio desacoplada[cite: 138].
+
+### Estructura de Capas
+* [cite_start]**Presentación (Frontend):** Comunicación asíncrona mediante **Fetch API**[cite: 173]. [cite_start]No requiere gestión de headers manuales para la sesión, apoyándose en cookies nativas (`PHPSESSID`)[cite: 158, 175].
+* **Lógica de Negocio (Backend):**
+    * [cite_start]**Controladores:** Gestionan peticiones y respuestas JSON sin lógica de negocio[cite: 149].
+    * [cite_start]**Servicios:** Implementan la lógica compleja como optimización de ingredientes y cálculos nutricionales[cite: 150].
+    * [cite_start]**Modelos:** Encapsulan el acceso a datos mediante **PDO** con *prepared statements*[cite: 151].
+* [cite_start]**Integración Externa:** Consumo exclusivo desde el backend de la **API Spoonacular** a través de `SpoonacularService.php`[cite: 154, 164].
+
+## 3. Modelo de Dominio (Entidades Clave)
+* [cite_start]**Usuario:** Posee preferencias alimentarias, alergias, recetas favoritas y planes activos[cite: 215, 216].
+* [cite_start]**Plato vs. Receta:** El **Plato** define el contenido nutricional y dietas [cite: 217][cite_start], mientras que la **Receta** contiene los pasos e instrucciones de cocina[cite: 218].
+* **Asistentes:**
+    * [cite_start]**Asistente de Cocina:** Sugiere platos basados en ingredientes disponibles (modos **Buscador** y **MealPrep**)[cite: 222, 223].
+    * [cite_start]**Asistente de Dieta:** Genera planes completos basados en objetivos de calorías y macronutrientes[cite: 224].
+* [cite_start]**Planificación:** Un **Plan** organiza comidas en **Días**, calculando automáticamente los totales nutricionales[cite: 225, 226].
+
+## 4. Seguridad y Rutas
+* [cite_start]**Autenticación:** Basada en sesiones nativas de PHP[cite: 156].
+* [cite_start]**Control de Acceso:** Uso de `AuthMiddleware.php` para verificar sesiones activas en rutas protegidas[cite: 159].
+* [cite_start]**Ruteo:** Gestión de URLs amigables mediante reglas de reescritura en el archivo `.htaccess` de Apache[cite: 134, 136].
+
+## 5. Mantenimiento y Calidad
+* **Citas Técnicas:** Las respuestas deben ser críticas, detalladas y fundamentadas en los documentos de arquitectura.
+* [cite_start]**Persistencia:** En entornos Docker, se deben declarar volúmenes para `/var/lib/php/sessions` para no perder sesiones al reiniciar[cite: 162].
+
+---
+[cite_start]**Nota para el modelo:** Al generar código PHP, priorizá siempre la estructura de directorios definida (`api/controllers/`, `api/services/`, `api/models/`) y el cumplimiento estricto de los estándares **PSR**[cite: 132].
