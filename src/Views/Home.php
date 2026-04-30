@@ -5,26 +5,26 @@
         tus objetivos nutricionales y descubrí qué cocinar con los
         ingredientes que tenés.
     </p>
-    <a href="asistenteCocina.html">Asistente de cocina</a>
-    <a href="catalogoRecetas.html">Explorar recetas &#8594;</a>
+    <a href="/asistente-cocina">Asistente de cocina</a>
+    <a href="/recetas">Explorar recetas &#8594;</a>
 </section>
 
 <section class="features">
     <h2>¿Qué podés hacer en What2Cook?</h2>
     <nav>
-        <a href="asistenteCocina.html">
+        <a href="/asistente-cocina">
             Asistente de Cocina
             <span>Encontrá recetas con los ingredientes que tenés</span>
         </a>
-        <a href="asistenteDieta.html">
+        <a href="/asistente-dieta">
             Asistente de Dietas
             <span>Creá un plan de comidas personalizado</span>
         </a>
-        <a href="catalogoRecetas.html">
+        <a href="/recetas">
             Catálogo de Recetas
             <span>Explorá más de 5,000 recetas saludables</span>
         </a>
-        <a href="informacionDietas.html">
+        <a href="/diets">
             Información de Dietas
             <span>Conocé los distintos tipos de dietas</span>
         </a>
@@ -37,7 +37,7 @@
         Creá una cuenta gratis y accedé a todas las
         funcionalidades de What2Cook
     </p>
-    <a href="register.html">Crear cuenta gratis</a>
+    <a href="/register">Crear cuenta gratis</a>
 </section>
 
 <dl class="stats">

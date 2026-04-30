@@ -25,8 +25,7 @@ $dotenv->load();
 $dotenv->required(['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD']);
 
 // ── 3. Logger ────────────────────────────────────────────────────────────────
-$logger = new Logger('what2cook');
-$logger->pushHandler(new StreamHandler(__DIR__ . '/../log/app.log', Logger::DEBUG));
+$logger = new \App\Core\Log\FileLogger(__DIR__ . '/../log/app.log');
 
 // ── 4. Base de datos ─────────────────────────────────────────────────────────
 try {
