@@ -1,4 +1,3 @@
-<!-- HERO -->
 <section class="asistente-hero">
     <h1>Asistente de Cocina</h1>
     <p>Decime qué ingredientes tenés y te diré qué cocinar</p>
@@ -11,7 +10,6 @@
     </div>
 </section>
 
-<!-- FORMULARIO INGREDIENTES -->
 <section class="form-panel">
     <h2>Encontrá la receta perfecta</h2>
     <p>Ingresá los ingredientes que tenés y te sugerimos recetas que puedas preparar.</p>
@@ -37,7 +35,6 @@
     </form>
 </section>
 
-<!-- GRILLA DE RECETAS -->
 <div class="recipe-grid">
     <?php for($i=0; $i<8; $i++): ?>
     <article onclick="window.location='/receta/1'" role="link" tabindex="0">

@@ -4,11 +4,11 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 
-class PerfilController extends Controller
+class ProfileController extends Controller
 {
     public function index()
     {
-        $this->view('Perfil', [
+        $this->view('Profile', [
             'title' => 'Mi Perfil - What2Cook',
             'styles' => ['perfil'],
             'userName' => 'Usuario Gastronómico'

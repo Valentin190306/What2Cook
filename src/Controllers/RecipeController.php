@@ -4,16 +4,16 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 
-class RecetaController extends Controller
+class RecipeController extends Controller
 {
     public function show($params)
     {
         $id = $params['id'] ?? 0;
-        
-        $this->view('Receta', [
-            'title' => "Receta #$id - What2Cook",
+
+        $this->view('Recipe', [
+            'title' => "What2Cook - Receta #$id",
             'styles' => ['receta'],
-            'recipeName' => "Receta Especial #$id"
+            'recipeName' => "Receta #$id"
         ]);
     }
 }

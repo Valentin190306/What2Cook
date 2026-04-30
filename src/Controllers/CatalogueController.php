@@ -4,11 +4,11 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 
-class CatalogoRecetasController extends Controller
+class CatalogueController extends Controller
 {
     public function index()
     {
-        $this->view('CatalogoRecetas', [
+        $this->view('Catalogue', [
             'title' => 'Catálogo de Recetas - What2Cook',
             'styles' => ['catalogoRecetas']
         ]);

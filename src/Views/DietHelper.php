@@ -1,10 +1,8 @@
-<!-- HERO -->
 <section class="dieta-hero">
     <h1>Asistente de Dietas</h1>
     <p>Creá un plan de comidas personalizado según tus objetivos nutricionales</p>
 </section>
 
-<!-- PANEL DE CONFIGURACIÓN -->
 <section class="config-panel">
     <h2>Asistente de Dietas</h2>
 

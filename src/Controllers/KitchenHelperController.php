@@ -4,11 +4,11 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 
-class AsistenteCocinaController extends Controller
+class KitchenHelperController extends Controller
 {
     public function index()
     {
-        $this->view('AsistenteCocina', [
+        $this->view('KitchenHelper', [
             'title' => 'Asistente de Cocina - What2Cook',
             'styles' => ['asistenteCocina']
         ]);
