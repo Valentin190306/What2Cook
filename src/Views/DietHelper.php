@@ -1,3 +1,7 @@
+<?php
+$title = 'Asistente de Dietas - What2Cook';
+$styles = ['asistenteDieta'];
+?>
 <section class="dieta-hero">
     <h1>Asistente de Dietas</h1>
     <p>Creá un plan de comidas personalizado según tus objetivos nutricionales</p>

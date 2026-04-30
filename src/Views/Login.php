@@ -1,3 +1,7 @@
+<?php
+$title = 'Iniciar Sesión - What2Cook';
+$styles = ['components'];
+?>
 <section class="form-panel">
     <h1>Iniciar sesión</h1>
     <p>Ingresá tus credenciales para acceder a tu cuenta.</p>

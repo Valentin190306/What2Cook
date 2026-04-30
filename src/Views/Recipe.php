@@ -1,3 +1,7 @@
+<?php
+$title = "What2Cook - Receta #$id";
+$styles = ['receta'];
+?>
 <article>
     <img src="/assets/img/placeholder.jpg" alt="Imagen del plato">
     <button type="button" aria-label="Agregar a favoritos">Agregar a favoritos</button>

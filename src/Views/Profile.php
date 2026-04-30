@@ -1,3 +1,7 @@
+<?php
+$title = 'Mi Perfil - What2Cook';
+$styles = ['perfil'];
+?>
 <section class="profile-hero">
     <img src="/assets/img/avatar_placeholder.jpg" alt="Avatar de Usuario" class="avatar">
     <p>Bienvenido</p>

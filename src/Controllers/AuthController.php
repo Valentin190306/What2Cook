@@ -8,18 +8,12 @@ class AuthController extends Controller
 {
     public function loginForm()
     {
-        $this->view('Login', [
-            'title' => 'Iniciar Sesión - What2Cook',
-            'styles' => ['components'] // Usamos estilos de componentes para el formulario
-        ]);
+        \App\Core\View::render('Login');
     }
 
     public function registerForm()
     {
-        $this->view('Register', [
-            'title' => 'Registrarse - What2Cook',
-            'styles' => ['components']
-        ]);
+        \App\Core\View::render('Register');
     }
 
     public function login()

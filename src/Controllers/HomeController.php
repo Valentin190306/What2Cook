@@ -8,9 +8,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $this->view('Home', [
-            'title' => 'Inicio - What2Cook',
-            'styles' => ['index']
-        ]);
+        \App\Core\View::render('Home');
     }
 }

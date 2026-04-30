@@ -1,3 +1,7 @@
+<?php
+$title = 'Registrarse - What2Cook';
+$styles = ['components'];
+?>
 <section class="form-panel">
     <h1>Registrarse</h1>
     <p>Creá tu cuenta gratis y empezá a planificar tus comidas.</p>

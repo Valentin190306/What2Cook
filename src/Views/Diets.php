@@ -1,3 +1,7 @@
+<?php
+$title = 'Dietas y Nutrición - What2Cook';
+$styles = ['informacionDietas'];
+?>
 <header class="page-header">
     <h1>Información de Dietas</h1>
     <p>

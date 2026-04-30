@@ -8,9 +8,7 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        $this->view('Profile', [
-            'title' => 'Mi Perfil - What2Cook',
-            'styles' => ['perfil'],
+        \App\Core\View::render('Profile', [
             'userName' => 'Usuario Gastronómico'
         ]);
     }

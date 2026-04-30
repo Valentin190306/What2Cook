@@ -10,9 +10,8 @@ class RecipeController extends Controller
     {
         $id = $params['id'] ?? 0;
 
-        $this->view('Recipe', [
-            'title' => "What2Cook - Receta #$id",
-            'styles' => ['receta'],
+        \App\Core\View::render('Recipe', [
+            'id' => $id,
             'recipeName' => "Receta #$id"
         ]);
     }

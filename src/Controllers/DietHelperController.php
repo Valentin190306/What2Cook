@@ -8,9 +8,6 @@ class DietHelperController extends Controller
 {
     public function index()
     {
-        $this->view('DietHelper', [
-            'title' => 'Asistente de Dietas - What2Cook',
-            'styles' => ['asistenteDieta']
-        ]);
+        \App\Core\View::render('DietHelper');
     }
 }

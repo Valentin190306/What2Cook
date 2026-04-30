@@ -1,3 +1,7 @@
+<?php
+$title = 'Asistente de Cocina - What2Cook';
+$styles = ['asistenteCocina'];
+?>
 <section class="asistente-hero">
     <h1>Asistente de Cocina</h1>
     <p>Decime qué ingredientes tenés y te diré qué cocinar</p>

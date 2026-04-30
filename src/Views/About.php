@@ -1,3 +1,7 @@
+<?php
+$title = 'Sobre Nosotros - What2Cook';
+$styles = ['nosotros'];
+?>
 <h1>Sobre nosotros</h1>
 
 <section>

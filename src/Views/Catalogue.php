@@ -1,3 +1,7 @@
+<?php
+$title = 'Catálogo de Recetas - What2Cook';
+$styles = ['catalogoRecetas'];
+?>
 <section class="catalogo-header">
     <h1>Catálogo de Recetas</h1>
     <p>Explorá nuestra colección de recetas deliciosas y saludables.</p>

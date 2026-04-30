@@ -8,9 +8,6 @@ class CatalogueController extends Controller
 {
     public function index()
     {
-        $this->view('Catalogue', [
-            'title' => 'Catálogo de Recetas - What2Cook',
-            'styles' => ['catalogoRecetas']
-        ]);
+        \App\Core\View::render('Catalogue');
     }
 }

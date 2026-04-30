@@ -1,3 +1,7 @@
+<?php
+$title = 'Inicio - What2Cook';
+$styles = ['index'];
+?>
 <section class="hero">
     <h1>Descubre tu próxima receta favorita</h1>
     <p>

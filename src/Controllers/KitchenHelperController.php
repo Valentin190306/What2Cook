@@ -8,9 +8,6 @@ class KitchenHelperController extends Controller
 {
     public function index()
     {
-        $this->view('KitchenHelper', [
-            'title' => 'Asistente de Cocina - What2Cook',
-            'styles' => ['asistenteCocina']
-        ]);
+        \App\Core\View::render('KitchenHelper');
     }
 }

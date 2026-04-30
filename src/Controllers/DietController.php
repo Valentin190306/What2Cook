@@ -8,9 +8,6 @@ class DietController extends Controller
 {
     public function index()
     {
-        $this->view('Diets', [
-            'title' => 'Dietas y Nutrición - What2Cook',
-            'styles' => ['informacionDietas']
-        ]);
+        \App\Core\View::render('Diets');
     }
 }
