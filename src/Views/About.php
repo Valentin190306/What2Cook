@@ -1,7 +1,7 @@
 <h1>Sobre nosotros</h1>
 
 <section>
-    <img src="../img/LogoW2C_2.png" alt="Logo What2Cook">
+    <img src="/assets/img/LogoW2C_2.png" alt="Logo What2Cook">
     <h2>Nuestra historia</h2>
     <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit.
         Aperiam ab distinctio, doloremque eveniet, quis repellat totam

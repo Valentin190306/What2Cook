@@ -30,7 +30,6 @@ $logger = new \App\Core\Log\FileLogger(__DIR__ . '/../log/app.log');
 // ── 4. Base de datos ─────────────────────────────────────────────────────────
 try {
     $pdo = Database::getInstance();
-    $logger->info('Conexión a la base de datos establecida');
 } catch (Exception $e) {
     $logger->critical('Error de conexión a la base de datos', ['error' => $e->getMessage()]);
     die("Error crítico: No se pudo conectar a la base de datos.");
