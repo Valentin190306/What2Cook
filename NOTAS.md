@@ -1,8 +1,5 @@
-Aquí tenés el archivo de contexto para **Antigravity** actualizado, incorporando la obligatoriedad de seguir las convenciones de PHP especificadas en los **PSR** (PHP Standards Recommendations):
 
----
-
-# Antigravity Context: What2Cook (Updated)
+# Context: What2Cook (Updated)
 
 ## 1. Visión General del Proyecto
 [cite_start]**What2Cook** es una aplicación web de tres capas orientada a la gastronomía y nutrición, diseñada para permitir el descubrimiento de recetas y la planificación de dietas personalizadas[cite: 8, 121].
