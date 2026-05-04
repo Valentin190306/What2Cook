@@ -3,20 +3,21 @@
 Repositorio de trabajo de la catedrá de Programación en Ambiente Web.
 
 Estudiantes:
-* Contardi, Gustavo
-* Zander, Matt
-* Romero Monteagudo, Valentín Joel
+
+- Contardi, Gustavo
+- Zander, Matt
+- Romero Monteagudo, Valentín Joel
 
 # Entorno de Desarrollo
 
 ## Stack
 
-| Capa | Tecnología |
-|---|---|
-| Servidor web | Nginx (Alpine) |
-| Backend | PHP 8.3 FPM (Alpine) |
-| Base de datos | PostgreSQL 16 (Alpine) |
-| Contenedores | Docker + Docker Compose |
+| Capa          | Tecnología              |
+| ------------- | ----------------------- |
+| Servidor web  | Nginx (Alpine)          |
+| Backend       | PHP 8.3 FPM (Alpine)    |
+| Base de datos | PostgreSQL 16 (Alpine)  |
+| Contenedores  | Docker + Docker Compose |
 
 ## Estructura del proyecto
 
@@ -124,15 +125,27 @@ pawprints-php-1   backend       running
 pawprints-web-1   web           running
 ```
 
+### 7. Ejecutar migraciones y seeds
+
+Para crear las tablas y cargar datos iniciales de prueba:
+
+```bash
+# Crear las tablas
+docker compose exec backend ./vendor/bin/phinx migrate
+
+# Cargar datos de prueba (opcional)
+docker compose exec backend ./vendor/bin/phinx seed:run
+```
+
 El sitio queda disponible en **http://localhost:8080**
 
 ## Dependencias PHP
 
-| Librería | Versión | Uso |
-|---|---|---|
-| monolog/monolog | ^3.10 | Logging |
-| vlucas/phpdotenv | ^5.6 | Variables de entorno |
-| robmorgan/phinx | ^0.16 | Migraciones de base de datos |
+| Librería         | Versión | Uso                          |
+| ---------------- | ------- | ---------------------------- |
+| monolog/monolog  | ^3.10   | Logging                      |
+| vlucas/phpdotenv | ^5.6    | Variables de entorno         |
+| robmorgan/phinx  | ^0.16   | Migraciones de base de datos |
 
 ## Comandos útiles
 
