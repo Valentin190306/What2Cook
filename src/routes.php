@@ -10,6 +10,11 @@ $router->add('GET', '/about', 'AboutController@index');
 $router->add('GET', '/diets', 'DietController@index');
 $router->add('GET', '/asistente-cocina', 'KitchenHelperController@index');
 $router->add('GET', '/asistente-dieta', 'DietHelperController@index');
+
+// Rutas de API — Asistente de Cocina
+$router->add('POST', '/api/kitchen-helper/single',      'KitchenHelperController@single');
+$router->add('POST', '/api/kitchen-helper/meal-prep',   'KitchenHelperController@mealPrep');
+$router->add('GET',  '/api/kitchen-helper/recipe/{id}', 'KitchenHelperController@recipeDetail');
 $router->add('GET', '/recetas', 'CatalogController@index');
 $router->add('GET', '/receta/{id}', 'RecipeController@show');
 $router->add('GET', '/perfil', 'ProfileController@index');

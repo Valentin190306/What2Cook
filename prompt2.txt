@@ -1,0 +1,150 @@
+Estoy trabajando en una aplicación PHP llamada What2Cook.
+Los endpoints del backend del Asistente de Cocina ya están implementados:
+
+- GET  /cooking-assistant                          → renderiza la vista
+- POST /api/cooking-assistant/single               → body JSON { ingredients: string[], sort: "healthiness"|"time"|null }
+- POST /api/cooking-assistant/meal-prep            → body JSON { ingredients: string[], count: number }
+- GET  /api/cooking-assistant/recipe/{id}          → detalle de receta
+
+Todos los endpoints JSON responden:
+  { "success": true,  "data": ... }
+  { "success": false, "message": "..." }
+
+## Arquitectura del proyecto
+
+Stack: PHP 8.3, JavaScript vanilla, AJAX (fetch), HTML, CSS. Sin framework JS.
+Estructura relevante:
+- src/Views/                   ← vistas PHP renderizadas con View::render()
+- public/assets/css/           ← hojas de estilo
+- public/assets/js/            ← scripts del cliente
+- public/index.php             ← front controller
+
+Las vistas se renderizan con View::render('NombreVista') y la vista vive
+en src/Views/NombreVista.php. Las vistas existentes incluyen el layout
+manualmente (header, main, footer) o extienden un layout base — replicar
+el patrón usado por la vista CookingAssistant generada por el index()
+del controller; si el proyecto ya tiene un layout base, usarlo.
+
+## Lo que necesito crear
+
+### 1. Vista: src/Views/CookingAssistant.php
+HTML semántico con los siguientes bloques:
+
+  a) Sección de ingredientes
+     - Input de texto con id="ingredient-input" y botón "Agregar"
+       con id="add-ingredient-btn".
+     - Lista visual con id="ingredient-list" donde cada ingrediente
+       agregado aparece como una etiqueta con botón "x" para eliminar.
+     - Enter dentro del input también agrega el ingrediente.
+
+  b) Selector de modo
+     - Dos radio buttons: "Comida única" (value="single") y
+       "Meal Prep" (value="meal-prep"). Name="mode". Por defecto "single".
+
+  c) Controles condicionales
+     - Si modo = "single": mostrar grupo de filtros con dos botones
+       toggle: "Más saludable" (data-sort="healthiness") y "Más rápido"
+       (data-sort="time"). Solo uno activo a la vez. Permitir desactivar
+       (ningún filtro = orden por defecto).
+     - Si modo = "meal-prep": mostrar input numérico
+       id="meal-prep-count", min=2, max=5, default=3.
+     - El cambio de modo oculta/muestra el bloque correspondiente.
+
+  d) Botón principal
+     - id="search-btn", texto "Buscar recetas".
+
+  e) Contenedor de resultados
+     - id="results-container", inicialmente vacío.
+     - Dentro: id="results-status" para mensajes ("Cargando...",
+       "Sin resultados", errores) y id="results-grid" para las tarjetas.
+
+  f) Modal de detalle
+     - id="recipe-modal", oculto por defecto.
+     - Contiene: botón cerrar, imagen, título, tiempo de preparación,
+       lista de ingredientes, instrucciones, tabla de info nutricional.
+     - Cierre por click en el botón, click en el backdrop, o tecla Escape.
+
+Incluir al final de la vista:
+  <link rel="stylesheet" href="/assets/css/cooking-assistant.css">
+  <script src="/assets/js/cooking-assistant.js" defer></script>
+
+### 2. CSS: public/assets/css/cooking-assistant.css
+Estilos básicos y limpios, sin frameworks. Cubrir:
+  - Layout vertical de la sección de configuración.
+  - Etiquetas de ingredientes con fondo, padding, botón de eliminación.
+  - Botones toggle de filtros con estado activo visible.
+  - Grilla responsiva de resultados (CSS Grid, mínimo 250px por tarjeta).
+  - Tarjeta de receta: imagen arriba, título, contadores de ingredientes
+    usados/faltantes con colores diferenciados (verde/rojo suaves).
+  - Modal con backdrop semitransparente, contenido centrado, scroll
+    interno si el contenido excede el viewport.
+  - Estado de carga: spinner o texto "Cargando...".
+
+### 3. JavaScript: public/assets/js/cooking-assistant.js
+Vanilla JS, sin dependencias. Estructura por funciones, no clases.
+Responsabilidades:
+
+  a) Estado en memoria
+     - Array de ingredientes agregados.
+     - Filtro de orden activo (null | "healthiness" | "time").
+     - Modo activo ("single" | "meal-prep").
+
+  b) Gestión de ingredientes
+     - addIngredient(): valida no vacío, no duplicado (case-insensitive),
+       agrega al array y re-renderiza la lista.
+     - removeIngredient(name): quita del array y re-renderiza.
+     - renderIngredientList(): regenera el HTML de #ingredient-list.
+
+  c) Gestión de modo y filtros
+     - Listener en los radio de modo: alterna visibilidad de bloques.
+     - Listener en botones de filtro: toggle exclusivo. Click en el
+       botón ya activo lo desactiva.
+
+  d) Búsqueda (AJAX con fetch)
+     - search(): valida que haya al menos un ingrediente. Si no, muestra
+       mensaje en #results-status y aborta.
+     - Muestra estado de carga.
+     - Si modo = "single":
+         POST /api/cooking-assistant/single
+         body: { ingredients: [...], sort: filtroActivo }
+     - Si modo = "meal-prep":
+         POST /api/cooking-assistant/meal-prep
+         body: { ingredients: [...], count: valorDelInput }
+     - Headers: Content-Type: application/json.
+     - Procesa la respuesta:
+         - response.success === true → renderResults(response.data)
+         - response.success === false → muestra response.message en #results-status
+         - error de red o HTTP no-200 → muestra "Error al buscar recetas"
+
+  e) Renderizado de resultados
+     - renderResults(recipes): si array vacío, muestra "Sin resultados".
+       Si no, genera tarjetas con: <img>, título, readyInMinutes (si existe),
+       usedIngredientCount y missedIngredientCount. Cada tarjeta tiene
+       data-recipe-id y listener de click que abre el modal de detalle.
+
+  f) Detalle de receta
+     - openRecipeDetail(id):
+         GET /api/cooking-assistant/recipe/{id}
+         Muestra estado de carga dentro del modal.
+         Pinta: imagen, título, readyInMinutes, lista de extendedIngredients
+         (campo .original), instrucciones (campo .instructions, que viene
+         como HTML; insertarlo con innerHTML), nutrición (recorrer
+         data.nutrition.nutrients y mostrar name + amount + unit, filtrar
+         a calorías, proteínas, grasas, carbohidratos).
+     - closeRecipeModal(): oculta el modal y limpia el contenido.
+
+  g) Inicialización
+     - Función init() ejecutada en DOMContentLoaded.
+     - Registra todos los listeners.
+
+## Lo que NO necesito ahora
+- Autocomplete de ingredientes (lo haría con /food/ingredients/autocomplete
+  en una iteración posterior).
+- Persistencia de búsquedas previas.
+- i18n.
+- Tests.
+
+## Output esperado
+1. src/Views/CookingAssistant.php
+2. public/assets/css/cooking-assistant.css
+3. public/assets/js/cooking-assistant.js

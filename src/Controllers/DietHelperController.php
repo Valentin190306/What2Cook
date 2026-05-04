@@ -220,27 +220,4 @@ class DietHelperController extends Controller
 
         return (int) $_SESSION['user_id'];
     }
-
-    private function requireJson(): void
-    {
-        $contentType = $_SERVER['CONTENT_TYPE'] ?? '';
-        if (!str_contains($contentType, 'application/json')) {
-            $this->json(['error' => 'Content-Type debe ser application/json.'], 415);
-            exit;
-        }
-    }
-
-    private function parseBody(): array
-    {
-        $raw = file_get_contents('php://input');
-        return json_decode($raw, true) ?? [];
-    }
-
-    private function json(array $data, int $status = 200): void
-    {
-        http_response_code($status);
-        header('Content-Type: application/json');
-        echo json_encode($data);
-        exit;
-    }
 }
