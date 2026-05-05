@@ -7,15 +7,15 @@
    Estado en memoria
    ============================================================ */
 let ingredients = [];          // string[]
-let activeSort  = null;        // null | "healthiness" | "time"
-let activeMode  = 'single';    // "single" | "meal-prep"
+let activeSort = null;        // null | "healthiness" | "time"
+let activeMode = 'single';    // "single" | "meal-prep"
 
 /* ============================================================
    Utilidades DOM
    ============================================================ */
-function el(id)         { return document.getElementById(id); }
-function show(elem)     { elem.hidden = false; }
-function hide(elem)     { elem.hidden = true;  }
+function el(id) { return document.getElementById(id); }
+function show(elem) { elem.hidden = false; }
+function hide(elem) { elem.hidden = true; }
 function setText(elem, text) { elem.textContent = text; }
 
 /* ============================================================
@@ -23,12 +23,12 @@ function setText(elem, text) { elem.textContent = text; }
    ============================================================ */
 function addIngredient() {
     const input = el('ingredient-input');
-    const raw   = input.value.trim();
+    const raw = input.value.trim();
 
     if (!raw) return;
 
     const normalized = raw.toLowerCase();
-    const duplicate  = ingredients.some(i => i.toLowerCase() === normalized);
+    const duplicate = ingredients.some(i => i.toLowerCase() === normalized);
 
     if (duplicate) {
         flashInput(input);
@@ -52,7 +52,7 @@ function renderIngredientList() {
     list.innerHTML = '';
 
     ingredients.forEach(name => {
-        const li  = document.createElement('li');
+        const li = document.createElement('li');
         li.classList.add('ca-ingredient-tag');
 
         const text = document.createElement('span');
@@ -74,10 +74,10 @@ function renderIngredientList() {
 /** Efecto visual cuando se intenta agregar un duplicado */
 function flashInput(input) {
     input.style.borderColor = '#e05454';
-    input.style.boxShadow   = '0 0 0 3px rgba(224,84,84,0.2)';
+    input.style.boxShadow = '0 0 0 3px rgba(224,84,84,0.2)';
     setTimeout(() => {
         input.style.borderColor = '';
-        input.style.boxShadow   = '';
+        input.style.boxShadow = '';
     }, 800);
 }
 
@@ -87,7 +87,7 @@ function flashInput(input) {
 function onModeChange(e) {
     activeMode = e.target.value;
 
-    const singleControls   = el('controls-single');
+    const singleControls = el('controls-single');
     const mealPrepControls = el('controls-meal-prep');
 
     if (activeMode === 'single') {
@@ -103,7 +103,7 @@ function onModeChange(e) {
 }
 
 function onFilterClick(e) {
-    const btn  = e.currentTarget;
+    const btn = e.currentTarget;
     const sort = btn.dataset.sort;
 
     // Toggle: si ya está activo, lo desactiva
@@ -139,18 +139,18 @@ async function search() {
         let url, body;
 
         if (activeMode === 'single') {
-            url  = '/api/cooking-assistant/single';
+            url = '/api/kitchen-helper/single';
             body = { ingredients, sort: activeSort };
         } else {
             const count = parseInt(el('meal-prep-count').value, 10);
-            url  = '/api/cooking-assistant/meal-prep';
+            url = '/api/kitchen-helper/meal-prep';
             body = { ingredients, count };
         }
 
         const response = await fetch(url, {
-            method:  'POST',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(body),
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {
@@ -176,7 +176,7 @@ async function search() {
    e) Renderizado de resultados
    ============================================================ */
 function renderResults(recipes) {
-    const grid   = el('results-grid');
+    const grid = el('results-grid');
     const status = el('results-status');
 
     grid.innerHTML = '';
@@ -204,11 +204,11 @@ function buildCard(recipe) {
 
     const img = document.createElement('img');
     img.classList.add('ca-card__img');
-    img.src   = recipe.image || '';
-    img.alt   = recipe.title;
+    img.src = recipe.image || '';
+    img.alt = recipe.title;
     img.loading = 'lazy';
 
-    const body  = document.createElement('div');
+    const body = document.createElement('div');
     body.classList.add('ca-card__body');
 
     const title = document.createElement('h2');
@@ -239,13 +239,33 @@ function buildCard(recipe) {
         meta.appendChild(missed);
     }
 
-    body.appendChild(title);
-    body.appendChild(meta);
+    // Tabla de macros
+    if (recipe.nutrition) {
+        const n = recipe.nutrition;
+        const table = document.createElement('table');
+        table.classList.add('ca-nutrition-table');
+        table.innerHTML = `
+            <thead><tr><th>Kcal</th><th>Proteína</th><th>Carbs</th><th>Grasa</th></tr></thead>
+            <tbody><tr>
+                <td>${Math.round(n.calories)}</td>
+                <td>${Math.round(n.protein)}g</td>
+                <td>${Math.round(n.carbs)}g</td>
+                <td>${Math.round(n.fat)}g</td>
+            </tr></tbody>
+        `;
+        body.appendChild(title);
+        body.appendChild(meta);
+        body.appendChild(table);
+    } else {
+        body.appendChild(title);
+        body.appendChild(meta);
+    }
+
     card.appendChild(img);
     card.appendChild(body);
 
     // Listeners para abrir el modal
-    card.addEventListener('click',  () => openRecipeDetail(recipe.id));
+    card.addEventListener('click', () => openRecipeDetail(recipe.id));
     card.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -261,14 +281,14 @@ function buildCard(recipe) {
    ============================================================ */
 async function openRecipeDetail(id) {
     const modal = el('recipe-modal');
-    const body  = el('modal-body');
+    const body = el('modal-body');
 
     body.innerHTML = `<p class="ca-status"><span class="ca-spinner"></span> Cargando detalle…</p>`;
-    show(modal);
+    modal.style.display = "flex"; modal.style.alignItems = "center"; modal.style.justifyContent = "center"; modal.hidden = false;
     document.body.style.overflow = 'hidden';
 
     try {
-        const response = await fetch(`/api/cooking-assistant/recipe/${id}`);
+        const response = await fetch(`/api/kitchen-helper/recipe/${id}`);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -326,10 +346,10 @@ function renderModalContent(recipe) {
     let nutritionHtml = '';
     if (recipe.nutrition && recipe.nutrition.nutrients) {
         const targets = ['Calories', 'Protein', 'Fat', 'Carbohydrates'];
-        const labels  = {
-            'Calories':      'Calorías',
-            'Protein':       'Proteínas',
-            'Fat':           'Grasas',
+        const labels = {
+            'Calories': 'Calorías',
+            'Protein': 'Proteínas',
+            'Fat': 'Grasas',
             'Carbohydrates': 'Carbohidratos',
         };
 
@@ -366,7 +386,7 @@ function renderModalContent(recipe) {
 
 function closeRecipeModal() {
     const modal = el('recipe-modal');
-    hide(modal);
+    modal.hidden = true; modal.style.display = "";
     el('modal-body').innerHTML = '';
     document.body.style.overflow = '';
 }
@@ -376,7 +396,7 @@ function closeRecipeModal() {
    ============================================================ */
 function setStatus(message, isError) {
     const status = el('results-status');
-    const grid   = el('results-grid');
+    const grid = el('results-grid');
     grid.innerHTML = '';
     status.textContent = message;
     status.classList.toggle('ca-status--error', !!isError);
@@ -384,9 +404,9 @@ function setStatus(message, isError) {
 }
 
 function setLoading(loading) {
-    const btn    = el('search-btn');
+    const btn = el('search-btn');
     const status = el('results-status');
-    const grid   = el('results-grid');
+    const grid = el('results-grid');
 
     if (loading) {
         btn.disabled = true;
@@ -435,6 +455,7 @@ function init() {
 
     /* Búsqueda */
     el('search-btn').addEventListener('click', search);
+    el('search-btn-prep').addEventListener('click', search);
 
     /* Cerrar modal */
     el('modal-close-btn').addEventListener('click', closeRecipeModal);

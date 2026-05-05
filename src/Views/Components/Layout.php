@@ -86,5 +86,10 @@
             </a>
         </nav>
     </footer>
+    <?php if (isset($scripts)): ?>
+        <?php foreach ($scripts as $script): ?>
+            <script src="/assets/js/<?= $script ?>.js" defer></script>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </body>
 </html>

@@ -1,67 +1,75 @@
 <?php
-$title = 'Asistente de Cocina - What2Cook';
+$title  = 'Asistente de Cocina - What2Cook';
 $styles = ['asistenteCocina'];
+$scripts = ['cooking-assistant'];
 ?>
+
+<!-- ── HERO ─────────────────────────────────────────────────────────────── -->
 <section class="asistente-hero">
     <h1>Asistente de Cocina</h1>
     <p>Decime qué ingredientes tenés y te diré qué cocinar</p>
 
     <div class="tabs">
-        <input type="radio" id="comidaUnica" name="modo" value="unica" checked>
-        <label for="comidaUnica">Comida Única</label>
-        <input type="radio" id="mealPrep" name="modo" value="prep">
-        <label for="mealPrep">Meal Prep</label>
+        <input type="radio" id="tab-single" name="mode" value="single" checked>
+        <label for="tab-single">Comida Única</label>
+        <input type="radio" id="tab-prep" name="mode" value="meal-prep">
+        <label for="tab-prep">Meal Prep</label>
     </div>
 </section>
 
+<!-- ── FORMULARIO ───────────────────────────────────────────────────────── -->
 <section class="form-panel">
     <h2>Encontrá la receta perfecta</h2>
     <p>Ingresá los ingredientes que tenés y te sugerimos recetas que puedas preparar.</p>
 
-    <form class="ingredientes-form" action="/buscar-recetas" method="GET">
-        <ul class="ingredientes-lista">
-            <li>
-                <span>Huevos <em>x3</em></span>
-                <button type="button" class="btn-remove" aria-label="Quitar ingrediente">&times;</button>
-            </li>
-        </ul>
+    <!-- Lista de ingredientes agregados (poblada por JS) -->
+    <ul class="ingredientes-lista" id="ingredient-list"></ul>
 
-        <div class="input-row">
-            <input type="text" name="ingrediente" placeholder="Ej: pollo, arroz, tomate...">
-            <button type="button" class="btn-add" aria-label="Agregar ingrediente">+</button>
-        </div>
+    <!-- Input + botón agregar -->
+    <div class="input-row">
+        <input
+            type="text"
+            id="ingredient-input"
+            placeholder="Ej: pollo, arroz, tomate..."
+            autocomplete="off"
+        >
+        <button type="button" id="add-ingredient-btn" class="btn-add" aria-label="Agregar ingrediente">+</button>
+    </div>
 
+    <!-- Controles modo Comida Única -->
+    <div id="controls-single">
         <div class="form-actions">
-            <button type="submit" class="btn-primary">Buscar Recetas</button>
-            <button type="submit" class="btn-secondary">Las más rápidas</button>
-            <button type="submit" class="btn-secondary">Las más saludables</button>
+            <button type="button" id="search-btn" class="btn-primary">Buscar Recetas</button>
+            <button type="button" class="btn-secondary ca-filter-btn" data-sort="time"        aria-pressed="false">Las más rápidas</button>
+            <button type="button" class="btn-secondary ca-filter-btn" data-sort="healthiness" aria-pressed="false">Las más saludables</button>
         </div>
-    </form>
+    </div>
+
+    <!-- Controles modo Meal Prep (oculto por defecto) -->
+    <div id="controls-meal-prep" hidden>
+        <div class="input-row" style="align-items:center; gap:1rem; margin-bottom:1rem;">
+            <label for="meal-prep-count" style="white-space:nowrap; font-size:0.9rem;">Cantidad de recetas:</label>
+            <input type="number" id="meal-prep-count" min="2" max="5" value="3" style="width:70px;">
+        </div>
+        <div class="form-actions">
+            <button type="button" id="search-btn-prep" class="btn-primary">Generar Meal Prep</button>
+        </div>
+    </div>
 </section>
 
-<div class="recipe-grid">
-    <?php for($i=0; $i<8; $i++): ?>
-    <article onclick="window.location='/receta/1'" role="link" tabindex="0">
-        <img src="/assets/img/placeholder.jpg" alt="Foto de la receta">
-        <button type="button" onclick="event.stopPropagation()" aria-label="Agregar a favoritos"><img src="" alt=""></button>
-        <h2>Receta de ejemplo</h2>
-        <div class="recipe-meta">
-            <span>Tiempo: 30 min</span>
-            <span>Porciones: 4</span>
-        </div>
-        <div class="recipe-tags">
-            <span>Vegetariano</span>
-            <span>Keto</span>
-        </div>
-        <table>
-            <thead>
-                <tr><th>Kcal</th><th>Proteína</th><th>Carbs</th><th>Grasa</th></tr>
-            </thead>
-            <tbody>
-                <tr><td>350</td><td>15g</td><td>40g</td><td>10g</td></tr>
-            </tbody>
-        </table>
-        <a class="recipe-link" href="/receta/1" aria-hidden="true" tabindex="-1"></a>
-    </article>
-    <?php endfor; ?>
+<!-- ── ESTADO Y RESULTADOS ──────────────────────────────────────────────── -->
+<p id="results-status" hidden></p>
+
+<div id="results-grid" class="recipe-grid"></div>
+
+<!-- ── MODAL DE DETALLE ─────────────────────────────────────────────────── -->
+<div id="recipe-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden
+     class="recipe-modal-overlay" style="position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.55);padding:1rem;">
+    <div style="background:var(--color-cream);border:2px solid var(--color-black);box-shadow:8px 8px 0 var(--color-black);max-width:680px;width:100%;max-height:90vh;overflow-y:auto;position:relative;">
+        <button id="modal-close-btn" type="button" aria-label="Cerrar"
+                style="position:sticky;top:0;float:right;margin:0.75rem 0.75rem 0 0;width:36px;height:36px;border:2px solid var(--color-black);background:var(--color-white);font-size:1.3rem;cursor:pointer;line-height:1;z-index:1;">
+            &times;
+        </button>
+        <div id="modal-body" style="padding:1.5rem 1.75rem 2rem; clear:both;"></div>
+    </div>
 </div>

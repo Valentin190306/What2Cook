@@ -15,17 +15,6 @@ class KitchenHelperController extends Controller
 
     // ── API: Búsqueda por ingredientes ────────────────────────────────────────
 
-    /**
-     * POST /api/kitchen-helper/single
-     *
-     * Body JSON:
-     * {
-     *   "ingredients": ["chicken", "rice"],
-     *   "sort": "healthiness"|"time"|null
-     * }
-     *
-     * Si se indica sort, usa complexSearch; de lo contrario findByIngredients.
-     */
     public function single(): void
     {
         $this->requireJson();
@@ -43,16 +32,19 @@ class KitchenHelperController extends Controller
             $service = new \App\Services\SpoonacularService();
 
             if ($sort === 'healthiness' || $sort === 'time') {
+                // complexSearch ya incluye nutrición con addRecipeNutrition:true
                 $results = $service->searchRecipes([
                     'includeIngredients' => implode(',', $ingredients),
                     'sort'               => $sort,
                     'sortDirection'      => 'desc',
                 ]);
+                $list = $results['results'] ?? $results;
             } else {
-                $results = $service->searchByIngredients($ingredients, 12, true);
+                $list = $service->searchByIngredients($ingredients, 12, true);
+                $list = $this->enrichWithNutrition($list, $service);
             }
 
-            $this->json(['success' => true, 'data' => $results]);
+            $this->json(['success' => true, 'data' => $list]);
         } catch (\RuntimeException $e) {
             $this->json(['error' => $e->getMessage()], 502);
         }
@@ -60,17 +52,6 @@ class KitchenHelperController extends Controller
 
     // ── API: Meal Prep ────────────────────────────────────────────────────────
 
-    /**
-     * POST /api/kitchen-helper/meal-prep
-     *
-     * Body JSON:
-     * {
-     *   "ingredients": ["chicken", "rice"],
-     *   "count": 3
-     * }
-     *
-     * Devuelve `count` recetas (2–5) optimizadas para reutilizar ingredientes.
-     */
     public function mealPrep(): void
     {
         $this->requireJson();
@@ -84,14 +65,12 @@ class KitchenHelperController extends Controller
             return;
         }
 
-        // Clamp count to [2, 5]
         $count = max(2, min(5, $count));
 
         try {
             $service = new \App\Services\SpoonacularService();
             $pool    = $service->searchByIngredients($ingredients, $count * 5, true);
 
-            // Sort: usedIngredientCount DESC, then missedIngredientCount ASC
             usort($pool, function (array $a, array $b): int {
                 $usedDiff = ($b['usedIngredientCount'] ?? 0) <=> ($a['usedIngredientCount'] ?? 0);
                 if ($usedDiff !== 0) {
@@ -101,6 +80,7 @@ class KitchenHelperController extends Controller
             });
 
             $selected = array_slice($pool, 0, $count);
+            $selected = $this->enrichWithNutrition($selected, $service);
 
             $this->json(['success' => true, 'data' => $selected]);
         } catch (\RuntimeException $e) {
@@ -110,11 +90,6 @@ class KitchenHelperController extends Controller
 
     // ── API: Detalle de receta ─────────────────────────────────────────────────
 
-    /**
-     * GET /api/kitchen-helper/recipe/{id}
-     *
-     * Devuelve información completa (con nutrición) de una receta por su ID.
-     */
     public function recipeDetail(int $id): void
     {
         try {
@@ -125,5 +100,38 @@ class KitchenHelperController extends Controller
         } catch (\RuntimeException $e) {
             $this->json(['error' => $e->getMessage()], 502);
         }
+    }
+
+    // ── Helpers privados ──────────────────────────────────────────────────────
+
+    /**
+     * Agrega macros a cada receta de un array de resultados de findByIngredients.
+     * nutritionWidget devuelve: calories (int), protein/carbs/fat (strings "15g").
+     */
+    private function enrichWithNutrition(array $recipes, \App\Services\SpoonacularService $service): array
+    {
+        foreach ($recipes as &$recipe) {
+            try {
+                // getRecipeInfo con includeNutrition=true funciona en plan gratuito
+                $info      = $service->getRecipeInfo((int) $recipe['id'], true);
+                $nutrients = $info['nutrition']['nutrients'] ?? [];
+
+                $map = [];
+                foreach ($nutrients as $n) {
+                    $map[$n['name']] = (float) ($n['amount'] ?? 0);
+                }
+
+                $recipe['nutrition'] = [
+                    'calories' => $map['Calories']     ?? 0.0,
+                    'protein'  => $map['Protein']       ?? 0.0,
+                    'carbs'    => $map['Carbohydrates'] ?? 0.0,
+                    'fat'      => $map['Fat']           ?? 0.0,
+                ];
+            } catch (\RuntimeException) {
+                $recipe['nutrition'] = ['calories' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0];
+            }
+        }
+
+        return $recipes;
     }
 }
