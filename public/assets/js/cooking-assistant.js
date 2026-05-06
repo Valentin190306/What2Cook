@@ -198,9 +198,11 @@ function buildCard(recipe) {
     const card = document.createElement('article');
     card.classList.add('ca-card');
     card.dataset.recipeId = recipe.id;
-    card.tabIndex = 0;
-    card.setAttribute('role', 'button');
-    card.setAttribute('aria-label', `Ver detalle de ${recipe.title}`);
+
+    const link = document.createElement('a');
+    link.classList.add('recipe-link');
+    link.href = `/receta/${recipe.id}`;
+    link.setAttribute('aria-label', `Ver detalle de ${recipe.title}`);
 
     const img = document.createElement('img');
     img.classList.add('ca-card__img');
@@ -208,38 +210,40 @@ function buildCard(recipe) {
     img.alt = recipe.title;
     img.loading = 'lazy';
 
-    const body = document.createElement('div');
-    body.classList.add('ca-card__body');
-
     const title = document.createElement('h2');
     title.classList.add('ca-card__title');
     title.textContent = recipe.title;
 
     const meta = document.createElement('div');
-    meta.classList.add('ca-card__meta');
+    meta.classList.add('recipe-meta', 'ca-card__meta');
 
     if (recipe.readyInMinutes) {
         const time = document.createElement('span');
-        time.classList.add('ca-card__time');
+        time.classList.add('recipe-time', 'ca-card__time');
         time.innerHTML = `⏱ ${recipe.readyInMinutes} min`;
         meta.appendChild(time);
     }
 
     if (recipe.usedIngredientCount !== undefined) {
         const used = document.createElement('span');
-        used.classList.add('ca-badge', 'ca-badge--used');
+        used.classList.add('recipe-badge', 'recipe-badge--used', 'ca-badge', 'ca-badge--used');
         used.textContent = `✓ ${recipe.usedIngredientCount} usados`;
         meta.appendChild(used);
     }
 
     if (recipe.missedIngredientCount !== undefined) {
         const missed = document.createElement('span');
-        missed.classList.add('ca-badge', 'ca-badge--missed');
+        missed.classList.add('recipe-badge', 'recipe-badge--missed', 'ca-badge', 'ca-badge--missed');
         missed.textContent = `✗ ${recipe.missedIngredientCount} faltan`;
         meta.appendChild(missed);
     }
 
-    // Tabla de macros
+    card.appendChild(link);
+    card.appendChild(img);
+    card.appendChild(title);
+    card.appendChild(meta);
+
+    // Tabla de macros — agregada directamente al article card para quedar abajo cerrando el cuadro
     if (recipe.nutrition) {
         const n = recipe.nutrition;
         const table = document.createElement('table');
@@ -253,23 +257,14 @@ function buildCard(recipe) {
                 <td>${Math.round(n.fat)}g</td>
             </tr></tbody>
         `;
-        body.appendChild(title);
-        body.appendChild(meta);
-        body.appendChild(table);
-    } else {
-        body.appendChild(title);
-        body.appendChild(meta);
+        card.appendChild(table);
     }
 
-    card.appendChild(img);
-    card.appendChild(body);
-
-    // Listeners para abrir el modal
-    card.addEventListener('click', () => openRecipeDetail(recipe.id));
+    // Listeners — navegación por teclado
     card.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            openRecipeDetail(recipe.id);
+            link.click();
         }
     });
 

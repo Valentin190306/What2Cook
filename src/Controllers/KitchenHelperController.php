@@ -90,7 +90,7 @@ class KitchenHelperController extends Controller
 
     // ── API: Detalle de receta ─────────────────────────────────────────────────
 
-    public function recipeDetail(int $id): void
+    public function recipeDetail(string $id): void
     {
         try {
             $service = new \App\Services\SpoonacularService();

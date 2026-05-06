@@ -6,14 +6,14 @@
     <title><?= $title ?? 'What2Cook' ?></title>
     
     <!-- Estilos base y comunes -->
-    <link rel="stylesheet" href="/assets/styles/base.css">
-    <link rel="stylesheet" href="/assets/styles/layout.css">
-    <link rel="stylesheet" href="/assets/styles/components.css">
+    <link rel="stylesheet" href="/assets/styles/base.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/styles/layout.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/styles/components.css?v=<?= time() ?>">
     
     <!-- Estilo específico de la página -->
     <?php if (isset($styles)): ?>
         <?php foreach ($styles as $style): ?>
-            <link rel="stylesheet" href="/assets/styles/<?= $style ?>.css">
+            <link rel="stylesheet" href="/assets/styles/<?= $style ?>.css?v=<?= time() ?>">
         <?php endforeach; ?>
     <?php endif; ?>
 </head>
@@ -88,7 +88,7 @@
     </footer>
     <?php if (isset($scripts)): ?>
         <?php foreach ($scripts as $script): ?>
-            <script src="/assets/js/<?= $script ?>.js" defer></script>
+            <script src="/assets/js/<?= $script ?>.js?v=<?= time() ?>" defer></script>
         <?php endforeach; ?>
     <?php endif; ?>
 </body>
