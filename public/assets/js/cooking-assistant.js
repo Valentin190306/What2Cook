@@ -130,7 +130,7 @@ function updateFilterButtons(sort) {
    ============================================================ */
 async function search() {
     if (ingredients.length === 0) {
-        setStatus('⚠️ Agregá al menos un ingrediente para buscar.', false);
+        setStatus('Agregá al menos un ingrediente para buscar.', false);
         return;
     }
 
