@@ -71,7 +71,6 @@ function renderIngredientList() {
     });
 }
 
-/** Efecto visual cuando se intenta agregar un duplicado */
 function flashInput(input) {
     input.style.borderColor = '#e05454';
     input.style.boxShadow = '0 0 0 3px rgba(224,84,84,0.2)';
@@ -96,7 +95,6 @@ function onModeChange(e) {
     } else {
         hide(singleControls);
         show(mealPrepControls);
-        // Resetear filtro de orden al cambiar de modo
         activeSort = null;
         updateFilterButtons(null);
     }
@@ -106,7 +104,6 @@ function onFilterClick(e) {
     const btn = e.currentTarget;
     const sort = btn.dataset.sort;
 
-    // Toggle: si ya está activo, lo desactiva
     if (activeSort === sort) {
         activeSort = null;
     } else {
@@ -176,6 +173,14 @@ async function search() {
    e) Renderizado de resultados
    ============================================================ */
 function renderResults(recipes) {
+    if (activeMode === 'meal-prep') {
+        renderMealPrep(recipes);
+    } else {
+        renderSingle(recipes);
+    }
+}
+
+function renderSingle(recipes) {
     const grid = el('results-grid');
     const status = el('results-status');
 
@@ -191,6 +196,58 @@ function renderResults(recipes) {
     recipes.forEach(recipe => {
         const card = buildCard(recipe);
         grid.appendChild(card);
+    });
+}
+
+function renderMealPrep(recipes) {
+    const grid = el('results-grid');
+    grid.innerHTML = '';
+
+    if (!recipes || recipes.length === 0) {
+        setStatus('Sin resultados. Probá con otros ingredientes.', false);
+        return;
+    }
+
+    hide(el('results-status'));
+
+    // Totales del conjunto
+    const totals = recipes.reduce((acc, r) => {
+        const n = r.nutrition || {};
+        acc.calories += n.calories || 0;
+        acc.protein += n.protein || 0;
+        acc.carbs += n.carbs || 0;
+        acc.fat += n.fat || 0;
+        return acc;
+    }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+
+    // Banner de resumen
+    const banner = document.createElement('div');
+    banner.classList.add('mp-summary');
+    banner.innerHTML = `
+        <h2 class="mp-summary__title">Tu Meal Prep — ${recipes.length} recetas</h2>
+        <div class="mp-summary__macros">
+            <span><strong>${Math.round(totals.calories)}</strong> Kcal totales</span>
+            <span><strong>${Math.round(totals.protein)}g</strong> Proteína</span>
+            <span><strong>${Math.round(totals.carbs)}g</strong> Carbs</span>
+            <span><strong>${Math.round(totals.fat)}g</strong> Grasa</span>
+        </div>
+    `;
+    grid.appendChild(banner);
+
+    // Cards con número de receta y porciones
+    recipes.forEach((recipe, i) => {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('mp-recipe');
+
+        const label = document.createElement('p');
+        label.classList.add('mp-recipe__label');
+        label.textContent = `Receta ${i + 1}${recipe.servings ? ' · ' + recipe.servings + ' porciones' : ''}`;
+
+        const card = buildCard(recipe);
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(card);
+        grid.appendChild(wrapper);
     });
 }
 
@@ -243,7 +300,7 @@ function buildCard(recipe) {
     card.appendChild(title);
     card.appendChild(meta);
 
-    // Tabla de macros — agregada directamente al article card para quedar abajo cerrando el cuadro
+    // Tabla de macros
     if (recipe.nutrition) {
         const n = recipe.nutrition;
         const table = document.createElement('table');
@@ -305,18 +362,15 @@ async function openRecipeDetail(id) {
 function renderModalContent(recipe) {
     const body = el('modal-body');
 
-    // Imagen
     let imgHtml = '';
     if (recipe.image) {
         imgHtml = `<img class="ca-modal-img" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.title)}">`;
     }
 
-    // Tiempo
     const timeHtml = recipe.readyInMinutes
         ? `<p class="ca-modal-meta">⏱ <strong>${recipe.readyInMinutes} minutos</strong> de preparación</p>`
         : '';
 
-    // Ingredientes
     let ingredientsHtml = '';
     if (recipe.extendedIngredients && recipe.extendedIngredients.length > 0) {
         const items = recipe.extendedIngredients
@@ -328,7 +382,6 @@ function renderModalContent(recipe) {
         `;
     }
 
-    // Instrucciones (viene como HTML del backend)
     let instructionsHtml = '';
     if (recipe.instructions) {
         instructionsHtml = `
@@ -337,7 +390,6 @@ function renderModalContent(recipe) {
         `;
     }
 
-    // Nutrición
     let nutritionHtml = '';
     if (recipe.nutrition && recipe.nutrition.nutrients) {
         const targets = ['Calories', 'Protein', 'Fat', 'Carbohydrates'];
@@ -421,7 +473,6 @@ function setLoading(loading) {
     }
 }
 
-/** Escapa caracteres HTML para inserción segura como texto */
 function escapeHtml(str) {
     if (!str) return '';
     return String(str)
@@ -436,7 +487,6 @@ function escapeHtml(str) {
    g) Inicialización
    ============================================================ */
 function init() {
-    /* Ingredientes */
     el('add-ingredient-btn').addEventListener('click', addIngredient);
 
     el('ingredient-input').addEventListener('keydown', e => {
@@ -446,25 +496,20 @@ function init() {
         }
     });
 
-    /* Modo */
     document.querySelectorAll('input[name="mode"]').forEach(radio => {
         radio.addEventListener('change', onModeChange);
     });
 
-    /* Filtros toggle */
     document.querySelectorAll('.ca-filter-btn').forEach(btn => {
         btn.addEventListener('click', onFilterClick);
     });
 
-    /* Búsqueda */
     el('search-btn').addEventListener('click', search);
     el('search-btn-prep').addEventListener('click', search);
 
-    /* Cerrar modal */
     el('modal-close-btn').addEventListener('click', closeRecipeModal);
 
     el('recipe-modal').addEventListener('click', e => {
-        // Click en el backdrop (fuera del contenido)
         if (e.target === el('recipe-modal')) closeRecipeModal();
     });
 

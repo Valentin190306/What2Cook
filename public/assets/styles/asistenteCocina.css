@@ -40,11 +40,9 @@
    ============================================================ */
 .asistente-hero {
   margin: -2rem -1rem 2rem;
-  /* se escapa del padding del <main> */
   padding: 2.5rem 1.5rem 2rem;
   text-align: center;
   background-color: #efede8;
-  /* gris-crema levemente más oscuro que body */
   border-bottom: 3px double var(--color-black);
   animation: fadeUp 0.45s ease both;
 }
@@ -333,6 +331,7 @@
   transform: translate(-2px, -2px);
   box-shadow: 4px 4px 0 var(--color-carrot);
 }
+
 /* ---------- Estado / Loading Newspaper ---------- */
 .ca-loading-newspaper {
   display: flex;
@@ -354,18 +353,20 @@
 }
 
 @keyframes flip {
-  0% { 
-    transform: perspective(120px) rotateX(0deg) rotateY(0deg); 
-    background-color: var(--color-black); 
+  0% {
+    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    background-color: var(--color-black);
   }
-  50% { 
-    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg); 
-    background-color: var(--color-carrot); 
+
+  50% {
+    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+    background-color: var(--color-carrot);
     box-shadow: -4px 4px 0 var(--color-black);
   }
-  100% { 
-    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); 
-    background-color: var(--color-black); 
+
+  100% {
+    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+    background-color: var(--color-black);
     box-shadow: -4px -4px 0 var(--color-carrot);
   }
 }
@@ -382,13 +383,21 @@
 }
 
 @keyframes pulseText {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.98); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
 }
 
 /* ============================================================
    GRILLA DE RECETAS — MOBILE (< 900px)
-   Patrón idéntico a catalogoRecetas para coherencia visual
    ============================================================ */
 @media (max-width: 899px) {
 
@@ -472,7 +481,6 @@
     margin-bottom: 0.25rem;
     align-self: end;
     padding-top: 0.5rem;
-    /* Limitar a 2 líneas para que no rompa la grilla */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -561,7 +569,6 @@
    ============================================================ */
 @media (min-width: 900px) {
 
-  /* --- Hero --- */
   .asistente-hero {
     margin: -2rem -1rem 3rem;
     padding: 4rem 2rem 3rem;
@@ -569,7 +576,6 @@
 
   .asistente-hero .hero-logo {
     display: none;
-    /* en desktop el logo está en el header */
   }
 
   .asistente-hero h1 {
@@ -586,7 +592,6 @@
     font-size: 0.85rem;
   }
 
-  /* --- Panel de form --- */
   .form-panel {
     max-width: 860px;
     margin: 0 auto 3rem;
@@ -622,7 +627,6 @@
     font-size: 1.5rem !important;
   }
 
-  /* En desktop los 3 botones van en fila */
   .meal-prep-quantity {
     justify-content: flex-start;
   }
@@ -640,7 +644,6 @@
     flex: 1;
   }
 
-  /* --- Grilla de recetas desktop (idéntica a catalogo) --- */
   .recipe-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -721,7 +724,6 @@
     padding: 1.15rem 1rem 0.25rem;
     font-size: 0.95rem;
     margin-bottom: 0;
-    /* Limitar a 2 líneas para que no rompa la grilla */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -779,7 +781,6 @@
     padding: 0.15rem 0.45rem;
   }
 
-  /* Estilo para spans genéricos dentro de recipe-meta (mockups / estáticos) */
   .recipe-meta>span:not([class]) {
     display: inline-flex;
     align-items: center;
@@ -889,4 +890,48 @@
     z-index: 1;
     display: block;
   }
+}
+
+/* ============================================================
+   MEAL PREP — Banner de resumen y wrappers
+   ============================================================ */
+.mp-summary {
+  grid-column: 1 / -1;
+  border: 2px solid var(--color-black);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+  background: var(--color-cream, #faf7f2);
+  box-shadow: 4px 4px 0 var(--color-black);
+}
+
+.mp-summary__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.mp-summary__macros {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.mp-recipe {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.mp-recipe__label {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.5rem 0;
+  color: var(--color-black);
+  border-bottom: 2px solid var(--color-black);
+  padding-bottom: 0.2rem;
+  flex-shrink: 0;
 }
