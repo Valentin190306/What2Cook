@@ -400,16 +400,24 @@ function setStatus(message, isError) {
 
 function setLoading(loading) {
     const btn = el('search-btn');
+    const btnPrep = el('search-btn-prep');
     const status = el('results-status');
     const grid = el('results-grid');
 
     if (loading) {
-        btn.disabled = true;
+        if (btn) btn.disabled = true;
+        if (btnPrep) btnPrep.disabled = true;
         grid.innerHTML = '';
-        status.innerHTML = '<span class="ca-spinner"></span> Buscando recetas…';
+        status.innerHTML = `
+            <div class="ca-loading-newspaper">
+                <span class="ca-loading-spinner"></span>
+                <span class="ca-loading-text">Buscando recetas...</span>
+            </div>
+        `;
         show(status);
     } else {
-        btn.disabled = false;
+        if (btn) btn.disabled = false;
+        if (btnPrep) btnPrep.disabled = false;
     }
 }
 

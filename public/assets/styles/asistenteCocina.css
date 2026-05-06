@@ -255,6 +255,43 @@
   transform: scale(1.05);
 }
 
+/* ---------- Meal Prep Quantity ---------- */
+.meal-prep-quantity {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  justify-content: center;
+}
+
+.meal-prep-quantity label {
+  font-family: var(--font-title);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.meal-prep-quantity input[type="number"] {
+  width: 70px;
+  padding: 0.4rem;
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-align: center;
+  border: 2px solid var(--color-black);
+  background-color: var(--color-white);
+  box-shadow: 3px 3px 0 var(--color-spinach);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.meal-prep-quantity input[type="number"]:focus {
+  outline: none;
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--color-spinach);
+}
+
 /* ---------- Botones de acción ---------- */
 .form-actions {
   display: flex;
@@ -295,6 +332,58 @@
   color: var(--color-white) !important;
   transform: translate(-2px, -2px);
   box-shadow: 4px 4px 0 var(--color-carrot);
+}
+/* ---------- Estado / Loading Newspaper ---------- */
+.ca-loading-newspaper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 4rem 1rem;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.ca-loading-spinner {
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-black);
+  display: inline-block;
+  animation: flip 1.2s infinite ease-in-out;
+  box-shadow: 4px 4px 0 var(--color-carrot);
+}
+
+@keyframes flip {
+  0% { 
+    transform: perspective(120px) rotateX(0deg) rotateY(0deg); 
+    background-color: var(--color-black); 
+  }
+  50% { 
+    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg); 
+    background-color: var(--color-carrot); 
+    box-shadow: -4px 4px 0 var(--color-black);
+  }
+  100% { 
+    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg); 
+    background-color: var(--color-black); 
+    box-shadow: -4px -4px 0 var(--color-carrot);
+  }
+}
+
+.ca-loading-text {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-black);
+  animation: pulseText 1.5s ease-in-out infinite;
+  text-align: center;
+}
+
+@keyframes pulseText {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.98); }
 }
 
 /* ============================================================
@@ -534,6 +623,10 @@
   }
 
   /* En desktop los 3 botones van en fila */
+  .meal-prep-quantity {
+    justify-content: flex-start;
+  }
+
   .form-actions {
     flex-direction: row;
     gap: 0.85rem;

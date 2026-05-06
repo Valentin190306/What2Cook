@@ -47,9 +47,9 @@ $scripts = ['cooking-assistant'];
 
     <!-- Controles modo Meal Prep (oculto por defecto) -->
     <div id="controls-meal-prep" hidden>
-        <div class="input-row" style="align-items:center; gap:1rem; margin-bottom:1rem;">
-            <label for="meal-prep-count" style="white-space:nowrap; font-size:0.9rem;">Cantidad de recetas:</label>
-            <input type="number" id="meal-prep-count" min="2" max="5" value="3" style="width:70px;">
+        <div class="meal-prep-quantity">
+            <label for="meal-prep-count">Cantidad de recetas:</label>
+            <input type="number" id="meal-prep-count" min="2" max="5" value="3">
         </div>
         <div class="form-actions">
             <button type="button" id="search-btn-prep" class="btn-primary">Generar Meal Prep</button>
