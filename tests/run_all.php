@@ -70,7 +70,8 @@ try {
 echo "\n3. Probando SpoonacularService...\n";
 try {
     // Apagamos la traducción forzadamente para probar Spoonacular crudo
-    $_ENV['ENABLE_TRANSLATION'] = 'false';
+    $_ENV['ENABLE_INPUT_TRANSLATION'] = 'false';
+    $_ENV['ENABLE_OUTPUT_TRANSLATION'] = 'false';
     $spoonacular = new \App\Services\SpoonacularService();
 
     // Buscamos algo rápido por ingredientes
@@ -79,7 +80,8 @@ try {
 
     // 4. Probando Flujo Completo (Input ES -> API EN -> Output ES)
     echo "\n4. Probando Flujo Completo (Traducción de entrada y salida)...\n";
-    $_ENV['ENABLE_TRANSLATION'] = 'true';
+    $_ENV['ENABLE_INPUT_TRANSLATION'] = 'true';
+    $_ENV['ENABLE_OUTPUT_TRANSLATION'] = 'true';
     // Nos aseguramos de usar Gemini para el test si está disponible, o el que esté configurado
     $spoonacularTrans = new \App\Services\SpoonacularService();
     
