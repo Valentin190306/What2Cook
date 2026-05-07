@@ -86,6 +86,10 @@ DB_PORT=5432
 DB_NAME=what2cook
 DB_USER=what2cook
 DB_PASSWORD=what2cook
+
+SPOONACULAR_KEY=tu_api_key_aqui
+OPENAI_API_KEY=tu_api_key_aqui
+ENABLE_TRANSLATION=true
 ```
 
 ### 3. Construir las imágenes
@@ -139,6 +143,13 @@ docker compose exec backend ./vendor/bin/phinx seed:run
 
 El sitio queda disponible en **http://localhost:8080**
 
+## APIs Externas y Traducción
+
+La aplicación se integra con **Spoonacular** para obtener recetas. Además, cuenta con un módulo de **Traducción Automática (OpenAI)** para traducir los resultados de recetas al español.
+
+- Para habilitar la traducción, asegúrate de tener saldo en tu cuenta de OpenAI y establece `ENABLE_TRANSLATION=true` en tu archivo `.env`.
+- Si deseas ahorrar cuota/saldo durante el desarrollo, puedes desactivarlo temporalmente usando `ENABLE_TRANSLATION=false`. Toda la información se mostrará en su idioma original (inglés).
+
 ## Dependencias PHP
 
 | Librería         | Versión | Uso                          |
@@ -150,16 +161,21 @@ El sitio queda disponible en **http://localhost:8080**
 ## Comandos útiles
 
 ```bash
+# Ejecutar scripts de prueba para APIs externas
+docker compose exec backend php tests/run_all.php
+# (O si lo ejecutas en tu máquina host sin docker)
+php tests/run_all.php
+
 # Ver logs de un servicio específico
-docker compose logs php
+docker compose logs backend
 docker compose logs web
-docker compose logs db
+docker compose logs database
 
 # Reiniciar un servicio sin bajar los demás
 docker compose restart web
 
 # Entrar al contenedor PHP
-docker compose exec php sh
+docker compose exec backend sh
 
 # Bajar todos los contenedores
 docker compose down
