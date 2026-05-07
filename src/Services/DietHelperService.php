@@ -180,17 +180,24 @@ class DietHelperService
                     $dailyIds[] = (int) $recipe['id'];
                     $nutrition = $this->extractNutritionFromRecipe($recipe);
 
+                    $multiplier = 1;
+                    if ($targetCalories > 0 && $nutrition['calories'] > 0) {
+                        $mealRatio = $macrosConfig[$mealName]['ratio'] ?? 0.25;
+                        $targetMealCals = $targetCalories * $mealRatio;
+                        $multiplier = max(1, (int) round($targetMealCals / $nutrition['calories']));
+                    }
+
                     $meals[] = [
                         'meal_type'        => $mealName,
                         'spoonacular_id'   => (int) $recipe['id'],
                         'title'            => $recipe['title'] ?? '',
                         'image'            => $recipe['image'] ?? '',
                         'ready_in_minutes' => (int) ($recipe['readyInMinutes'] ?? 0),
-                        'servings'         => 1,
-                        'calories'         => $nutrition['calories'],
-                        'protein'          => $nutrition['protein'],
-                        'carbs'            => $nutrition['carbs'],
-                        'fat'              => $nutrition['fat'],
+                        'servings'         => $multiplier,
+                        'calories'         => $nutrition['calories'] * $multiplier,
+                        'protein'          => $nutrition['protein'] * $multiplier,
+                        'carbs'            => $nutrition['carbs'] * $multiplier,
+                        'fat'              => $nutrition['fat'] * $multiplier,
                     ];
                 } else {
                     $meals[] = $this->emptyMeal($mealName);
