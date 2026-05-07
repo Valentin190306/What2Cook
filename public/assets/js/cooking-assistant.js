@@ -267,9 +267,13 @@ function buildCard(recipe) {
 
     const img = document.createElement('img');
     img.classList.add('ca-card__img');
-    img.src = recipe.image || '';
+    img.src = recipe.image || '/assets/img/placeholder_RecetaSinFoto.png';
     img.alt = recipe.title;
     img.loading = 'lazy';
+    img.onerror = function() {
+        this.onerror = null;
+        this.src = '/assets/img/placeholder_RecetaSinFoto.png';
+    };
 
     const title = document.createElement('h2');
     title.classList.add('ca-card__title');
@@ -368,7 +372,7 @@ function renderModalContent(recipe) {
 
     let imgHtml = '';
     if (recipe.image) {
-        imgHtml = `<img class="ca-modal-img" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.title)}">`;
+        imgHtml = `<img class="ca-modal-img" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.title)}" onerror="this.onerror=null;this.src='/assets/img/placeholder_RecetaSinFoto.png';">`;
     }
 
     const timeHtml = recipe.readyInMinutes

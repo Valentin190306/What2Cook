@@ -165,7 +165,7 @@ function renderDay(dayIndex) {
             <header class="comida-header"><h3>${escapeHtml(headerName)}</h3></header>
             <div class="comida-card">
                 <a href="/receta/${meal.spoonacular_id}" class="recipe-link" aria-label="Ver receta"></a>
-                <img src="${escapeHtml(meal.image)}" alt="Foto de la receta">
+                <img src="${escapeHtml(meal.image || '/assets/img/placeholder_RecetaSinFoto.png')}" alt="Foto de la receta" onerror="this.onerror=null;this.src='/assets/img/placeholder_RecetaSinFoto.png';">
                 <h4>${escapeHtml(meal.title)}</h4>
                 <div class="recipe-meta">
                     <span class="recipe-time">⏱ ${meal.ready_in_minutes || 0} min</span>
