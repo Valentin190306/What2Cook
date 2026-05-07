@@ -46,6 +46,8 @@ class SpoonacularService
      */
     public function searchByIngredients(array $ingredients, int $number = 10, bool $maximize = true): array
     {
+        $ingredients = $this->maybeTranslateInput($ingredients);
+
         return $this->get('/recipes/findByIngredients', [
             'ingredients'          => implode(',', $ingredients),
             'number'               => $number,
@@ -82,7 +84,26 @@ class SpoonacularService
             'number'             => 12,
         ];
 
-        return $this->get('/recipes/complexSearch', array_merge($defaults, $filters));
+        $filters = array_merge($defaults, $filters);
+
+        // Traducir campos de búsqueda si existen
+        if (isset($filters['query'])) {
+            $filters['query'] = $this->maybeTranslateInput($filters['query']);
+        }
+        
+        if (isset($filters['includeIngredients'])) {
+            $ingredients = explode(',', $filters['includeIngredients']);
+            $translated = $this->maybeTranslateInput($ingredients);
+            $filters['includeIngredients'] = implode(',', $translated);
+        }
+
+        if (isset($filters['excludeIngredients'])) {
+            $ingredients = explode(',', $filters['excludeIngredients']);
+            $translated = $this->maybeTranslateInput($ingredients);
+            $filters['excludeIngredients'] = implode(',', $translated);
+        }
+
+        return $this->get('/recipes/complexSearch', $filters);
     }
 
 
@@ -132,14 +153,47 @@ class SpoonacularService
         $enableTranslation = ($_ENV['ENABLE_TRANSLATION'] ?? 'false') === 'true';
         if ($enableTranslation) {
             try {
-                $translator = new \App\Services\Translation\OpenAITranslator();
+                $translator = $this->getTranslator();
                 $data = $translator->translateArray($data, 'es');
             } catch (\Exception $e) {
-                // If translation fails, we can just return the original data or log it
-                error_log("Error de traducción: " . $e->getMessage());
+                error_log("Error de traducción (output): " . $e->getMessage());
             }
         }
 
         return $data;
+    }
+
+    /**
+     * Traduce el input (ES -> EN) si la traducción está habilitada.
+     */
+    private function maybeTranslateInput(array|string $input): array|string
+    {
+        $enableTranslation = ($_ENV['ENABLE_TRANSLATION'] ?? 'false') === 'true';
+        if (!$enableTranslation) {
+            return $input;
+        }
+
+        try {
+            $translator = $this->getTranslator();
+            if (is_array($input)) {
+                return $translator->translateArray($input, 'en');
+            }
+            return $translator->translate($input, 'en');
+        } catch (\Exception $e) {
+            error_log("Error de traducción (input): " . $e->getMessage());
+            return $input;
+        }
+    }
+
+    /**
+     * Helper para instanciar el traductor configurado.
+     */
+    private function getTranslator(): \App\Services\Translation\TranslatorInterface
+    {
+        $provider = strtolower($_ENV['TRANSLATION_PROVIDER'] ?? 'gemini');
+        if ($provider === 'openai') {
+            return new \App\Services\Translation\OpenAITranslator();
+        }
+        return new \App\Services\Translation\GeminiTranslator();
     }
 }
