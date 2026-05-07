@@ -42,7 +42,32 @@ try {
     echo "Asegúrate de que tienes OPENAI_API_KEY configurada en tu .env y tiene saldo.\n";
 }
 
-echo "\n2. Probando SpoonacularService...\n";
+echo "\n2. Probando GeminiTranslator...\n";
+try {
+    $gemini = new \App\Services\Translation\GeminiTranslator();
+    
+    // Probando traducción de string
+    $resultString = $gemini->translate("Hello world", "es");
+    assertTest("Traduce 'Hello world' al español con Gemini", strtolower($resultString) === "hola mundo" || strtolower($resultString) === "hola, mundo" || strtolower($resultString) === "hola mundo.");
+
+    // Probando traducción de Array
+    $inputArray = [
+        "title" => "Apple Pie",
+        "description" => "A very tasty dessert."
+    ];
+    $resultArray = $gemini->translateArray($inputArray, "es");
+    assertTest("Traduce keys de un array y mantiene la estructura con Gemini", 
+        isset($resultArray['title']) && 
+        strtolower($resultArray['title']) !== "apple pie" && 
+        isset($resultArray['description'])
+    );
+
+} catch (\Exception $e) {
+    echo "⚠️ Error probando Gemini: " . $e->getMessage() . "\n";
+    echo "Asegúrate de que tienes GEMINI_API_KEY configurada en tu .env.\n";
+}
+
+echo "\n3. Probando SpoonacularService...\n";
 try {
     // Apagamos la traducción forzadamente para probar Spoonacular crudo
     $_ENV['ENABLE_TRANSLATION'] = 'false';
