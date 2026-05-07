@@ -108,6 +108,8 @@ class DietHelperService
 
             $pool = $results['results'] ?? [];
             shuffle($pool);
+            srand(crc32($mealName . date('Y-m-d')));
+            shuffle($pool);
             $pools[$mealName] = $pool;
         }
 
@@ -121,18 +123,54 @@ class DietHelperService
                 $pool = $pools[$mealName];
                 $recipe = null;
 
-                if (count($pool) > 0) {
-                    $startIndex = $i % count($pool);
-                    // Buscar una receta que no se haya usado hoy
-                    for ($j = 0; $j < count($pool); $j++) {
-                        $idx = ($startIndex + $j) % count($pool);
+                $poolSize = count($pool);
+
+                if ($poolSize > 0) {
+                    // Intentar encontrar una receta no usada en los últimos 3 días
+                    $recentIds = array_slice(
+                        array_column(
+                            array_filter($days, fn($d) => count($d['meals']) > 0),
+                            'meals'
+                        ),
+                        -3
+                    );
+                    $recentUsed = [];
+                    foreach ($recentIds as $dayMeals) {
+                        foreach ($dayMeals as $m) {
+                            if ($m['meal_type'] === $mealName) {
+                                $recentUsed[] = $m['spoonacular_id'];
+                            }
+                        }
+                    }
+
+                    // Buscar la primera receta del pool que no esté en $recentUsed ni en $dailyIds
+                    $startIndex = $i % $poolSize;
+                    for ($j = 0; $j < $poolSize; $j++) {
+                        $idx = ($startIndex + $j) % $poolSize;
                         $candidate = $pool[$idx];
-                        if (!in_array((int)$candidate['id'], $dailyIds, true)) {
+                        $candidateId = (int) $candidate['id'];
+                        if (
+                            !in_array($candidateId, $dailyIds, true) &&
+                            !in_array($candidateId, $recentUsed, true)
+                        ) {
                             $recipe = $candidate;
                             break;
                         }
                     }
-                    // Si todas se usaron hoy, usar la de startIndex
+
+                    // Fallback: si todas las recetas fueron usadas recientemente, usar cualquiera no usada hoy
+                    if ($recipe === null) {
+                        for ($j = 0; $j < $poolSize; $j++) {
+                            $idx = ($startIndex + $j) % $poolSize;
+                            $candidate = $pool[$idx];
+                            if (!in_array((int)$candidate['id'], $dailyIds, true)) {
+                                $recipe = $candidate;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Último fallback: usar startIndex sin restricciones
                     if ($recipe === null) {
                         $recipe = $pool[$startIndex];
                     }
@@ -148,7 +186,7 @@ class DietHelperService
                         'title'            => $recipe['title'] ?? '',
                         'image'            => $recipe['image'] ?? '',
                         'ready_in_minutes' => (int) ($recipe['readyInMinutes'] ?? 0),
-                        'servings'         => (int) ($recipe['servings'] ?? 1),
+                        'servings'         => 1,
                         'calories'         => $nutrition['calories'],
                         'protein'          => $nutrition['protein'],
                         'carbs'            => $nutrition['carbs'],
