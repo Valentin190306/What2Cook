@@ -22,7 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        status.textContent = 'Generando plan, por favor espera...';
+        status.innerHTML = `
+            <div class="ca-loading-newspaper">
+                <span class="ca-loading-spinner"></span>
+                <span class="ca-loading-text">Generando plan, por favor espera...</span>
+            </div>
+        `;
+        status.style.display = 'block';
+        status.style.border = 'none';
+        status.style.padding = '0';
+        status.style.backgroundColor = 'transparent';
         btnGenerar.disabled = true;
         panel.hidden = true;
 
@@ -44,50 +53,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Error al generar el plan');
+                const detail = errorData.error || errorData.message || '';
+                throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
             }
 
             planData = await response.json();
             status.textContent = '';
+            status.style.display = 'none';
             renderPlan(planData);
         } catch (err) {
-            status.textContent = `Error: ${err.message}`;
+            status.textContent = err.message;
+            status.style.display = 'block';
+            status.style.fontSize = '1.3rem';
+            status.style.fontFamily = 'Georgia, serif';
+            status.style.padding = '15px 20px';
+            status.style.textAlign = 'center';
+            status.style.color = '#c93a3a';
+            status.style.border = '2px dashed #b5a48b';
+            status.style.borderRadius = '8px';
+            status.style.backgroundColor = '#fdfbf7';
+            status.style.marginTop = '20px';
+            status.style.fontWeight = 'bold';
             console.error(err);
         } finally {
             btnGenerar.disabled = false;
         }
     });
 
-    btnGuardar.addEventListener('click', async () => {
-        if (!planData) return;
-        
-        btnGuardar.disabled = true;
-        status.textContent = 'Guardando plan...';
-        
-        try {
-            const response = await fetch('/api/diet-helper/plan', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(planData)
-            });
-
-            if (response.status === 401) {
-                status.textContent = 'Iniciá sesión para guardar el plan.';
-                return;
-            }
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Ocurrió un error al guardar el plan.');
-            }
-
-            status.textContent = 'Plan guardado correctamente.';
-        } catch (err) {
-            status.textContent = `Error: ${err.message}`;
-            console.error(err);
-        } finally {
-            btnGuardar.disabled = false;
-        }
+    btnGuardar.addEventListener('click', () => {
+        alert('Función en Desarrollo');
     });
 
     selectSemana.addEventListener('change', () => {

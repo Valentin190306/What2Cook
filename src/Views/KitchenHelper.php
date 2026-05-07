@@ -66,6 +66,8 @@ $scripts = ['cooking-assistant'];
         </div>
         <div class="form-actions">
             <button type="button" id="search-btn-prep" class="btn-primary">Generar Meal Prep</button>
+            <button type="button" class="btn-secondary ca-filter-btn" data-sort="time" aria-pressed="false">Las más rápidas</button>
+            <button type="button" class="btn-secondary ca-filter-btn" data-sort="healthiness" aria-pressed="false">Las más saludables</button>
         </div>
     </div>
 </section>

@@ -3,6 +3,64 @@ $title = 'Asistente de Dietas - What2Cook';
 $styles = ['asistenteDieta'];
 $scripts = ['diet-helper'];
 ?>
+<style>
+.ca-loading-newspaper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 4rem 1rem;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.ca-loading-spinner {
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-black);
+  display: inline-block;
+  animation: flip 1.2s infinite ease-in-out;
+  box-shadow: 4px 4px 0 var(--color-carrot);
+}
+
+@keyframes flip {
+  0% {
+    transform: perspective(120px) rotateX(0deg) rotateY(0deg);
+    background-color: var(--color-black);
+  }
+  50% {
+    transform: perspective(120px) rotateX(-180.1deg) rotateY(0deg);
+    background-color: var(--color-carrot);
+    box-shadow: -4px 4px 0 var(--color-black);
+  }
+  100% {
+    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg);
+    background-color: var(--color-black);
+    box-shadow: -4px -4px 0 var(--color-carrot);
+  }
+}
+
+.ca-loading-text {
+  font-family: var(--font-title, sans-serif);
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-black);
+  animation: pulseText 1.5s ease-in-out infinite;
+  text-align: center;
+}
+
+@keyframes pulseText {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.98); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
 <section class="dieta-hero">
     <h1>Asistente de Dietas</h1>
     <p>Creá un plan de comidas personalizado según tus objetivos nutricionales</p>
@@ -28,9 +86,16 @@ $scripts = ['diet-helper'];
                 <label for="dieta">Tipo de dieta (opcional)</label>
                 <select id="dieta" name="dieta">
                     <option value="">Seleccioná una dieta</option>
+                    <option value="sin-gluten">Libre de Gluten</option>
+                    <option value="keto">Cetogénica (Keto)</option>
                     <option value="vegetariana">Vegetariana</option>
+                    <option value="lacto-vegetariana">Lacto-Vegetariana</option>
+                    <option value="ovo-vegetariana">Ovo-Vegetariana</option>
                     <option value="vegana">Vegana</option>
-                    <option value="keto">Keto</option>
+                    <option value="pescetariano">Pescetariana</option>
+                    <option value="paleo">Paleo</option>
+                    <option value="primal">Primal</option>
+                    <option value="whole30">Whole30</option>
                 </select>
             </div>
         </div>
