@@ -53,7 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || 'Error al generar el plan');
+                const detail = errorData.error || errorData.message || '';
+                throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
             }
 
             planData = await response.json();
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             status.style.display = 'none';
             renderPlan(planData);
         } catch (err) {
-            status.textContent = `Error: ${err.message}`;
+            status.textContent = err.message;
             status.style.display = 'block';
             status.style.fontSize = '1.3rem';
             status.style.fontFamily = 'Georgia, serif';

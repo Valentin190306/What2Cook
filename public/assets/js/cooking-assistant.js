@@ -152,7 +152,9 @@ async function search() {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            const detail = errorData.message || errorData.error || '';
+            throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
         }
 
         const json = await response.json();
@@ -164,7 +166,7 @@ async function search() {
         }
     } catch (err) {
         console.error('[CookingAssistant] search error:', err);
-        setStatus('Error al buscar recetas. Verificá tu conexión e intentá nuevamente.', true);
+        setStatus(`Error al buscar recetas: ${err.message}`, true);
     } finally {
         setLoading(false);
     }
@@ -344,7 +346,9 @@ async function openRecipeDetail(id) {
         const response = await fetch(`/api/kitchen-helper/recipe/${id}`);
 
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            const detail = errorData.message || errorData.error || '';
+            throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
         }
 
         const json = await response.json();
@@ -356,7 +360,7 @@ async function openRecipeDetail(id) {
         }
     } catch (err) {
         console.error('[CookingAssistant] recipe detail error:', err);
-        body.innerHTML = `<p class="ca-status ca-status--error">Error al cargar el detalle de la receta.</p>`;
+        body.innerHTML = `<p class="ca-status ca-status--error">${escapeHtml(err.message || 'Error al cargar el detalle de la receta.')}</p>`;
     }
 }
 
