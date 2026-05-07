@@ -20,7 +20,7 @@ class SpoonacularService
         $this->apiKey = $key;
     }
 
-    // ── Meal Planner ─────────────────────────────────────────────────────────
+    // ── Meal Planner (descontinuado) ─────────────────────────────────────────
 
     /**
      * Genera un plan de comidas semanal desde Spoonacular.
