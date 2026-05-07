@@ -507,6 +507,21 @@ function init() {
     el('search-btn').addEventListener('click', search);
     el('search-btn-prep').addEventListener('click', search);
 
+    // Stepper Meal Prep
+    const mpCount = el('meal-prep-count');
+    el('mp-minus').addEventListener('click', () => {
+        const val = parseInt(mpCount.value, 10);
+        if (val > parseInt(mpCount.min, 10)) {
+            mpCount.value = val - 1;
+        }
+    });
+    el('mp-plus').addEventListener('click', () => {
+        const val = parseInt(mpCount.value, 10);
+        if (val < parseInt(mpCount.max, 10)) {
+            mpCount.value = val + 1;
+        }
+    });
+
     el('modal-close-btn').addEventListener('click', closeRecipeModal);
 
     el('recipe-modal').addEventListener('click', e => {

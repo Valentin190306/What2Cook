@@ -68,6 +68,15 @@ main {
   padding-top: 2rem;
 }
 
+@media (max-width: 767px) {
+  header > a:first-child img {
+    max-width: 240px;
+  }
+  main {
+    padding-top: 0 !important;
+  }
+}
+
 main > * {
   width: 100%;
   max-width: 1200px;

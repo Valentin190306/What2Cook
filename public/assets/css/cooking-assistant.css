@@ -48,6 +48,12 @@
     margin-bottom: 2rem;
 }
 
+@media (max-width: 767px) {
+  .ca-hero {
+    margin-top: 0 !important;
+  }
+}
+
 .ca-hero h1 {
     font-size: clamp(1.6rem, 4vw, 2.4rem);
     margin-bottom: 0.5rem;
@@ -266,19 +272,93 @@
 }
 
 /* ── Input numérico meal-prep ──────────────────────────────── */
-.ca-number-input {
-    width: 6rem;
-    padding: 0.6rem 0.75rem;
-    border: 1px solid #cdd5e0;
-    border-radius: var(--ca-radius-sm);
-    font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
+.ca-stepper-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
 }
 
-.ca-number-input:focus {
+.ca-stepper-circle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--ca-card-border);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ca-accent-dark);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.ca-stepper-circle:hover {
+    background: var(--ca-accent);
+    color: #fff;
     border-color: var(--ca-accent);
-    box-shadow: 0 0 0 3px rgba(45, 158, 95, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(45, 158, 95, 0.2);
+}
+
+.ca-stepper-circle:active {
+    transform: translateY(0);
+}
+
+.ca-stepper-field {
+    width: 3.5rem;
+    height: 3rem;
+    background: #f7f9fc;
+    border: 2px solid var(--ca-card-border);
+    border-radius: var(--ca-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ca-number-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-size: 1.25rem;
+    font-weight: 800;
+    text-align: center;
+    color: var(--color-black);
+    outline: none;
+    padding: 0;
+    appearance: textfield;
+}
+
+.ca-number-input::-webkit-outer-spin-button,
+.ca-number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.ca-number-input {
+    width: 4rem;
+    height: 2.5rem;
+    padding: 0;
+    border: none;
+    border-left: 1px solid #cdd5e0;
+    border-right: 1px solid #cdd5e0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--color-black);
+    outline: none;
+    background: transparent;
+    appearance: textfield; /* Remove default arrows */
+    -moz-appearance: textfield;
+}
+
+.ca-number-input::-webkit-outer-spin-button,
+.ca-number-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .ca-hint {

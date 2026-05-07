@@ -35,6 +35,12 @@
   margin-bottom: 2.5rem;
 }
 
+@media (max-width: 767px) {
+  .dieta-hero {
+    margin-top: 0 !important;
+  }
+}
+
 .dieta-hero .hero-logo {
   display: inline-block;
   margin-bottom: 1.25rem;
