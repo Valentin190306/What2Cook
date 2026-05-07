@@ -128,9 +128,10 @@ class DietHelperService
         ];
 
         $meals = [];
+        $index = 1;
 
         foreach ($rawMeals as $raw) {
-            $slot      = $raw['slot'] ?? 0;
+            $slot      = $raw['slot'] ?? $index++;
             $mealType  = $slotMap[$slot] ?? 'lunch';
             $nutrition = $this->fetchNutrition((int) $raw['id']);
 
