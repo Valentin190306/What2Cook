@@ -70,4 +70,63 @@ class OpenAITranslator implements TranslatorInterface
 
         return trim($translation);
     }
+
+    public function translateArray(array $data, string $targetLanguage = 'es'): array
+    {
+        $ch = curl_init();
+
+        $payload = [
+            'model' => 'gpt-3.5-turbo',
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => "You are a professional translator. Translate all textual values in the following JSON to language code: {$targetLanguage}. Preserve all keys and structural elements exactly. Return valid JSON."
+                ],
+                [
+                    'role' => 'user',
+                    'content' => json_encode($data)
+                ]
+            ],
+            'response_format' => ['type' => 'json_object'],
+            'temperature' => 0.3
+        ];
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL            => self::BASE_URL,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => json_encode($payload),
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . $this->apiKey,
+            ],
+            CURLOPT_TIMEOUT        => 30, // Mayor timeout para arrays grandes
+        ]);
+
+        $body  = curl_exec($ch);
+        $errno = curl_errno($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($errno !== 0 || $body === false) {
+            throw new RuntimeException("Error de red al llamar a OpenAI: cURL errno {$errno}");
+        }
+
+        $response = json_decode((string) $body, true);
+
+        if ($httpCode >= 400) {
+            $message = $response['error']['message'] ?? 'Error desconocido';
+            throw new RuntimeException("OpenAI respondió {$httpCode}: {$message}");
+        }
+
+        $translationString = $response['choices'][0]['message']['content'] ?? '{}';
+        
+        $translatedData = json_decode($translationString, true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($translatedData)) {
+            // Fallback en caso de que OpenAI devuelva algo que no es JSON válido o array (aunque usamos json_object)
+            return $data;
+        }
+
+        return $translatedData;
+    }
 }
