@@ -76,7 +76,8 @@
   border: 2px solid var(--color-black);
   background: var(--color-white);
   padding: 1.5rem 1.25rem;
-  margin-bottom: 2.5rem;
+  margin: 0 auto 2.5rem;
+  width: calc(100% - 2rem);
   box-shadow: 6px 6px 0 var(--color-black);
   animation: fadeUp 0.45s 0.08s ease both;
 }
@@ -171,7 +172,7 @@
 }
 
 .nutri-fieldset legend {
-  padding: 0 !important;
+  padding: 0 0.75rem 0 0 !important;
   font-family: var(--font-title);
   font-size: 1.05rem;
   font-weight: 700;

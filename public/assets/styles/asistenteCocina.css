@@ -139,7 +139,8 @@
   border: 2px solid var(--color-black);
   background: var(--color-white);
   padding: 1.25rem 1.1rem;
-  margin-bottom: 2.5rem;
+  margin: 0 auto 2.5rem;
+  width: calc(100% - 2rem);
   box-shadow: 6px 6px 0 var(--color-black);
   animation: fadeUp 0.45s 0.08s ease both;
 }
