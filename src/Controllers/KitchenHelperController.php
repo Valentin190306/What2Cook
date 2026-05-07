@@ -82,6 +82,7 @@ class KitchenHelperController extends Controller
 
         $ingredients = $body['ingredients'] ?? [];
         $count       = (int) ($body['count'] ?? 3);
+        $sort        = $body['sort'] ?? null;
 
         if (!is_array($ingredients) || empty($ingredients)) {
             $this->json(['error' => 'Ingredients required'], 400);
@@ -94,13 +95,19 @@ class KitchenHelperController extends Controller
             $service = new \App\Services\SpoonacularService();
             $pool    = $service->searchByIngredients($ingredients, $count * 5, true);
 
-            usort($pool, function (array $a, array $b): int {
-                $usedDiff = ($b['usedIngredientCount'] ?? 0) <=> ($a['usedIngredientCount'] ?? 0);
-                if ($usedDiff !== 0) {
-                    return $usedDiff;
-                }
-                return ($a['missedIngredientCount'] ?? 0) <=> ($b['missedIngredientCount'] ?? 0);
-            });
+            if ($sort === 'time') {
+                usort($pool, function (array $a, array $b): int {
+                    return ($a['readyInMinutes'] ?? 9999) <=> ($b['readyInMinutes'] ?? 9999);
+                });
+            } else {
+                usort($pool, function (array $a, array $b): int {
+                    $usedDiff = ($b['usedIngredientCount'] ?? 0) <=> ($a['usedIngredientCount'] ?? 0);
+                    if ($usedDiff !== 0) {
+                        return $usedDiff;
+                    }
+                    return ($a['missedIngredientCount'] ?? 0) <=> ($b['missedIngredientCount'] ?? 0);
+                });
+            }
 
             $selected = array_slice($pool, 0, $count);
             $selected = $this->enrichWithNutrition($selected, $service);

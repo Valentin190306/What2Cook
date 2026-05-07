@@ -104,24 +104,21 @@ function onFilterClick(e) {
     const btn = e.currentTarget;
     const sort = btn.dataset.sort;
 
-    if (activeSort === sort) {
-        activeSort = null;
-    } else {
-        activeSort = sort;
-    }
+    activeSort = sort;
 
-    updateFilterButtons(activeSort);
+    updateFilterButtons(null);
 
-    if (ingredients.length > 0) {
-        search();
+    if (ingredients.length === 0) {
+        setStatus('Ingresá al menos 1 ingrediente', false);
+        return;
     }
+    search();
 }
 
 function updateFilterButtons(sort) {
     document.querySelectorAll('.ca-filter-btn').forEach(btn => {
-        const isActive = btn.dataset.sort === sort;
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
     });
 }
 
@@ -130,7 +127,7 @@ function updateFilterButtons(sort) {
    ============================================================ */
 async function search() {
     if (ingredients.length === 0) {
-        setStatus('Agregá al menos un ingrediente para buscar.', false);
+        setStatus('Ingresá al menos 1 ingrediente', false);
         return;
     }
 
@@ -145,7 +142,7 @@ async function search() {
         } else {
             const count = parseInt(el('meal-prep-count').value, 10);
             url = '/api/kitchen-helper/meal-prep';
-            body = { ingredients, count };
+            body = { ingredients, count, sort: activeSort };
         }
 
         const response = await fetch(url, {
@@ -451,6 +448,18 @@ function setStatus(message, isError) {
     grid.innerHTML = '';
     status.textContent = message;
     status.classList.toggle('ca-status--error', !!isError);
+    
+    status.style.fontSize = '1.3rem';
+    status.style.fontFamily = 'Georgia, serif';
+    status.style.padding = '15px 20px';
+    status.style.textAlign = 'center';
+    status.style.color = isError ? '#c93a3a' : '#4a4a4a';
+    status.style.border = '2px dashed #b5a48b';
+    status.style.borderRadius = '8px';
+    status.style.backgroundColor = '#fdfbf7';
+    status.style.marginTop = '20px';
+    status.style.fontWeight = 'bold';
+
     show(status);
 }
 
