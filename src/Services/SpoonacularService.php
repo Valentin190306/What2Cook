@@ -129,6 +129,17 @@ class SpoonacularService
             throw new RuntimeException("Spoonacular respondió {$httpCode}: {$message}");
         }
 
+        $enableTranslation = ($_ENV['ENABLE_TRANSLATION'] ?? 'false') === 'true';
+        if ($enableTranslation) {
+            try {
+                $translator = new \App\Services\Translation\OpenAITranslator();
+                $data = $translator->translateArray($data, 'es');
+            } catch (\Exception $e) {
+                // If translation fails, we can just return the original data or log it
+                error_log("Error de traducción: " . $e->getMessage());
+            }
+        }
+
         return $data;
     }
 }
