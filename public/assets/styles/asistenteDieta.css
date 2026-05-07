@@ -25,12 +25,14 @@
    HERO — bloque crema
    ============================================================ */
 .dieta-hero {
-  margin: -2rem -1rem 2rem;
-  padding: 2.5rem 1.5rem 2rem;
+  max-width: none !important;
   text-align: center;
   background-color: #efede8;
   border-bottom: 3px double var(--color-black);
   animation: fadeUp 0.45s ease both;
+  padding: 3rem 1.5rem;
+  margin-top: 1rem;
+  margin-bottom: 2.5rem;
 }
 
 .dieta-hero .hero-logo {
@@ -194,11 +196,11 @@
 .plan-actions {
   display: flex;
   justify-content: center;
-  margin-top: 0.25rem;
+  margin-top: 2rem;
 }
 
 .plan-actions {
-  margin-top: 1.5rem;
+  margin-top: 2.5rem;
 }
 
 .config-form .btn-primary,

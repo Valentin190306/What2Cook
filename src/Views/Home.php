@@ -45,9 +45,9 @@ $styles = ['index'];
 </section>
 
 <dl class="stats">
-    <dt>5000+</dt>
+    <dt>+5000</dt>
     <dd>Recetas</dd>
-    <dt>10+</dt>
+    <dt>+10</dt>
     <dd>Tipos de dietas</dd>
     <dt>100%</dt>
     <dd>Gratis</dd>

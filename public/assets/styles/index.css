@@ -25,7 +25,7 @@
 }
  
 .hero h1 {
-  font-size: clamp(2.8rem, 10vw, 5rem);
+  font-size: clamp(2.2rem, 8vw, 3.5rem);
   line-height: 1.05;
   letter-spacing: -0.03em;
   margin-bottom: 1.25rem;
@@ -134,18 +134,18 @@
    SECCIÓN CTA ("¿Listo/a para empezar?")
    ============================================================ */
 .cta-banner {
-  margin: 2.5rem 1.5rem;
-  padding: 2.5rem 1.5rem;
+  margin: 2rem 1rem;
+  padding: 1.5rem 1rem;
   border: 2px solid var(--color-black);
   text-align: center;
   background: var(--color-cream);
-  box-shadow: 6px 6px 0px var(--color-black);
+  box-shadow: 4px 4px 0px var(--color-black);
 }
  
 .cta-banner h2 {
-  font-size: clamp(1.6rem, 6vw, 2.5rem);
+  font-size: clamp(1.3rem, 5vw, 1.8rem);
   line-height: 1.1;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
  
 .cta-banner > p {
@@ -226,7 +226,7 @@ dl.stats dd:last-child {
   }
 
   .hero h1 {
-    font-size: clamp(4rem, 6vw, 6.5rem);
+    font-size: clamp(3rem, 5vw, 4rem);
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
@@ -282,12 +282,13 @@ dl.stats dd:last-child {
 
   /* --- CTA --- */
   .cta-banner {
-    margin: 4rem;
-    padding: 4rem 3rem;
+    margin: 4rem auto;
+    padding: 3rem 2rem;
+    max-width: 800px;
   }
 
   .cta-banner h2 {
-    font-size: 3rem;
+    font-size: 2.2rem;
   }
 
   /* --- Stats: 4 columnas × 2 filas (dt arriba, dd abajo) --- */
