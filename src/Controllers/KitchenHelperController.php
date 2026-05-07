@@ -32,13 +32,36 @@ class KitchenHelperController extends Controller
             $service = new \App\Services\SpoonacularService();
 
             if ($sort === 'healthiness' || $sort === 'time') {
-                // complexSearch ya incluye nutrición con addRecipeNutrition:true
                 $results = $service->searchRecipes([
-                    'includeIngredients' => implode(',', $ingredients),
-                    'sort'               => $sort,
-                    'sortDirection'      => 'desc',
+                    'includeIngredients'   => implode(',', $ingredients),
+                    'sort'                 => $sort,
+                    'sortDirection'        => 'desc',
+                    'addRecipeNutrition'   => 'true',
+                    'fillIngredients'      => 'true',
+                    'addRecipeInformation' => 'true',
                 ]);
                 $list = $results['results'] ?? $results;
+
+                foreach ($list as &$recipe) {
+                    if (isset($recipe['nutrition']['nutrients'])) {
+                        $map = [];
+                        foreach ($recipe['nutrition']['nutrients'] as $n) {
+                            $map[$n['name']] = (float) ($n['amount'] ?? 0);
+                        }
+                        $recipe['nutrition'] = [
+                            'calories' => $map['Calories']     ?? 0.0,
+                            'protein'  => $map['Protein']       ?? 0.0,
+                            'carbs'    => $map['Carbohydrates'] ?? 0.0,
+                            'fat'      => $map['Fat']           ?? 0.0,
+                        ];
+                    }
+                    if (!isset($recipe['usedIngredientCount']) && isset($recipe['usedIngredients'])) {
+                        $recipe['usedIngredientCount'] = count($recipe['usedIngredients']);
+                    }
+                    if (!isset($recipe['missedIngredientCount']) && isset($recipe['missedIngredients'])) {
+                        $recipe['missedIngredientCount'] = count($recipe['missedIngredients']);
+                    }
+                }
             } else {
                 $list = $service->searchByIngredients($ingredients, 12, true);
                 $list = $this->enrichWithNutrition($list, $service);

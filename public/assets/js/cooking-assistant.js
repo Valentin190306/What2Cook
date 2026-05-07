@@ -111,6 +111,10 @@ function onFilterClick(e) {
     }
 
     updateFilterButtons(activeSort);
+
+    if (ingredients.length > 0) {
+        search();
+    }
 }
 
 function updateFilterButtons(sort) {

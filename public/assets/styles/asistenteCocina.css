@@ -990,3 +990,10 @@
   padding-bottom: 0.2rem;
   flex-shrink: 0;
 }
+
+.ca-filter-btn.active {
+  background: var(--color-black) !important;
+  color: var(--color-white) !important;
+  border-color: var(--color-black) !important;
+  box-shadow: 3px 3px 0 var(--color-carrot);
+}
