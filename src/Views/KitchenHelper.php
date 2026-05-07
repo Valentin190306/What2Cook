@@ -56,7 +56,7 @@ $scripts = ['cooking-assistant'];
                         type="number"
                         id="meal-prep-count"
                         min="2"
-                        max="5"
+                        max="28"
                         value="3"
                         readonly
                     >
