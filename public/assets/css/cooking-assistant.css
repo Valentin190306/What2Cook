@@ -39,8 +39,13 @@
 
 /* ── Hero ──────────────────────────────────────────────────── */
 .ca-hero {
+    max-width: none !important;
     text-align: center;
-    padding: 2.5rem 1rem 1.5rem;
+    padding: 3rem 1.5rem;
+    background-color: #f5f7f9;
+    border-bottom: 3px double #000;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
 }
 
 .ca-hero h1 {

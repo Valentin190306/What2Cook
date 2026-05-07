@@ -19,17 +19,17 @@
 </head>
 <body>
     <header>
-        <a href="/"><img src="/assets/img/LogoW2C_2.png" alt="Logo W2C"></a>
-        <strong>What2Cook</strong>
+        <a href="/"><img src="/assets/img/LogoW2C_1.png" alt="Logo W2C"></a>
+        <!-- <strong>What2Cook</strong> -->
         <nav>
             <ul>
                 <li><a href="/">Inicio</a></li>
-                <li><a href="/about">Nosotros</a></li>
+                <li><a href="/asistente-cocina">Asistente de Cocina</a></li>
+                <li><a href="/asistente-dieta">Asistente de Dietas</a></li>
+                <li><a href="/recetas">Catálogo</a></li>
                 <li><a href="/diets">Dietas</a></li>
-                <li><a href="/asistente-cocina">Asistente</a></li>
-                <li><a href="/recetas">Recetas</a></li>
-                <li><a href="/login">Iniciar sesión</a></li>
-                <li><a href="/register">Registrarse</a></li>
+                <li><a href="/about">Nosotros</a></li>
+                <li><a href="/login">Accedé</a></li>
             </ul>
         </nav>
     </header>
