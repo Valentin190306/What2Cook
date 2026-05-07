@@ -60,16 +60,22 @@ $styles = ['asistenteCocina'];
     </div>
 
     <div id="controls-meal-prep" class="ca-block ca-mode-controls" hidden>
-        <label class="ca-label" for="meal-prep-count">Cantidad de comidas</label>
-        <input
-            type="number"
-            id="meal-prep-count"
-            class="ca-number-input"
-            min="2"
-            max="5"
-            value="3"
-            aria-describedby="meal-prep-hint"
-        >
+        <div class="ca-stepper-row">
+            <button type="button" class="ca-stepper-circle" id="mp-minus" aria-label="Disminuir cantidad">−</button>
+            <div class="ca-stepper-field">
+                <input
+                    type="number"
+                    id="meal-prep-count"
+                    class="ca-number-input"
+                    min="2"
+                    max="5"
+                    value="3"
+                    readonly
+                    aria-describedby="meal-prep-hint"
+                >
+            </div>
+            <button type="button" class="ca-stepper-circle" id="mp-plus" aria-label="Aumentar cantidad">+</button>
+        </div>
         <small id="meal-prep-hint" class="ca-hint">Entre 2 y 5 recetas para tu semana.</small>
     </div>
 

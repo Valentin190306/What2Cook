@@ -49,7 +49,20 @@ $scripts = ['cooking-assistant'];
     <div id="controls-meal-prep" hidden>
         <div class="meal-prep-quantity">
             <label for="meal-prep-count">Cantidad de recetas:</label>
-            <input type="number" id="meal-prep-count" min="2" max="5" value="3">
+            <div class="ca-stepper-row">
+                <button type="button" class="ca-stepper-circle" id="mp-minus" aria-label="Disminuir cantidad">−</button>
+                <div class="ca-stepper-field">
+                    <input
+                        type="number"
+                        id="meal-prep-count"
+                        min="2"
+                        max="5"
+                        value="3"
+                        readonly
+                    >
+                </div>
+                <button type="button" class="ca-stepper-circle" id="mp-plus" aria-label="Aumentar cantidad">+</button>
+            </div>
         </div>
         <div class="form-actions">
             <button type="button" id="search-btn-prep" class="btn-primary">Generar Meal Prep</button>

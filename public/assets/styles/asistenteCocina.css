@@ -49,6 +49,12 @@
   margin-bottom: 2.5rem;
 }
 
+@media (max-width: 767px) {
+  .asistente-hero {
+    margin-top: 0 !important;
+  }
+}
+
 .asistente-hero .hero-logo {
   display: inline-block;
   margin-bottom: 1.25rem;
@@ -256,40 +262,87 @@
 }
 
 /* ---------- Meal Prep Quantity ---------- */
+/* ---------- Meal Prep Quantity Stepper ---------- */
 .meal-prep-quantity {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 1.25rem;
-  justify-content: center;
+  margin-bottom: 1.5rem;
 }
 
 .meal-prep-quantity label {
   font-family: var(--font-title);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  white-space: nowrap;
+  color: var(--color-text);
 }
 
-.meal-prep-quantity input[type="number"] {
-  width: 70px;
-  padding: 0.4rem;
+.ca-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.ca-stepper-circle {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--color-cream);
+  border: 2px solid var(--color-black);
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--color-black);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 4px 4px 0 var(--color-black);
+}
+
+.ca-stepper-circle:hover {
+  background: var(--color-carrot);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-black);
+}
+
+.ca-stepper-circle:active {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 var(--color-black);
+}
+
+.ca-stepper-field {
+  width: 4rem;
+  height: 3.5rem;
+  background: var(--color-cream);
+  border: 2px solid var(--color-black);
+  box-shadow: 4px 4px 0 var(--color-spinach);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ca-stepper-field input[type="number"] {
+  width: 100%;
+  border: none;
+  background: transparent;
   font-family: var(--font-title);
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 900;
   text-align: center;
-  border: 2px solid var(--color-black);
-  background-color: var(--color-white);
-  box-shadow: 3px 3px 0 var(--color-spinach);
-  transition: transform 0.2s, box-shadow 0.2s;
+  color: var(--color-black);
+  outline: none;
+  padding: 0;
+  appearance: textfield;
 }
 
-.meal-prep-quantity input[type="number"]:focus {
-  outline: none;
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0 var(--color-spinach);
+.ca-stepper-field input[type="number"]::-webkit-outer-spin-button,
+.ca-stepper-field input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 /* ---------- Botones de acción ---------- */
