@@ -150,7 +150,7 @@ class SpoonacularService
             throw new RuntimeException("Spoonacular respondió {$httpCode}: {$message}");
         }
 
-        $enableTranslation = ($_ENV['ENABLE_TRANSLATION'] ?? 'false') === 'true';
+        $enableTranslation = ($_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false') === 'true';
         if ($enableTranslation) {
             try {
                 $translator = $this->getTranslator();
@@ -168,7 +168,7 @@ class SpoonacularService
      */
     private function maybeTranslateInput(array|string $input): array|string
     {
-        $enableTranslation = ($_ENV['ENABLE_TRANSLATION'] ?? 'false') === 'true';
+        $enableTranslation = ($_ENV['ENABLE_INPUT_TRANSLATION'] ?? 'false') === 'true';
         if (!$enableTranslation) {
             return $input;
         }
