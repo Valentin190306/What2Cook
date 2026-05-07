@@ -191,18 +191,18 @@ function renderDay(dayIndex) {
     });
 
     divTotales.innerHTML = `
-        <div class="dia-totales-inner" style="margin-top: 1.5rem; text-align: center; border-top: 2px solid var(--color-black); padding-top: 1rem;">
-            <h3 style="font-family: var(--font-title); text-transform: uppercase; margin-bottom: 0.5rem; font-size: 1rem;">Totales del Día ${dayIndex}</h3>
-            <table class="ca-nutrition-table" style="max-width: 400px; margin: 0 auto;">
+        <div class="totales-dia-wrapper">
+            <h3>Totales del Día ${dayIndex}</h3>
+            <table class="totales-table">
                 <thead>
                     <tr><th>Kcal</th><th>Proteína</th><th>Carbs</th><th>Grasa</th></tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>${Math.round(day.total_calories)}</strong></td>
-                        <td><strong>${Math.round(day.total_protein)}g</strong></td>
-                        <td><strong>${Math.round(day.total_carbs)}g</strong></td>
-                        <td><strong>${Math.round(day.total_fat)}g</strong></td>
+                        <td>${Math.round(day.total_calories)}</td>
+                        <td>${Math.round(day.total_protein)}g</td>
+                        <td>${Math.round(day.total_carbs)}g</td>
+                        <td>${Math.round(day.total_fat)}g</td>
                     </tr>
                 </tbody>
             </table>

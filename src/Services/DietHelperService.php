@@ -95,7 +95,10 @@ class DietHelperService
             $rawDay   = $weekData['week'][$dayName];
             $meals    = $this->extractMeals($rawDay['meals'] ?? []);
             $snack    = $this->fetchSnack($meals);
-            $meals[]  = $snack;
+            
+            // Insertar la merienda antes de la última comida (Cena)
+            $insertPos = max(0, count($meals) - 1);
+            array_splice($meals, $insertPos, 0, [$snack]);
 
             $totals = $this->calculateDayTotals($meals);
 
@@ -166,7 +169,7 @@ class DietHelperService
         $results = $this->spoonacular->searchRecipes([
             'maxCalories' => 300,
             'minCalories' => 100,
-            'type'        => 'snack',
+            'type'        => 'breakfast',
             'number'      => 5,
         ]);
 
