@@ -100,7 +100,7 @@ class OpenAITranslator implements TranslatorInterface
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $this->apiKey,
             ],
-            CURLOPT_TIMEOUT        => 30, // Mayor timeout para arrays grandes
+            CURLOPT_TIMEOUT        => 30,
         ]);
 
         $body  = curl_exec($ch);
@@ -123,7 +123,6 @@ class OpenAITranslator implements TranslatorInterface
         
         $translatedData = json_decode($translationString, true);
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($translatedData)) {
-            // Fallback en caso de que OpenAI devuelva algo que no es JSON válido o array (aunque usamos json_object)
             return $data;
         }
 

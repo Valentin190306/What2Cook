@@ -102,7 +102,7 @@ class GeminiTranslator implements TranslatorInterface
             CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
             ],
-            CURLOPT_TIMEOUT        => 30, // Mayor timeout para arrays grandes
+            CURLOPT_TIMEOUT        => 30,
         ]);
 
         $body  = curl_exec($ch);
@@ -125,7 +125,6 @@ class GeminiTranslator implements TranslatorInterface
         
         $translatedData = json_decode($translationString, true);
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($translatedData)) {
-            // Fallback en caso de que Gemini devuelva algo que no es JSON válido
             return $data;
         }
 
