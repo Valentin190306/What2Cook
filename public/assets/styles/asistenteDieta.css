@@ -299,6 +299,9 @@
 
 .comida {
   animation: fadeUp 0.4s ease both;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .comida:nth-child(1) { animation-delay: 0.05s; }
@@ -323,6 +326,7 @@
 .comida-card {
   position: relative;
   display: grid;
+  flex-grow: 1;
   grid-template-columns: 130px 1fr;
   grid-template-rows: auto auto auto auto;
   column-gap: 1rem;
