@@ -123,10 +123,10 @@ docker compose ps
 Los tres servicios deben aparecer con estado `running`:
 
 ```
-NAME              SERVICE       STATUS
-pawprints-db-1    database      running
-pawprints-php-1   backend       running
-pawprints-web-1   web           running
+NAME                       SERVICE       STATUS
+what2cook-database-1       database      running
+what2cook-backend-1        backend       running
+what2cook-web-1            web           running
 ```
 
 ### 7. Ejecutar migraciones y seeds
