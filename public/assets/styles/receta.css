@@ -22,7 +22,7 @@
    ============================================================ */
 main>article.receta-detalle {
   animation: fadeIn 0.4s ease-out forwards;
-  padding: 1rem 0;
+  padding: 1 1.5rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -88,6 +88,7 @@ main>article.receta-detalle {
 /* --- Content Wrapper --- */
 .receta-content {
   display: flex;
+  margin: 0 auto 2.5rem;
   flex-direction: column;
   gap: 1.25rem;
 }
