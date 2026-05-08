@@ -73,7 +73,7 @@ $scripts = ['diet-helper'];
 
         <div class="form-grid">
             <div class="form-field">
-                <label for="duracion">Duración del plan</label>
+                <label for="duracion">Duración del plan <span aria-hidden="true" style="color:var(--color-carrot)">*</span></label>
                 <select id="duracion" name="duracion" required>
                     <option value="">Seleccioná una duración</option>
                     <option value="7">7 días (1 semana)</option>
@@ -83,9 +83,9 @@ $scripts = ['diet-helper'];
             </div>
 
             <div class="form-field">
-                <label for="dieta">Tipo de dieta (opcional)</label>
+                <label for="dieta">Tipo de dieta <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
                 <select id="dieta" name="dieta">
-                    <option value="">Seleccioná una dieta</option>
+                    <option value="">Sin restricción — dieta variada</option>
                     <option value="sin-gluten">Libre de Gluten</option>
                     <option value="keto">Cetogénica (Keto)</option>
                     <option value="vegetariana">Vegetariana</option>
