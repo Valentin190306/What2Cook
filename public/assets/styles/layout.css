@@ -31,7 +31,7 @@ header > strong {
 }
 
 header > a:first-child img {
-  max-width: 260px;
+  max-width: 450px;
   margin: 0 auto;
 }
 
@@ -62,8 +62,24 @@ header nav ul li a:hover {
 main {
   flex: 1;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2rem;
+}
+
+@media (max-width: 767px) {
+  header > a:first-child img {
+    max-width: 240px;
+  }
+  main {
+    padding-top: 0 !important;
+  }
+}
+
+main > * {
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
   padding: 2rem 1rem;
 }
 

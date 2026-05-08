@@ -3,16 +3,22 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Services\SpoonacularService;
 
 class RecipeController extends Controller
 {
-    public function show($params)
+    public function show(string $id): void
     {
-        $id = $params['id'] ?? 0;
+        try {
+            $service = new SpoonacularService();
+            $recipe  = $service->getRecipeInfo((int) $id, true);
+        } catch (\RuntimeException $e) {
+            $recipe = null;
+        }
 
         \App\Core\View::render('Recipe', [
-            'id' => $id,
-            'recipeName' => "Receta #$id"
+            'id'     => $id,
+            'recipe' => $recipe,
         ]);
     }
 }

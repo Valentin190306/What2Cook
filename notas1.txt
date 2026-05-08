@@ -1,0 +1,123 @@
+## Context
+
+I'm working on a PHP web application called What2Cook. I need to implement the backend logic for the "Kitchen Helper" (Asistente de Cocina) module, which consumes the Spoonacular API.
+
+## Existing architecture
+
+Stack: PHP 8.3, Nginx, PostgreSQL 16, Docker Compose. Custom MVC — no framework.
+
+Relevant structure:
+- `src/Controllers/` — controllers extending `App\Core\Controller` (which is abstract and currently empty)
+- `src/Services/` — service classes instantiated directly inside controllers
+- `src/Views/` — PHP view files rendered via `\App\Core\View::render('ViewName')`
+- `src/routes.php` — where all routes are registered on a `$router` instance
+- `.env` / `.env.example` — environment variables loaded via vlucas/phpdotenv
+
+Route registration syntax:
+```php
+$router->add('GET',  '/path',        'SomeController@method');
+$router->add('POST', '/api/path',    'SomeController@method');
+```
+
+The Router instantiates controllers with `new ClassName()` and calls the method directly. Route params like `{id}` are passed as method arguments.
+
+---
+
+## What already exists — do NOT recreate or overwrite
+
+### `src/Services/SpoonacularService.php` — already implemented
+Relevant methods available:
+- `searchByIngredients(array $ingredients, int $number, bool $maximize): array`
+  → Calls `GET /recipes/findByIngredients`. Note: `ranking=2` when `$maximize=true` (minimizes missing ingredients), `ranking=1` when false.
+- `searchRecipes(array $filters): array`
+  → Calls `GET /recipes/complexSearch` with `addRecipeNutrition=true` and `number=12` as defaults. Accepts any additional Spoonacular filter params merged in.
+- `getRecipeInfo(int $id, bool $includeNutrition): array`
+  → Calls `GET /recipes/{id}/information`
+
+The service reads the API key from `$_ENV['SPOONACULAR_KEY']` (not `SPOONACULAR_API_KEY`).
+It throws `RuntimeException` on HTTP errors, quota exceeded (402), and network failures.
+All HTTP calls are done with cURL.
+
+### `src/Controllers/KitchenHelperController.php` — already exists, only has `index()`
+```php
+class KitchenHelperController extends Controller {
+    public function index() {
+        \App\Core\View::render('KitchenHelper');
+    }
+}
+```
+
+### `src/routes.php` — already has this route:
+```php
+$router->add('GET', '/asistente-cocina', 'KitchenHelperController@index');
+```
+
+### `src/Views/KitchenHelper.php` — already exists (static HTML placeholder, not to be modified now)
+
+### Pattern reference — `DietHelperController` uses this approach:
+- Calls `$this->requireJson()` and `$this->parseBody()` — but these are NOT in the base `Controller` class (which is currently abstract and empty). The DietHelper controller calls them, meaning they must be added to the base class or implemented inline.
+- Responds with `$this->json($data)` and `$this->json(['error' => '...'], $code)` — same issue.
+- Instantiates the service inside the method: `$service = new DietHelperService();`
+- Catches `RuntimeException $e` and responds 502 with `['error' => $e->getMessage()]`
+
+---
+
+## What I need you to implement
+
+### 1. Add helper methods to `src/Core/Controller.php`
+
+Add the following protected methods to the base `Controller` class (matching the pattern already used by `DietHelperController`):
+
+- `requireJson(): void` — checks that `Content-Type: application/json` is present; responds 415 and exits if not.
+- `parseBody(): array` — reads and JSON-decodes `php://input`; returns empty array on failure.
+- `json(array $data, int $status = 200): void` — sets `Content-Type: application/json`, sets HTTP status, echoes `json_encode($data)`, and exits.
+
+### 2. Add API methods to `src/Controllers/KitchenHelperController.php`
+
+Add the following methods to the existing class (keep `index()` untouched):
+
+**`single(): void`**
+- Accepts `POST` with JSON body: `{ "ingredients": ["chicken", "rice"], "sort": "healthiness"|"time"|null }`
+- Validates that `ingredients` is a non-empty array; responds `['error' => 'Ingredients required']` with HTTP 400 if invalid.
+- If `sort` is `"healthiness"` or `"time"`: calls `$service->searchRecipes()` passing `['includeIngredients' => implode(',', $ingredients), 'sort' => $sort, 'sortDirection' => 'desc']`.
+- If `sort` is absent or null: calls `$service->searchByIngredients($ingredients, 12, true)`.
+- Responds `['success' => true, 'data' => $results]` on success.
+- Catches `RuntimeException` and responds `['error' => $e->getMessage()]` with HTTP 502.
+
+**`mealPrep(): void`**
+- Accepts `POST` with JSON body: `{ "ingredients": ["chicken", "rice"], "count": 3 }`
+- Validates non-empty `ingredients`; responds 400 if invalid.
+- Clamps `count` to the range 2–5.
+- Calls `$service->searchByIngredients($ingredients, $count * 5, true)` to fetch a wider pool.
+- Selection algorithm: sort the results by `usedIngredientCount` descending, then `missedIngredientCount` ascending. Take the first `$count` recipes.
+- Responds `['success' => true, 'data' => $selected]` on success.
+- Catches `RuntimeException` and responds `['error' => $e->getMessage()]` with HTTP 502.
+
+**`recipeDetail(int $id): void`**
+- Accepts `GET` with route param `{id}`.
+- Calls `$service->getRecipeInfo($id, true)`.
+- Responds `['success' => true, 'data' => $result]` on success.
+- Catches `RuntimeException` and responds `['error' => $e->getMessage()]` with HTTP 502.
+
+### 3. Register the new routes in `src/routes.php`
+
+Add these three lines in the API section (after the existing `/asistente-cocina` GET route):
+
+```php
+$router->add('POST', '/api/kitchen-helper/single',         'KitchenHelperController@single');
+$router->add('POST', '/api/kitchen-helper/meal-prep',      'KitchenHelperController@mealPrep');
+$router->add('GET',  '/api/kitchen-helper/recipe/{id}',    'KitchenHelperController@recipeDetail');
+```
+
+### 4. Add to `.env.example`
+SPOONACULAR_KEY=2cae7a709da64204b2ab693b0fa3af35
+---
+
+## What NOT to implement
+
+- Frontend JavaScript / AJAX (separate task)
+- CSS changes
+- Modifications to `KitchenHelper.php` view
+- Authentication / session checks on these endpoints
+- Database persistence for Kitchen Helper results
+- Any changes to `SpoonacularService.php`

@@ -6,30 +6,30 @@
     <title><?= $title ?? 'What2Cook' ?></title>
     
     <!-- Estilos base y comunes -->
-    <link rel="stylesheet" href="/assets/styles/base.css">
-    <link rel="stylesheet" href="/assets/styles/layout.css">
-    <link rel="stylesheet" href="/assets/styles/components.css">
+    <link rel="stylesheet" href="/assets/styles/base.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/styles/layout.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="/assets/styles/components.css?v=<?= time() ?>">
     
     <!-- Estilo específico de la página -->
     <?php if (isset($styles)): ?>
         <?php foreach ($styles as $style): ?>
-            <link rel="stylesheet" href="/assets/styles/<?= $style ?>.css">
+            <link rel="stylesheet" href="/assets/styles/<?= $style ?>.css?v=<?= time() ?>">
         <?php endforeach; ?>
     <?php endif; ?>
 </head>
 <body>
     <header>
-        <a href="/"><img src="/assets/img/LogoW2C_2.png" alt="Logo W2C"></a>
-        <strong>What2Cook</strong>
+        <a href="/"><img src="/assets/img/LogoW2C_1.png" alt="Logo W2C"></a>
+        <!-- <strong>What2Cook</strong> -->
         <nav>
             <ul>
                 <li><a href="/">Inicio</a></li>
-                <li><a href="/about">Nosotros</a></li>
+                <li><a href="/asistente-cocina">Asistente de Cocina</a></li>
+                <li><a href="/asistente-dieta">Asistente de Dietas</a></li>
+                <li><a href="/recetas">Catálogo</a></li>
                 <li><a href="/diets">Dietas</a></li>
-                <li><a href="/asistente-cocina">Asistente</a></li>
-                <li><a href="/recetas">Recetas</a></li>
-                <li><a href="/login">Iniciar sesión</a></li>
-                <li><a href="/register">Registrarse</a></li>
+                <li><a href="/about">Nosotros</a></li>
+                <li><a href="/login">Accedé</a></li>
             </ul>
         </nav>
     </header>
@@ -86,5 +86,10 @@
             </a>
         </nav>
     </footer>
+    <?php if (isset($scripts)): ?>
+        <?php foreach ($scripts as $script): ?>
+            <script src="/assets/js/<?= $script ?>.js?v=<?= time() ?>" defer></script>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </body>
 </html>

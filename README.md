@@ -3,20 +3,21 @@
 Repositorio de trabajo de la catedrá de Programación en Ambiente Web.
 
 Estudiantes:
-* Contardi, Gustavo
-* Zander, Matt
-* Romero Monteagudo, Valentín Joel
+
+- Contardi, Gustavo
+- Zander, Matt
+- Romero Monteagudo, Valentín Joel
 
 # Entorno de Desarrollo
 
 ## Stack
 
-| Capa | Tecnología |
-|---|---|
-| Servidor web | Nginx (Alpine) |
-| Backend | PHP 8.3 FPM (Alpine) |
-| Base de datos | PostgreSQL 16 (Alpine) |
-| Contenedores | Docker + Docker Compose |
+| Capa          | Tecnología              |
+| ------------- | ----------------------- |
+| Servidor web  | Nginx (Alpine)          |
+| Backend       | PHP 8.3 FPM (Alpine)    |
+| Base de datos | PostgreSQL 16 (Alpine)  |
+| Contenedores  | Docker + Docker Compose |
 
 ## Estructura del proyecto
 
@@ -85,6 +86,10 @@ DB_PORT=5432
 DB_NAME=what2cook
 DB_USER=what2cook
 DB_PASSWORD=what2cook
+
+SPOONACULAR_KEY=tu_api_key_aqui
+OPENAI_API_KEY=tu_api_key_aqui
+ENABLE_TRANSLATION=true
 ```
 
 ### 3. Construir las imágenes
@@ -118,35 +123,59 @@ docker compose ps
 Los tres servicios deben aparecer con estado `running`:
 
 ```
-NAME              SERVICE       STATUS
-pawprints-db-1    database      running
-pawprints-php-1   backend       running
-pawprints-web-1   web           running
+NAME                       SERVICE       STATUS
+what2cook-database-1       database      running
+what2cook-backend-1        backend       running
+what2cook-web-1            web           running
+```
+
+### 7. Ejecutar migraciones y seeds
+
+Para crear las tablas y cargar datos iniciales de prueba:
+
+```bash
+# Crear las tablas
+docker compose exec backend ./vendor/bin/phinx migrate
+
+# Cargar datos de prueba (opcional)
+docker compose exec backend ./vendor/bin/phinx seed:run
 ```
 
 El sitio queda disponible en **http://localhost:8080**
 
+## APIs Externas y Traducción
+
+La aplicación se integra con **Spoonacular** para obtener recetas. Además, cuenta con un módulo de **Traducción Automática (OpenAI)** para traducir los resultados de recetas al español.
+
+- Para habilitar la traducción, asegúrate de tener saldo en tu cuenta de OpenAI y establece `ENABLE_TRANSLATION=true` en tu archivo `.env`.
+- Si deseas ahorrar cuota/saldo durante el desarrollo, puedes desactivarlo temporalmente usando `ENABLE_TRANSLATION=false`. Toda la información se mostrará en su idioma original (inglés).
+
 ## Dependencias PHP
 
-| Librería | Versión | Uso |
-|---|---|---|
-| monolog/monolog | ^3.10 | Logging |
-| vlucas/phpdotenv | ^5.6 | Variables de entorno |
-| robmorgan/phinx | ^0.16 | Migraciones de base de datos |
+| Librería         | Versión | Uso                          |
+| ---------------- | ------- | ---------------------------- |
+| monolog/monolog  | ^3.10   | Logging                      |
+| vlucas/phpdotenv | ^5.6    | Variables de entorno         |
+| robmorgan/phinx  | ^0.16   | Migraciones de base de datos |
 
 ## Comandos útiles
 
 ```bash
+# Ejecutar scripts de prueba para APIs externas
+docker compose exec backend php tests/run_all.php
+# (O si lo ejecutas en tu máquina host sin docker)
+php tests/run_all.php
+
 # Ver logs de un servicio específico
-docker compose logs php
+docker compose logs backend
 docker compose logs web
-docker compose logs db
+docker compose logs database
 
 # Reiniciar un servicio sin bajar los demás
 docker compose restart web
 
 # Entrar al contenedor PHP
-docker compose exec php sh
+docker compose exec backend sh
 
 # Bajar todos los contenedores
 docker compose down
