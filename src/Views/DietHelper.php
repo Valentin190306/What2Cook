@@ -106,22 +106,25 @@ $scripts = ['diet-helper'];
 
             <div class="nutri-grid">
                 <div class="form-field">
-                    <label for="calorias">Calorías diarias (kcal)</label>
-                    <input type="number" id="calorias" name="calorias" placeholder="ej: 2000">
+                    <label for="calorias">Calorías diarias (kcal) <span aria-hidden="true" style="color:var(--color-carrot)">*</span></label>
+                    <input type="number" id="calorias" name="calorias" placeholder="ej: 2000" required min="500" max="5000">
                 </div>
                 <div class="form-field">
-                    <label for="proteinas">Proteínas (g)</label>
+                    <label for="proteinas">Proteínas (g) <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
                     <input type="number" id="proteinas" name="proteinas" placeholder="ej: 150">
                 </div>
                 <div class="form-field">
-                    <label for="carbohidratos">Carbohidratos (g)</label>
+                    <label for="carbohidratos">Carbohidratos (g) <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
                     <input type="number" id="carbohidratos" name="carbohidratos" placeholder="ej: 200">
                 </div>
                 <div class="form-field">
-                    <label for="grasas">Grasas (g)</label>
+                    <label for="grasas">Grasas (g) <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
                     <input type="number" id="grasas" name="grasas" placeholder="ej: 70">
                 </div>
             </div>
+            <p style="font-size:0.8rem; color:var(--color-text-muted); margin-top:0.5rem;">
+                Si no completás proteínas, carbohidratos y grasas, el plan se generará con una distribución balanceada respetando las calorías indicadas.
+            </p>
         </fieldset>
 
         <div class="form-actions">

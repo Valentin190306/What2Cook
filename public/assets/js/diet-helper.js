@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
+        const caloriasVal = parseInt(document.getElementById('calorias').value);
+        if (!caloriasVal || caloriasVal < 500) {
+            status.textContent = 'Ingresá un valor de calorías diarias (mínimo 500 kcal).';
+            status.style.display = 'block';
+            btnGenerar.disabled = false;
+            return;
+        }
+
         status.innerHTML = `
             <div class="ca-loading-newspaper">
                 <span class="ca-loading-spinner"></span>
