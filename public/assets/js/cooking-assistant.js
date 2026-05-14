@@ -104,20 +104,21 @@ function onFilterClick(e) {
     const btn = e.currentTarget;
     const sort = btn.dataset.sort;
 
-    if (activeSort === sort) {
-        activeSort = null;
-    } else {
-        activeSort = sort;
-    }
+    activeSort = sort;
 
-    updateFilterButtons(activeSort);
+    updateFilterButtons(null);
+
+    if (ingredients.length === 0) {
+        setStatus('Ingresá al menos 1 ingrediente', false);
+        return;
+    }
+    search();
 }
 
 function updateFilterButtons(sort) {
     document.querySelectorAll('.ca-filter-btn').forEach(btn => {
-        const isActive = btn.dataset.sort === sort;
-        btn.classList.toggle('active', isActive);
-        btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        btn.classList.remove('active');
+        btn.setAttribute('aria-pressed', 'false');
     });
 }
 
@@ -126,7 +127,7 @@ function updateFilterButtons(sort) {
    ============================================================ */
 async function search() {
     if (ingredients.length === 0) {
-        setStatus('Agregá al menos un ingrediente para buscar.', false);
+        setStatus('Ingresá al menos 1 ingrediente', false);
         return;
     }
 
@@ -141,7 +142,7 @@ async function search() {
         } else {
             const count = parseInt(el('meal-prep-count').value, 10);
             url = '/api/kitchen-helper/meal-prep';
-            body = { ingredients, count };
+            body = { ingredients, count, sort: activeSort };
         }
 
         const response = await fetch(url, {
@@ -151,7 +152,9 @@ async function search() {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            const detail = errorData.message || errorData.error || '';
+            throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
         }
 
         const json = await response.json();
@@ -163,7 +166,7 @@ async function search() {
         }
     } catch (err) {
         console.error('[CookingAssistant] search error:', err);
-        setStatus('Error al buscar recetas. Verificá tu conexión e intentá nuevamente.', true);
+        setStatus(`Error al buscar recetas: ${err.message}`, true);
     } finally {
         setLoading(false);
     }
@@ -263,9 +266,13 @@ function buildCard(recipe) {
 
     const img = document.createElement('img');
     img.classList.add('ca-card__img');
-    img.src = recipe.image || '';
+    img.src = recipe.image || '/assets/img/placeholder_RecetaSinFoto.png';
     img.alt = recipe.title;
     img.loading = 'lazy';
+    img.onerror = function() {
+        this.onerror = null;
+        this.src = '/assets/img/placeholder_RecetaSinFoto.png';
+    };
 
     const title = document.createElement('h2');
     title.classList.add('ca-card__title');
@@ -343,7 +350,9 @@ async function openRecipeDetail(id) {
         const response = await fetch(`/api/kitchen-helper/recipe/${id}`);
 
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            const errorData = await response.json().catch(() => ({}));
+            const detail = errorData.message || errorData.error || '';
+            throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
         }
 
         const json = await response.json();
@@ -355,7 +364,7 @@ async function openRecipeDetail(id) {
         }
     } catch (err) {
         console.error('[CookingAssistant] recipe detail error:', err);
-        body.innerHTML = `<p class="ca-status ca-status--error">Error al cargar el detalle de la receta.</p>`;
+        body.innerHTML = `<p class="ca-status ca-status--error">${escapeHtml(err.message || 'Error al cargar el detalle de la receta.')}</p>`;
     }
 }
 
@@ -364,7 +373,7 @@ function renderModalContent(recipe) {
 
     let imgHtml = '';
     if (recipe.image) {
-        imgHtml = `<img class="ca-modal-img" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.title)}">`;
+        imgHtml = `<img class="ca-modal-img" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.title)}" onerror="this.onerror=null;this.src='/assets/img/placeholder_RecetaSinFoto.png';">`;
     }
 
     const timeHtml = recipe.readyInMinutes
@@ -447,6 +456,18 @@ function setStatus(message, isError) {
     grid.innerHTML = '';
     status.textContent = message;
     status.classList.toggle('ca-status--error', !!isError);
+    
+    status.style.fontSize = '1.3rem';
+    status.style.fontFamily = 'Georgia, serif';
+    status.style.padding = '15px 20px';
+    status.style.textAlign = 'center';
+    status.style.color = isError ? '#c93a3a' : '#4a4a4a';
+    status.style.border = '2px dashed #b5a48b';
+    status.style.borderRadius = '8px';
+    status.style.backgroundColor = '#fdfbf7';
+    status.style.marginTop = '20px';
+    status.style.fontWeight = 'bold';
+
     show(status);
 }
 

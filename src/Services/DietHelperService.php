@@ -3,13 +3,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use RuntimeException;
-
 class DietHelperService
 {
     private SpoonacularService $spoonacular;
 
-    // Mapeo del valor del formulario al parámetro que acepta Spoonacular
     private const DIET_MAP = [
         'vegana'        => 'vegan',
         'vegetariana'   => 'vegetarian',
@@ -25,19 +22,6 @@ class DietHelperService
         $this->spoonacular = new SpoonacularService();
     }
 
-    // ── Punto de entrada principal ────────────────────────────────────────────
-
-    /**
-     * Genera un plan completo de N días.
-     *
-     * @param  int    $durationDays    7 | 14 | 30
-     * @param  int    $targetCalories  Calorías diarias
-     * @param  int    $targetProtein   Proteínas diarias en gramos
-     * @param  int    $targetCarbs     Carbohidratos diarios en gramos
-     * @param  int    $targetFat       Grasas diarias en gramos
-     * @param  string $dietType        Valor del formulario (vegana, keto, etc.) o vacío
-     * @return array  Plan estructurado con 'meta' y 'days'
-     */
     public function generatePlan(
         int    $durationDays,
         int    $targetCalories,
@@ -47,16 +31,189 @@ class DietHelperService
         string $dietType = ''
     ): array {
         $spoonacularDiet = self::DIET_MAP[$dietType] ?? '';
-        $weeksNeeded     = (int) ceil($durationDays / 7);
-        $days            = [];
 
-        for ($week = 0; $week < $weeksNeeded; $week++) {
-            $weekData  = $this->spoonacular->generateWeeklyPlan($targetCalories, $spoonacularDiet);
-            $weekDays  = $this->extractDaysFromWeek($weekData, $week * 7);
+        $macrosConfig = [
+            'breakfast' => ['ratio' => 0.25, 'type' => 'breakfast'],
+            'lunch'     => ['ratio' => 0.35, 'type' => 'main course'],
+            'snack'     => ['ratio' => 0.10, 'type' => 'breakfast'],
+            'dinner'    => ['ratio' => 0.30, 'type' => 'main course'],
+        ];
 
-            // Si la duración no es múltiplo de 7, recortamos los días sobrantes
-            $remaining = $durationDays - count($days);
-            $days      = array_merge($days, array_slice($weekDays, 0, $remaining));
+        $pools = [];
+
+        foreach ($macrosConfig as $mealName => $config) {
+            $ratio = $config['ratio'];
+
+            $filters = [
+                'type' => $config['type'],
+                'number' => max(30, $durationDays),
+                'addRecipeNutrition' => 'true',
+                'addRecipeInformation' => 'true',
+            ];
+
+            if ($spoonacularDiet !== '') {
+                $filters['diet'] = $spoonacularDiet;
+            }
+
+            if ($targetCalories > 0) {
+                $filters['minCalories'] = max(0, (int) round(($targetCalories * $ratio) * 0.7));
+                $filters['maxCalories'] = (int) round(($targetCalories * $ratio) * 1.3);
+            }
+            if ($targetProtein > 0) {
+                $filters['minProtein'] = max(0, (int) round(($targetProtein * $ratio) * 0.7));
+                $filters['maxProtein'] = (int) round(($targetProtein * $ratio) * 1.3);
+            }
+            if ($targetCarbs > 0) {
+                $filters['minCarbs'] = max(0, (int) round(($targetCarbs * $ratio) * 0.7));
+                $filters['maxCarbs'] = (int) round(($targetCarbs * $ratio) * 1.3);
+            }
+            if ($targetFat > 0) {
+                $filters['minFat'] = max(0, (int) round(($targetFat * $ratio) * 0.7));
+                $filters['maxFat'] = (int) round(($targetFat * $ratio) * 1.3);
+            }
+
+            $results = $this->spoonacular->searchRecipes($filters);
+
+            // Fallback 1: Si es muy restrictivo y no hay recetas, intentar solo con Calorías y Dieta con 50% de margen
+            if (empty($results['results'])) {
+                $fallbackFilters = [
+                    'type' => $config['type'],
+                    'number' => max(30, $durationDays),
+                    'addRecipeNutrition' => 'true',
+                    'addRecipeInformation' => 'true',
+                ];
+                if ($spoonacularDiet !== '') {
+                    $fallbackFilters['diet'] = $spoonacularDiet;
+                }
+                if ($targetCalories > 0) {
+                    $fallbackFilters['minCalories'] = max(0, (int) round(($targetCalories * $ratio) * 0.5));
+                    $fallbackFilters['maxCalories'] = (int) round(($targetCalories * $ratio) * 1.5);
+                }
+                $results = $this->spoonacular->searchRecipes($fallbackFilters);
+            }
+
+            // Fallback 2: Si aun no hay, intentar sin restricciones de macros/calorías (solo dieta)
+            if (empty($results['results'])) {
+                $fallbackFilters2 = [
+                    'type' => $config['type'],
+                    'number' => max(30, $durationDays),
+                    'addRecipeNutrition' => 'true',
+                    'addRecipeInformation' => 'true',
+                ];
+                if ($spoonacularDiet !== '') {
+                    $fallbackFilters2['diet'] = $spoonacularDiet;
+                }
+                $results = $this->spoonacular->searchRecipes($fallbackFilters2);
+            }
+
+            $pool = $results['results'] ?? [];
+            shuffle($pool);
+            srand(crc32($mealName . date('Y-m-d')));
+            shuffle($pool);
+            $pools[$mealName] = $pool;
+        }
+
+        $days = [];
+
+        for ($i = 0; $i < $durationDays; $i++) {
+            $meals = [];
+            $dailyIds = [];
+
+            foreach (['breakfast', 'lunch', 'snack', 'dinner'] as $mealName) {
+                $pool = $pools[$mealName];
+                $recipe = null;
+
+                $poolSize = count($pool);
+
+                if ($poolSize > 0) {
+                    // Intentar encontrar una receta no usada en los últimos 3 días
+                    $recentIds = array_slice(
+                        array_column(
+                            array_filter($days, fn($d) => count($d['meals']) > 0),
+                            'meals'
+                        ),
+                        -3
+                    );
+                    $recentUsed = [];
+                    foreach ($recentIds as $dayMeals) {
+                        foreach ($dayMeals as $m) {
+                            if ($m['meal_type'] === $mealName) {
+                                $recentUsed[] = $m['spoonacular_id'];
+                            }
+                        }
+                    }
+
+                    // Buscar la primera receta del pool que no esté en $recentUsed ni en $dailyIds
+                    $startIndex = $i % $poolSize;
+                    for ($j = 0; $j < $poolSize; $j++) {
+                        $idx = ($startIndex + $j) % $poolSize;
+                        $candidate = $pool[$idx];
+                        $candidateId = (int) $candidate['id'];
+                        if (
+                            !in_array($candidateId, $dailyIds, true) &&
+                            !in_array($candidateId, $recentUsed, true)
+                        ) {
+                            $recipe = $candidate;
+                            break;
+                        }
+                    }
+
+                    // Fallback: si todas las recetas fueron usadas recientemente, usar cualquiera no usada hoy
+                    if ($recipe === null) {
+                        for ($j = 0; $j < $poolSize; $j++) {
+                            $idx = ($startIndex + $j) % $poolSize;
+                            $candidate = $pool[$idx];
+                            if (!in_array((int)$candidate['id'], $dailyIds, true)) {
+                                $recipe = $candidate;
+                                break;
+                            }
+                        }
+                    }
+
+                    // Último fallback: usar startIndex sin restricciones
+                    if ($recipe === null) {
+                        $recipe = $pool[$startIndex];
+                    }
+                }
+
+                if ($recipe !== null) {
+                    $dailyIds[] = (int) $recipe['id'];
+                    $nutrition = $this->extractNutritionFromRecipe($recipe);
+
+                    $multiplier = 1;
+                    if ($targetCalories > 0 && $nutrition['calories'] > 0) {
+                        $mealRatio = $macrosConfig[$mealName]['ratio'] ?? 0.25;
+                        $targetMealCals = $targetCalories * $mealRatio;
+                        $multiplier = max(1, (int) round($targetMealCals / $nutrition['calories']));
+                    }
+
+                    $meals[] = [
+                        'meal_type'        => $mealName,
+                        'spoonacular_id'   => (int) $recipe['id'],
+                        'title'            => $recipe['title'] ?? '',
+                        'image'            => $recipe['image'] ?? '',
+                        'ready_in_minutes' => (int) ($recipe['readyInMinutes'] ?? 0),
+                        'servings'         => $multiplier,
+                        'calories'         => $nutrition['calories'] * $multiplier,
+                        'protein'          => $nutrition['protein'] * $multiplier,
+                        'carbs'            => $nutrition['carbs'] * $multiplier,
+                        'fat'              => $nutrition['fat'] * $multiplier,
+                    ];
+                } else {
+                    $meals[] = $this->emptyMeal($mealName);
+                }
+            }
+
+            $totals = $this->calculateDayTotals($meals);
+
+            $days[] = [
+                'day_index'      => $i + 1,
+                'total_calories' => $totals['calories'],
+                'total_protein'  => $totals['protein'],
+                'total_carbs'    => $totals['carbs'],
+                'total_fat'      => $totals['fat'],
+                'meals'          => $meals,
+            ];
         }
 
         return [
@@ -72,175 +229,6 @@ class DietHelperService
         ];
     }
 
-    // ── Transformación de la respuesta de Spoonacular ─────────────────────────
-
-    /**
-     * Convierte la respuesta semanal de Spoonacular a un array de días
-     * con el formato interno del proyecto.
-     *
-     * Spoonacular devuelve las comidas bajo keys como 'monday', 'tuesday', etc.
-     * Cada día tiene 3 meals (breakfast, lunch, dinner).
-     * Acá se agrega la merienda (snack) buscando una receta liviana adicional.
-     */
-    private function extractDaysFromWeek(array $weekData, int $dayOffset): array
-    {
-        $dayNames = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-        $days     = [];
-
-        foreach ($dayNames as $i => $dayName) {
-            if (!isset($weekData['week'][$dayName])) {
-                continue;
-            }
-
-            $rawDay   = $weekData['week'][$dayName];
-            $meals    = $this->extractMeals($rawDay['meals'] ?? []);
-            $snack    = $this->fetchSnack($meals);
-            $meals[]  = $snack;
-
-            $totals = $this->calculateDayTotals($meals);
-
-            $days[] = [
-                'day_index'      => $dayOffset + $i + 1,
-                'total_calories' => $totals['calories'],
-                'total_protein'  => $totals['protein'],
-                'total_carbs'    => $totals['carbs'],
-                'total_fat'      => $totals['fat'],
-                'meals'          => $meals,
-            ];
-        }
-
-        return $days;
-    }
-
-    /**
-     * Mapea las meals crudas de Spoonacular al formato interno.
-     * Spoonacular usa slot 1=breakfast, 2=lunch, 3=dinner.
-     *
-     * @param  array $rawMeals
-     * @return array
-     */
-    private function extractMeals(array $rawMeals): array
-    {
-        $slotMap = [
-            1 => 'breakfast',
-            2 => 'lunch',
-            3 => 'dinner',
-        ];
-
-        $meals = [];
-
-        foreach ($rawMeals as $raw) {
-            $slot      = $raw['slot'] ?? 0;
-            $mealType  = $slotMap[$slot] ?? 'lunch';
-            $nutrition = $this->fetchNutrition((int) $raw['id']);
-
-            $meals[] = [
-                'meal_type'       => $mealType,
-                'spoonacular_id'  => (int) $raw['id'],
-                'title'           => $raw['title'] ?? '',
-                'image'           => $this->buildImageUrl((int) $raw['id'], $raw['imageType'] ?? 'jpg'),
-                'ready_in_minutes'=> (int) ($raw['readyInMinutes'] ?? 0),
-                'servings'        => (int) ($raw['servings'] ?? 1),
-                'calories'        => $nutrition['calories'],
-                'protein'         => $nutrition['protein'],
-                'carbs'           => $nutrition['carbs'],
-                'fat'             => $nutrition['fat'],
-            ];
-        }
-
-        return $meals;
-    }
-
-    /**
-     * Busca una receta liviana para usar como merienda.
-     * Usa calorías bajas y excluye los IDs ya presentes en el día.
-     *
-     * @param  array $existingMeals Meals ya asignadas al día (para excluir sus IDs)
-     * @return array
-     */
-    private function fetchSnack(array $existingMeals): array
-    {
-        $excludeIds = array_column($existingMeals, 'spoonacular_id');
-
-        $results = $this->spoonacular->searchRecipes([
-            'maxCalories' => 300,
-            'minCalories' => 100,
-            'type'        => 'snack',
-            'number'      => 5,
-        ]);
-
-        $recipes = $results['results'] ?? [];
-
-        // Buscar una que no esté ya en el día
-        $chosen = null;
-        foreach ($recipes as $recipe) {
-            if (!in_array((int) $recipe['id'], $excludeIds, true)) {
-                $chosen = $recipe;
-                break;
-            }
-        }
-
-        // Si no encontró ninguna distinta, usa la primera disponible
-        if ($chosen === null) {
-            $chosen = $recipes[0] ?? null;
-        }
-
-        if ($chosen === null) {
-            return $this->emptyMeal('snack');
-        }
-
-        $nutrition = $this->extractNutritionFromRecipe($chosen);
-
-        return [
-            'meal_type'        => 'snack',
-            'spoonacular_id'   => (int) $chosen['id'],
-            'title'            => $chosen['title'] ?? '',
-            'image'            => $chosen['image'] ?? '',
-            'ready_in_minutes' => (int) ($chosen['readyInMinutes'] ?? 0),
-            'servings'         => (int) ($chosen['servings'] ?? 1),
-            'calories'         => $nutrition['calories'],
-            'protein'          => $nutrition['protein'],
-            'carbs'            => $nutrition['carbs'],
-            'fat'              => $nutrition['fat'],
-        ];
-    }
-
-    // ── Nutrición ─────────────────────────────────────────────────────────────
-
-    /**
-     * Obtiene macros de una receta por su ID.
-     * Usa el endpoint nutritionWidget que devuelve los valores directamente.
-     *
-     * @param  int $id
-     * @return array{calories: float, protein: float, carbs: float, fat: float}
-     */
-    private function fetchNutrition(int $id): array
-    {
-        try {
-            $data = $this->spoonacular->getRecipeNutrition($id);
-            return $this->parseNutritionWidget($data);
-        } catch (RuntimeException) {
-            return ['calories' => 0.0, 'protein' => 0.0, 'carbs' => 0.0, 'fat' => 0.0];
-        }
-    }
-
-    /**
-     * Parsea la respuesta del nutritionWidget de Spoonacular.
-     * Los valores vienen como strings con unidad: "320 calories", "15g", etc.
-     */
-    private function parseNutritionWidget(array $data): array
-    {
-        return [
-            'calories' => (float) ($data['calories'] ?? 0),
-            'protein'  => (float) filter_var($data['protein'] ?? '0', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-            'carbs'    => (float) filter_var($data['carbs']   ?? '0', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-            'fat'      => (float) filter_var($data['fat']     ?? '0', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-        ];
-    }
-
-    /**
-     * Extrae nutrición desde la respuesta de complexSearch (que incluye nutrition inline).
-     */
     private function extractNutritionFromRecipe(array $recipe): array
     {
         $nutrients = $recipe['nutrition']['nutrients'] ?? [];
@@ -258,11 +246,6 @@ class DietHelperService
         ];
     }
 
-    // ── Utilidades ────────────────────────────────────────────────────────────
-
-    /**
-     * Suma los macros de todas las comidas de un día.
-     */
     private function calculateDayTotals(array $meals): array
     {
         $totals = ['calories' => 0.0, 'protein' => 0.0, 'carbs' => 0.0, 'fat' => 0.0];
@@ -277,24 +260,13 @@ class DietHelperService
         return $totals;
     }
 
-    /**
-     * Construye la URL de imagen de Spoonacular a partir del ID y tipo
-     */
-    private function buildImageUrl(int $id, string $imageType): string
-    {
-        return "https://img.spoonacular.com/recipes/{$id}-556x370.{$imageType}";
-    }
-
-    /**
-     * Devuelve una meal vacía para cuando no se encuentra snack
-     */
     private function emptyMeal(string $mealType): array
     {
         return [
             'meal_type'        => $mealType,
             'spoonacular_id'   => 0,
-            'title'            => '',
-            'image'            => '',
+            'title'            => 'Receta no encontrada (Ajuste muy restrictivo)',
+            'image'            => '/assets/img/placeholder.jpg',
             'ready_in_minutes' => 0,
             'servings'         => 0,
             'calories'         => 0.0,

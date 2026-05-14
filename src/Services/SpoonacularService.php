@@ -20,7 +20,7 @@ class SpoonacularService
         $this->apiKey = $key;
     }
 
-    // ── Meal Planner ─────────────────────────────────────────────────────────
+    // ── Meal Planner (descontinuado) ─────────────────────────────────────────
 
     /**
      * Genera un plan de comidas semanal desde Spoonacular.
@@ -52,7 +52,7 @@ class SpoonacularService
             'ingredients'          => implode(',', $ingredients),
             'number'               => $number,
             'ranking'              => $maximize ? 2 : 1,
-            'ignorePantry'         => true,
+            'ignorePantry'         => 'true',
         ]);
     }
 
@@ -80,7 +80,7 @@ class SpoonacularService
     public function searchRecipes(array $filters = []): array
     {
         $defaults = [
-            'addRecipeNutrition' => true,
+            'addRecipeNutrition' => 'true',
             'number'             => 12,
         ];
 

@@ -32,13 +32,36 @@ class KitchenHelperController extends Controller
             $service = new \App\Services\SpoonacularService();
 
             if ($sort === 'healthiness' || $sort === 'time') {
-                // complexSearch ya incluye nutrición con addRecipeNutrition:true
                 $results = $service->searchRecipes([
-                    'includeIngredients' => implode(',', $ingredients),
-                    'sort'               => $sort,
-                    'sortDirection'      => 'desc',
+                    'includeIngredients'   => implode(',', $ingredients),
+                    'sort'                 => $sort,
+                    'sortDirection'        => 'desc',
+                    'addRecipeNutrition'   => 'true',
+                    'fillIngredients'      => 'true',
+                    'addRecipeInformation' => 'true',
                 ]);
                 $list = $results['results'] ?? $results;
+
+                foreach ($list as &$recipe) {
+                    if (isset($recipe['nutrition']['nutrients'])) {
+                        $map = [];
+                        foreach ($recipe['nutrition']['nutrients'] as $n) {
+                            $map[$n['name']] = (float) ($n['amount'] ?? 0);
+                        }
+                        $recipe['nutrition'] = [
+                            'calories' => $map['Calories']     ?? 0.0,
+                            'protein'  => $map['Protein']       ?? 0.0,
+                            'carbs'    => $map['Carbohydrates'] ?? 0.0,
+                            'fat'      => $map['Fat']           ?? 0.0,
+                        ];
+                    }
+                    if (!isset($recipe['usedIngredientCount']) && isset($recipe['usedIngredients'])) {
+                        $recipe['usedIngredientCount'] = count($recipe['usedIngredients']);
+                    }
+                    if (!isset($recipe['missedIngredientCount']) && isset($recipe['missedIngredients'])) {
+                        $recipe['missedIngredientCount'] = count($recipe['missedIngredients']);
+                    }
+                }
             } else {
                 $list = $service->searchByIngredients($ingredients, 12, true);
                 $list = $this->enrichWithNutrition($list, $service);
@@ -59,6 +82,7 @@ class KitchenHelperController extends Controller
 
         $ingredients = $body['ingredients'] ?? [];
         $count       = (int) ($body['count'] ?? 3);
+        $sort        = $body['sort'] ?? null;
 
         if (!is_array($ingredients) || empty($ingredients)) {
             $this->json(['error' => 'Ingredients required'], 400);
@@ -71,13 +95,19 @@ class KitchenHelperController extends Controller
             $service = new \App\Services\SpoonacularService();
             $pool    = $service->searchByIngredients($ingredients, $count * 5, true);
 
-            usort($pool, function (array $a, array $b): int {
-                $usedDiff = ($b['usedIngredientCount'] ?? 0) <=> ($a['usedIngredientCount'] ?? 0);
-                if ($usedDiff !== 0) {
-                    return $usedDiff;
-                }
-                return ($a['missedIngredientCount'] ?? 0) <=> ($b['missedIngredientCount'] ?? 0);
-            });
+            if ($sort === 'time') {
+                usort($pool, function (array $a, array $b): int {
+                    return ($a['readyInMinutes'] ?? 9999) <=> ($b['readyInMinutes'] ?? 9999);
+                });
+            } else {
+                usort($pool, function (array $a, array $b): int {
+                    $usedDiff = ($b['usedIngredientCount'] ?? 0) <=> ($a['usedIngredientCount'] ?? 0);
+                    if ($usedDiff !== 0) {
+                        return $usedDiff;
+                    }
+                    return ($a['missedIngredientCount'] ?? 0) <=> ($b['missedIngredientCount'] ?? 0);
+                });
+            }
 
             $selected = array_slice($pool, 0, $count);
             $selected = $this->enrichWithNutrition($selected, $service);
