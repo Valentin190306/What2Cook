@@ -37,9 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
         `;
         status.style.display = 'block';
-        status.style.border = 'none';
-        status.style.padding = '0';
-        status.style.backgroundColor = 'transparent';
+        status.className = '';
         btnGenerar.disabled = true;
         panel.hidden = true;
 
@@ -53,35 +51,15 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            const response = await fetch('/api/diet-helper/generate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                const detail = errorData.error || errorData.message || '';
-                throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
-            }
-
-            planData = await response.json();
+            planData = await BackendAPI.generateDiet(data);
+            
             status.textContent = '';
             status.style.display = 'none';
             renderPlan(planData);
         } catch (err) {
             status.textContent = err.message;
             status.style.display = 'block';
-            status.style.fontSize = '1.3rem';
-            status.style.fontFamily = 'Georgia, serif';
-            status.style.padding = '15px 20px';
-            status.style.textAlign = 'center';
-            status.style.color = '#c93a3a';
-            status.style.border = '2px dashed #b5a48b';
-            status.style.borderRadius = '8px';
-            status.style.backgroundColor = '#fdfbf7';
-            status.style.marginTop = '20px';
-            status.style.fontWeight = 'bold';
+            status.className = 'ca-status-box ca-status-box--error';
             console.error(err);
         } finally {
             btnGenerar.disabled = false;
@@ -210,14 +188,4 @@ function renderDay(dayIndex) {
             </table>
         </div>
     `;
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
 }

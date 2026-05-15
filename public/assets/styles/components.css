@@ -141,3 +141,24 @@ input:focus, textarea:focus {
   left: 0;
   font-weight: bold;
 }
+
+/* ============================================================
+   Status Boxes (Alertas)
+   ============================================================ */
+.ca-status-box {
+    font-size: 1.3rem;
+    font-family: Georgia, serif;
+    padding: 15px 20px;
+    text-align: center;
+    color: #4a4a4a;
+    border: 2px dashed #b5a48b;
+    border-radius: 8px;
+    background-color: #fdfbf7;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.ca-status-box--error {
+    color: #c93a3a;
+}
+

@@ -114,6 +114,29 @@ class SpoonacularService
      */
     private function get(string $endpoint, array $params): array
     {
+        // 1. Crear llave de caché basada en el endpoint y los parámetros (sin la API key)
+        $cacheParams = $params;
+        $cacheKey = md5($endpoint . '?' . http_build_query($cacheParams));
+        
+        // 2. Definir ruta de caché y tiempo de expiración (ej: 7 días = 604800 segundos)
+        $cacheDir = __DIR__ . '/../../log/cache';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0777, true);
+        }
+        $cacheFile = $cacheDir . '/' . $cacheKey . '.json';
+        $cacheTime = 60 * 60 * 24 * 7;
+        
+        // 3. Revisar si tenemos un archivo en caché válido
+        if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTime)) {
+            $cachedContent = file_get_contents($cacheFile);
+            if ($cachedContent !== false) {
+                $cachedData = json_decode($cachedContent, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    return $cachedData;
+                }
+            }
+        }
+
         $params['apiKey'] = $this->apiKey;
 
         $url = self::BASE_URL . $endpoint . '?' . http_build_query($params);
@@ -160,6 +183,9 @@ class SpoonacularService
             }
         }
 
+        // 4. Guardar en caché antes de retornar (ya traducido, ahorra doble coste)
+        file_put_contents($cacheFile, json_encode($data));
+
         return $data;
     }
 
@@ -173,12 +199,33 @@ class SpoonacularService
             return $input;
         }
 
+        // 1. Caché local para traducciones de entrada
+        $cacheKey = md5('trans_input_' . json_encode($input));
+        $cacheDir = __DIR__ . '/../../log/cache/translations';
+        if (!is_dir($cacheDir)) {
+            mkdir($cacheDir, 0777, true);
+        }
+        $cacheFile = $cacheDir . '/' . $cacheKey . '.json';
+
+        if (file_exists($cacheFile)) {
+            $cachedContent = file_get_contents($cacheFile);
+            if ($cachedContent !== false) {
+                return json_decode($cachedContent, true);
+            }
+        }
+
         try {
             $translator = $this->getTranslator();
             if (is_array($input)) {
-                return $translator->translateArray($input, 'en');
+                $translated = $translator->translateArray($input, 'en');
+            } else {
+                $translated = $translator->translate($input, 'en');
             }
-            return $translator->translate($input, 'en');
+
+            // Guardar en caché permanentemente
+            file_put_contents($cacheFile, json_encode($translated));
+
+            return $translated;
         } catch (\Exception $e) {
             error_log("Error de traducción (input): " . $e->getMessage());
             return $input;

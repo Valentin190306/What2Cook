@@ -1,7 +1,7 @@
 <?php
 $title  = 'Asistente de Cocina - What2Cook';
 $styles = ['asistenteCocina'];
-$scripts = ['cooking-assistant'];
+$scripts = ['utils', 'api', 'ingredient-translations', 'cooking-assistant'];
 ?>
 
 <!-- ── HERO ─────────────────────────────────────────────────────────────── -->

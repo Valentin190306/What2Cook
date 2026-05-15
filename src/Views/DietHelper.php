@@ -1,7 +1,7 @@
 <?php
 $title = 'Asistente de Dietas - What2Cook';
 $styles = ['asistenteDieta'];
-$scripts = ['diet-helper'];
+$scripts = ['utils', 'api', 'diet-helper'];
 ?>
 <style>
 .ca-loading-newspaper {

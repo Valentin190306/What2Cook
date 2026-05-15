@@ -10,13 +10,6 @@ let ingredients = [];          // string[]
 let activeSort = null;        // null | "healthiness" | "time"
 let activeMode = 'single';    // "single" | "meal-prep"
 
-/* ============================================================
-   Utilidades DOM
-   ============================================================ */
-function el(id) { return document.getElementById(id); }
-function show(elem) { elem.hidden = false; }
-function hide(elem) { elem.hidden = true; }
-function setText(elem, text) { elem.textContent = text; }
 
 /* ============================================================
    a) Gestión de ingredientes
@@ -134,30 +127,8 @@ async function search() {
     setLoading(true);
 
     try {
-        let url, body;
-
-        if (activeMode === 'single') {
-            url = '/api/kitchen-helper/single';
-            body = { ingredients, sort: activeSort };
-        } else {
-            const count = parseInt(el('meal-prep-count').value, 10);
-            url = '/api/kitchen-helper/meal-prep';
-            body = { ingredients, count, sort: activeSort };
-        }
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            const detail = errorData.message || errorData.error || '';
-            throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
-        }
-
-        const json = await response.json();
+        const count = activeMode === 'meal-prep' ? parseInt(el('meal-prep-count').value, 10) : undefined;
+        const json = await BackendAPI.searchRecipes(ingredients, activeMode, activeSort, count);
 
         if (json.success === true) {
             renderResults(json.data);
@@ -347,15 +318,7 @@ async function openRecipeDetail(id) {
     document.body.style.overflow = 'hidden';
 
     try {
-        const response = await fetch(`/api/kitchen-helper/recipe/${id}`);
-
-        if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
-            const detail = errorData.message || errorData.error || '';
-            throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
-        }
-
-        const json = await response.json();
+        const json = await BackendAPI.getRecipeDetail(id);
 
         if (json.success === true) {
             renderModalContent(json.data);
@@ -455,18 +418,9 @@ function setStatus(message, isError) {
     const grid = el('results-grid');
     grid.innerHTML = '';
     status.textContent = message;
-    status.classList.toggle('ca-status--error', !!isError);
     
-    status.style.fontSize = '1.3rem';
-    status.style.fontFamily = 'Georgia, serif';
-    status.style.padding = '15px 20px';
-    status.style.textAlign = 'center';
-    status.style.color = isError ? '#c93a3a' : '#4a4a4a';
-    status.style.border = '2px dashed #b5a48b';
-    status.style.borderRadius = '8px';
-    status.style.backgroundColor = '#fdfbf7';
-    status.style.marginTop = '20px';
-    status.style.fontWeight = 'bold';
+    // Usamos las nuevas clases CSS en lugar de estilos en línea
+    status.className = 'ca-status-box' + (isError ? ' ca-status-box--error' : '');
 
     show(status);
 }
@@ -494,15 +448,6 @@ function setLoading(loading) {
     }
 }
 
-function escapeHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-}
 
 /* ============================================================
    g) Inicialización
