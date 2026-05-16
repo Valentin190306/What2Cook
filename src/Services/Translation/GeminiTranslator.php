@@ -123,8 +123,14 @@ class GeminiTranslator implements TranslatorInterface
 
         $translationString = $response['candidates'][0]['content']['parts'][0]['text'] ?? '{}';
         
+        // Limpiar posible bloque de markdown
+        $translationString = preg_replace('/^```json\s*/i', '', $translationString);
+        $translationString = preg_replace('/```\s*$/i', '', $translationString);
+        $translationString = trim($translationString);
+
         $translatedData = json_decode($translationString, true);
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($translatedData)) {
+            error_log("Error JSON Gemini: " . json_last_error_msg() . " -> " . substr($translationString, 0, 100));
             return $data;
         }
 

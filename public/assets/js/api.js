@@ -4,9 +4,18 @@
 
 const BackendAPI = {
     async searchRecipes(ingredients, mode, sort, count) {
+        // 0. Traducir ingredientes localmente usando el diccionario
+        const translatedIngredients = ingredients.map(ing => {
+            const lower = ing.toLowerCase().trim();
+            if (window.INGREDIENT_TRANSLATIONS && window.INGREDIENT_TRANSLATIONS[lower]) {
+                return window.INGREDIENT_TRANSLATIONS[lower];
+            }
+            return lower; // fallback
+        });
+
         // 1. Create cache key
         const sortVal = sort || 'none';
-        const cacheKey = `recipes_${mode}_${ingredients.slice().sort().join(',')}_${sortVal}_${count || 'none'}`;
+        const cacheKey = `recipes_${mode}_${translatedIngredients.slice().sort().join(',')}_${sortVal}_${count || 'none'}`;
         
         // 2. Check cache
         const cached = sessionStorage.getItem(cacheKey);
@@ -18,10 +27,10 @@ const BackendAPI = {
         let url, body;
         if (mode === 'single') {
             url = '/api/kitchen-helper/single';
-            body = { ingredients, sort };
+            body = { ingredients: translatedIngredients, sort };
         } else {
             url = '/api/kitchen-helper/meal-prep';
-            body = { ingredients, count, sort };
+            body = { ingredients: translatedIngredients, count, sort };
         }
 
         const response = await fetch(url, {

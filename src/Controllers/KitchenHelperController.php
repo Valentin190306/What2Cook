@@ -140,12 +140,29 @@ class KitchenHelperController extends Controller
      */
     private function enrichWithNutrition(array $recipes, \App\Services\SpoonacularService $service): array
     {
-        foreach ($recipes as &$recipe) {
-            try {
-                // getRecipeInfo con includeNutrition=true funciona en plan gratuito
-                $info      = $service->getRecipeInfo((int) $recipe['id'], true);
-                $nutrients = $info['nutrition']['nutrients'] ?? [];
+        if (empty($recipes)) {
+            return [];
+        }
 
+        $ids = array_column($recipes, 'id');
+
+        try {
+            // Bulk request sin traducir porque solo nos interesan los números de nutrición
+            $bulkInfo = $service->getRecipeInfoBulk($ids, true, false);
+            $infoMap = [];
+            foreach ($bulkInfo as $info) {
+                $infoMap[(int)($info['id'] ?? 0)] = $info;
+            }
+        } catch (\RuntimeException $e) {
+            $infoMap = [];
+        }
+
+        foreach ($recipes as &$recipe) {
+            $id = (int)$recipe['id'];
+            $info = $infoMap[$id] ?? null;
+
+            if ($info) {
+                $nutrients = $info['nutrition']['nutrients'] ?? [];
                 $map = [];
                 foreach ($nutrients as $n) {
                     $map[$n['name']] = (float) ($n['amount'] ?? 0);
@@ -157,7 +174,7 @@ class KitchenHelperController extends Controller
                     'carbs'    => $map['Carbohydrates'] ?? 0.0,
                     'fat'      => $map['Fat']           ?? 0.0,
                 ];
-            } catch (\RuntimeException) {
+            } else {
                 $recipe['nutrition'] = ['calories' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0];
             }
         }

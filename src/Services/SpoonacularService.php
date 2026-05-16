@@ -67,6 +67,19 @@ class SpoonacularService
     }
 
     /**
+     * Obtiene información completa de múltiples recetas de una sola vez.
+     */
+    public function getRecipeInfoBulk(array $ids, bool $includeNutrition = true, bool $translate = true): array
+    {
+        if (empty($ids)) return [];
+        
+        return $this->get("/recipes/informationBulk", [
+            'ids' => implode(',', $ids),
+            'includeNutrition' => $includeNutrition ? 'true' : 'false',
+        ], $translate);
+    }
+
+    /**
      * Obtiene información nutricional de una receta.
      */
     public function getRecipeNutrition(int $id): array
@@ -112,10 +125,11 @@ class SpoonacularService
     /**
      * GET a la API de Spoonacular.
      */
-    private function get(string $endpoint, array $params): array
+    private function get(string $endpoint, array $params, bool $translate = true): array
     {
         // 1. Crear llave de caché basada en el endpoint y los parámetros (sin la API key)
         $cacheParams = $params;
+        $cacheParams['translate'] = $translate; // Para distinguir en caché
         $cacheKey = md5($endpoint . '?' . http_build_query($cacheParams));
         
         // 2. Definir ruta de caché y tiempo de expiración (ej: 7 días = 604800 segundos)
@@ -173,7 +187,7 @@ class SpoonacularService
             throw new RuntimeException("Spoonacular respondió {$httpCode}: {$message}");
         }
 
-        $enableTranslation = ($_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false') === 'true';
+        $enableTranslation = $translate && ($_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false') === 'true';
         if ($enableTranslation) {
             try {
                 $translator = $this->getTranslator();
