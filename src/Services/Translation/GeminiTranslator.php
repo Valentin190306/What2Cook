@@ -8,7 +8,7 @@ use RuntimeException;
 class GeminiTranslator implements TranslatorInterface
 {
     private string $apiKey;
-    private const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent';
+    private const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
     public function __construct()
     {
@@ -83,7 +83,13 @@ class GeminiTranslator implements TranslatorInterface
                     'role' => 'user',
                     'parts' => [
                         [
-                            'text' => "You are a professional translator. Translate all textual values in the following JSON to language code: {$targetLanguage}. Preserve all keys and structural elements exactly. Return valid JSON only, without markdown formatting blocks.\n\nJSON:\n" . json_encode($data)
+                            'text' => "You are a professional translator. Translate all textual values (titles, summaries, ingredient names, instructions, etc.) in the following JSON to Spanish (es). 
+                            IMPORTANT: 
+                            1. Preserve all JSON keys, IDs, numbers, and structural elements exactly. 
+                            2. Only translate the values that are human-readable text.
+                            3. Return ONLY valid JSON.
+                            
+                            JSON:\n" . json_encode($data)
                         ]
                     ]
                 ]
