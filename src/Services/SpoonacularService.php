@@ -213,33 +213,13 @@ class SpoonacularService
             return $input;
         }
 
-        // 1. Caché local para traducciones de entrada
-        $cacheKey = md5('trans_input_' . json_encode($input));
-        $cacheDir = __DIR__ . '/../../log/cache/translations';
-        if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0777, true);
-        }
-        $cacheFile = $cacheDir . '/' . $cacheKey . '.json';
-
-        if (file_exists($cacheFile)) {
-            $cachedContent = file_get_contents($cacheFile);
-            if ($cachedContent !== false) {
-                return json_decode($cachedContent, true);
-            }
-        }
-
         try {
+            // CachedTranslator se encarga del caching automáticamente
             $translator = $this->getTranslator();
             if (is_array($input)) {
-                $translated = $translator->translateArray($input, 'en');
-            } else {
-                $translated = $translator->translate($input, 'en');
+                return $translator->translateArray($input, 'en');
             }
-
-            // Guardar en caché permanentemente
-            file_put_contents($cacheFile, json_encode($translated));
-
-            return $translated;
+            return $translator->translate($input, 'en');
         } catch (\Exception $e) {
             error_log("Error de traducción (input): " . $e->getMessage());
             return $input;
@@ -247,14 +227,16 @@ class SpoonacularService
     }
 
     /**
-     * Helper para instanciar el traductor configurado.
+     * Helper para instanciar el traductor configurado, envuelto en caché.
+     * CachedTranslator evita llamadas repetidas a la API para el mismo contenido.
      */
     private function getTranslator(): \App\Services\Translation\TranslatorInterface
     {
         $provider = strtolower($_ENV['TRANSLATION_PROVIDER'] ?? 'gemini');
-        if ($provider === 'openai') {
-            return new \App\Services\Translation\OpenAITranslator();
-        }
-        return new \App\Services\Translation\GeminiTranslator();
+        $inner = $provider === 'openai'
+            ? new \App\Services\Translation\OpenAITranslator()
+            : new \App\Services\Translation\GeminiTranslator();
+
+        return new \App\Services\Translation\CachedTranslator($inner);
     }
 }
