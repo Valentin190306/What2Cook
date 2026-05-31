@@ -34,6 +34,7 @@
                     <li><a href="/login">Accedé</a></li>
                     <li><a href="/register">Registrate</a></li>
                 <?php else: ?>
+                    <li><a href="/favoritos">Favoritos</a></li>
                     <li><a href="/perfil">Perfil</a></li>
                     <li>
                         <form action="/logout" method="POST" class="logout-form">
@@ -70,8 +71,8 @@
         <h3>Mi cuenta</h3>
         <address>
             <ul>
-                <li><a href="<?= $uid !== null ? '/perfil' : '#' ?>">Dashboard</a></li>
-                <li><a href="<?= $uid !== null ? '/favoritos' : '#' ?>">Mis favoritos</a></li>
+                <li><a href="#">Dashboard</a></li>
+                <li><a href="/favoritos">Mis favoritos</a></li>
                 <li><a href="#">Mis planes</a></li>
                 <li><a href="<?= $uid !== null ? '/perfil' : '#' ?>">Perfil</a></li>
             </ul>
