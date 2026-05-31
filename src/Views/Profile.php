@@ -52,10 +52,21 @@ $styles = ['perfil'];
 <section id="recent-recipes" class="profile-section">
     <h2>Recetas Recientes</h2>
     <p>Tus últimas recetas favoritas</p>
-    <article class="empty-state">
-        <p>Aún no tenés recetas favoritas</p>
-        <a href="/recetas" class="btn-link">Explorar recetas</a>
-    </article>
+    <?php if (empty($recentFavorites)): ?>
+        <article class="empty-state">
+            <p>Aún no tenés recetas favoritas</p>
+            <a href="/recetas" class="btn-link">Explorar recetas</a>
+        </article>
+    <?php else: ?>
+        <div class="grid-container">
+            <?php foreach ($recentFavorites as $fav): ?>
+                <a href="/receta/<?= (int) $fav['spoonacular_id'] ?>" class="action-card">
+                    <h3><?= htmlspecialchars($fav['title']) ?></h3>
+                    <p>Hacé clic para ver los detalles de la receta.</p>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 </section>
 
 <section id="meal-plans" class="profile-section">

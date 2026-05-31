@@ -19,15 +19,21 @@ class ProfileController extends Controller
         $userId = $this->requireAuthWeb();
         $user = (new User())->find($userId);
 
-        $favoritesCount = (new Favorite())->countByUser($userId);
+        $favoriteModel = new Favorite();
+        $favoritesCount = $favoriteModel->countByUser($userId);
         $plansCount = (new Plan())->countByUser($userId);
         $listsCount = (new ShoppingList())->countByUser($userId);
+
+        // Fetch recent favorites (up to 3) for the dashboard
+        $allFavorites = $favoriteModel->findAllByUser($userId);
+        $recentFavorites = array_slice($allFavorites, 0, 3);
 
         View::render('Profile', [
             'userName' => $user ? $user['name'] : 'Usuario',
             'favoritesCount' => $favoritesCount,
             'plansCount' => $plansCount,
             'listsCount' => $listsCount,
+            'recentFavorites' => $recentFavorites,
             'success' => Session::getFlash('success'),
         ]);
     }

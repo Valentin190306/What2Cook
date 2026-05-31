@@ -80,10 +80,12 @@ main>article.receta-detalle {
   box-shadow: 6px 6px 0 var(--color-black);
 }
 
-.btn-favorito.is-active {
-  background-color: var(--color-spinach);
+.btn-favorito.is-active,
+.btn-favorito[data-favorited="true"] {
+  background-color: var(--color-carrot);
   color: var(--color-white);
 }
+
 
 /* --- Content Wrapper --- */
 .receta-content {

@@ -70,8 +70,8 @@
         <h3>Mi cuenta</h3>
         <address>
             <ul>
-                <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Mis favoritos</a></li>
+                <li><a href="<?= $uid !== null ? '/perfil' : '#' ?>">Dashboard</a></li>
+                <li><a href="<?= $uid !== null ? '/favoritos' : '#' ?>">Mis favoritos</a></li>
                 <li><a href="#">Mis planes</a></li>
                 <li><a href="<?= $uid !== null ? '/perfil' : '#' ?>">Perfil</a></li>
             </ul>

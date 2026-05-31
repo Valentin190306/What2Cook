@@ -18,6 +18,7 @@ $router->add('GET',  '/api/kitchen-helper/recipe/{id}', 'KitchenHelperController
 $router->add('GET', '/recetas', 'CatalogController@index');
 $router->add('GET', '/receta/{id}', 'RecipeController@show');
 $router->add('GET', '/perfil', 'ProfileController@index');
+$router->add('GET', '/favoritos', 'FavoriteController@index');
 $router->add('GET', '/perfil/editar', 'ProfileController@editForm');
 $router->add('POST', '/perfil/editar', 'ProfileController@update');
 $router->add('GET', '/login', 'AuthController@loginForm');
@@ -38,5 +39,8 @@ $router->add('GET',  '/api/diet-helper/plan/{id}',                    'DietHelpe
 $router->add('GET',  '/api/diet-helper/active',                       'DietHelperController@getActivePlan');
 $router->add('GET',  '/api/diet-helper/shopping-list/{id}',           'DietHelperController@getShoppingList');
 $router->add('PATCH', '/api/diet-helper/shopping-list/item/{id}',     'DietHelperController@toggleShoppingItem');
+
+// Rutas de API — Favoritos
+$router->add('POST', '/api/favorites', 'FavoriteController@toggle');
 
 return $router;
