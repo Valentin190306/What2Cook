@@ -5,7 +5,7 @@ $styles = ['perfil'];
 <section class="profile-hero">
     <img src="/assets/img/avatar_placeholder.jpg" alt="Avatar de Usuario" class="avatar">
     <p>Bienvenido</p>
-    <h1><?= $userName ?? 'Usuario' ?></h1>
+    <h1><?= htmlspecialchars($userName ?? 'Usuario') ?></h1>
     <button class="btn-edit" type="button">Editar Perfil</button>
 </section>
 

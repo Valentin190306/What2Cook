@@ -73,4 +73,13 @@ abstract class Controller
         }
         return $id;
     }
+
+    /**
+     * Redirige a otra URL y finaliza la ejecución.
+     */
+    protected function redirect(string $to): void
+    {
+        header('Location: ' . $to);
+        exit;
+    }
 }

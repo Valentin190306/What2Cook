@@ -21,8 +21,9 @@ $router->add('GET', '/perfil', 'ProfileController@index');
 $router->add('GET', '/login', 'AuthController@loginForm');
 $router->add('GET', '/register', 'AuthController@registerForm');
 
-// Rutas de API — Auth
-$router->add('POST', '/api/login', 'AuthController@login');
+$router->add('POST', '/login', 'AuthController@login');
+$router->add('POST', '/register', 'AuthController@register');
+$router->add('POST', '/logout', 'AuthController@logout');
 
 // Rutas de API — Dishes
 $router->add('GET', '/api/dishes', 'DishController@all');
