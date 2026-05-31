@@ -58,6 +58,32 @@ header nav ul li a:hover {
   color: var(--color-carrot);
 }
 
+.logout-form {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+.logout-form button {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-family: var(--font-title) !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: var(--color-black) !important;
+  cursor: pointer !important;
+  transition: color 0.2s ease !important;
+  letter-spacing: normal !important;
+  display: inline !important;
+}
+
+.logout-form button:hover {
+  color: var(--color-carrot) !important;
+}
+
 /* ---------- Main Container ---------- */
 main {
   flex: 1;
@@ -213,6 +239,10 @@ footer > nav.social svg {
 
   header nav ul li a {
     font-size: 0.9rem;
+  }
+
+  .logout-form button {
+    font-size: 0.9rem !important;
   }
 
   footer {
