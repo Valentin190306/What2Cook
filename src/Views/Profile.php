@@ -2,11 +2,15 @@
 $title = 'Mi Perfil - What2Cook';
 $styles = ['perfil'];
 ?>
+<?php if (!empty($success)): ?>
+    <p class="form-success" role="status"><?= htmlspecialchars($success) ?></p>
+<?php endif; ?>
+
 <section class="profile-hero">
     <img src="/assets/img/avatar_placeholder.jpg" alt="Avatar de Usuario" class="avatar">
     <p>Bienvenido</p>
     <h1><?= htmlspecialchars($userName ?? 'Usuario') ?></h1>
-    <button class="btn-edit" type="button">Editar Perfil</button>
+    <a href="/perfil/editar" class="btn-edit">Editar Perfil</a>
 </section>
 
 <section id="dashboard" class="profile-section">
@@ -14,15 +18,15 @@ $styles = ['perfil'];
     <div class="grid-container">
         <article class="stat-card">
             <h3>Recetas Favoritas</h3>
-            <span class="stat-number">0</span>
+            <span class="stat-number"><?= (int) ($favoritesCount ?? 0) ?></span>
         </article>
         <article class="stat-card">
             <h3>Planes Creados</h3>
-            <span class="stat-number">0</span>
+            <span class="stat-number"><?= (int) ($plansCount ?? 0) ?></span>
         </article>
         <article class="stat-card">
             <h3>Listas de Compras</h3>
-            <span class="stat-number">0</span>
+            <span class="stat-number"><?= (int) ($listsCount ?? 0) ?></span>
         </article>
     </div>
 </section>

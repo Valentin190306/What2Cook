@@ -153,4 +153,11 @@ class Plan extends Model
             throw $e;
         }
     }
+
+    public function countByUser(int $userId): int
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM plans WHERE user_id = :user_id");
+        $stmt->execute(['user_id' => $userId]);
+        return (int) $stmt->fetchColumn();
+    }
 }

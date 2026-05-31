@@ -18,6 +18,8 @@ $router->add('GET',  '/api/kitchen-helper/recipe/{id}', 'KitchenHelperController
 $router->add('GET', '/recetas', 'CatalogController@index');
 $router->add('GET', '/receta/{id}', 'RecipeController@show');
 $router->add('GET', '/perfil', 'ProfileController@index');
+$router->add('GET', '/perfil/editar', 'ProfileController@editForm');
+$router->add('POST', '/perfil/editar', 'ProfileController@update');
 $router->add('GET', '/login', 'AuthController@loginForm');
 $router->add('GET', '/register', 'AuthController@registerForm');
 

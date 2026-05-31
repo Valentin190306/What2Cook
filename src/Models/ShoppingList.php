@@ -26,4 +26,16 @@ class ShoppingList extends Model
         $stmt->execute(['purchased' => $purchased, 'id' => $itemId]);
         return $stmt->rowCount() > 0;
     }
+
+    public function countByUser(int $userId): int
+    {
+        $stmt = $this->db->prepare(
+            "SELECT COUNT(DISTINCT s.plan_id) 
+             FROM shopping_list_items s 
+             JOIN plans p ON p.id = s.plan_id 
+             WHERE p.user_id = :user_id"
+        );
+        $stmt->execute(['user_id' => $userId]);
+        return (int) $stmt->fetchColumn();
+    }
 }
