@@ -19,6 +19,8 @@ $router->add('GET', '/recetas', 'CatalogController@index');
 $router->add('GET', '/receta/{id}', 'RecipeController@show');
 $router->add('GET', '/perfil', 'ProfileController@index');
 $router->add('GET', '/favoritos', 'FavoriteController@index');
+$router->add('GET', '/mis-planes', 'PlanController@myPlans');
+$router->add('GET', '/lista-compras', 'PlanController@shoppingList');
 $router->add('GET', '/perfil/editar', 'ProfileController@editForm');
 $router->add('POST', '/perfil/editar', 'ProfileController@update');
 $router->add('GET', '/login', 'AuthController@loginForm');
