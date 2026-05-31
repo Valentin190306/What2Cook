@@ -35,6 +35,7 @@ $styles = ['index'];
     </nav>
 </section>
 
+<?php if (!\App\Core\Session::isAuthenticated()): ?>
 <section class="cta-banner">
     <h2>¿Listo/a para empezar tu viaje culinario?</h2>
     <p>
@@ -43,6 +44,7 @@ $styles = ['index'];
     </p>
     <a href="/register">Crear cuenta gratis</a>
 </section>
+<?php endif; ?>
 
 <dl class="stats">
     <dt>+5000</dt>

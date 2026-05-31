@@ -5,7 +5,7 @@
    ============================================================ */
 
 /* ---------- Botones (Estilo Newspaper) ---------- */
-.btn, 
+.btn,
 button {
   display: inline-block;
   padding: 0.8rem 1.5rem;
@@ -22,7 +22,8 @@ button {
   font-size: 0.9rem;
 }
 
-.btn:hover, button:hover {
+.btn:hover,
+button:hover {
   background: var(--color-black);
   color: var(--color-white);
 }
@@ -59,7 +60,8 @@ article.card {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  box-shadow: 5px 5px 0px var(--color-black); /* Sombra rígida newspaper */
+  box-shadow: 5px 5px 0px var(--color-black);
+  /* Sombra rígida newspaper */
   margin-bottom: 2rem;
 }
 
@@ -104,6 +106,7 @@ label {
 
 input[type="text"],
 input[type="email"],
+input[type="password"],
 input[type="search"],
 textarea,
 select {
@@ -116,7 +119,8 @@ select {
   outline: none;
 }
 
-input:focus, textarea:focus {
+input:focus,
+textarea:focus {
   border-width: 2px;
   background-color: #fffdfa;
 }
@@ -146,19 +150,151 @@ input:focus, textarea:focus {
    Status Boxes (Alertas)
    ============================================================ */
 .ca-status-box {
-    font-size: 1.3rem;
-    font-family: Georgia, serif;
-    padding: 15px 20px;
-    text-align: center;
-    color: #4a4a4a;
-    border: 2px dashed #b5a48b;
-    border-radius: 8px;
-    background-color: #fdfbf7;
-    margin-top: 20px;
-    font-weight: bold;
+  font-size: 1.3rem;
+  font-family: Georgia, serif;
+  padding: 15px 20px;
+  text-align: center;
+  color: #4a4a4a;
+  border: 2px dashed #b5a48b;
+  border-radius: 8px;
+  background-color: #fdfbf7;
+  margin-top: 20px;
+  font-weight: bold;
 }
 
 .ca-status-box--error {
-    color: #c93a3a;
+  color: #c93a3a;
 }
 
+
+/* ---------- Form Panel (Auth & General Forms) ---------- */
+.form-panel {
+  border: 2px solid var(--color-black);
+  background: var(--color-white);
+  padding: 2rem;
+  margin: 2.5rem auto;
+  width: calc(100% - 2rem);
+  max-width: 500px;
+  box-shadow: 6px 6px 0 var(--color-black);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-panel h1 {
+  font-family: var(--font-title);
+  font-size: 2.2rem;
+  text-align: center;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.form-panel>p {
+  text-align: center;
+  font-family: var(--font-body);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.form-error {
+  background: #fdf2f2;
+  border: 1.5px solid var(--color-carrot);
+  color: var(--color-carrot);
+  padding: 0.8rem 1rem;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-align: center;
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.form-panel form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  display: block;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.form-panel input[type="text"],
+.form-panel input[type="email"],
+.form-panel input[type="password"] {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--color-black);
+  background: var(--color-cream);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  margin: 0;
+  outline: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.form-panel input[type="text"]:focus,
+.form-panel input[type="email"]:focus,
+.form-panel input[type="password"]:focus {
+  border-width: 2px;
+  background-color: var(--color-white);
+  border-color: var(--color-carrot);
+}
+
+.form-actions {
+  margin-top: 0.5rem;
+}
+
+.form-actions button.btn-primary {
+  width: 100%;
+  padding: 1rem;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  background: var(--color-black);
+  color: var(--color-white);
+  border: 2px solid var(--color-black);
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.form-actions button.btn-primary:hover {
+  background: var(--color-carrot);
+  border-color: var(--color-carrot);
+  color: var(--color-white);
+}
+
+.form-link {
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  color: var(--color-text);
+}
+
+.form-link a {
+  font-family: var(--font-title);
+  font-weight: 700;
+  color: var(--color-black);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.form-link a:hover {
+  color: var(--color-carrot);
+  text-decoration: none;
+}

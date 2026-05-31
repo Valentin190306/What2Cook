@@ -1,3 +1,4 @@
+<?php $uid = \App\Core\Session::userId(); ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -29,7 +30,19 @@
                 <li><a href="/recetas">Catálogo</a></li>
                 <li><a href="/diets">Dietas</a></li>
                 <li><a href="/about">Nosotros</a></li>
-                <li><a href="/login">Accedé</a></li>
+                <?php if ($uid === null): ?>
+                    <li><a href="/login">Accedé</a></li>
+                    <li><a href="/register">Registrate</a></li>
+                <?php else: ?>
+                    <li><a href="/favoritos">Favoritos</a></li>
+                    <li><a href="/perfil">Perfil</a></li>
+                    <li>
+                        <form action="/logout" method="POST" class="logout-form">
+                            <input type="hidden" name="_csrf" value="<?= htmlspecialchars(\App\Core\Session::csrfToken()) ?>">
+                            <button type="submit">Cerrar sesión</button>
+                        </form>
+                    </li>
+                <?php endif; ?>
             </ul>
         </nav>
     </header>
@@ -59,9 +72,9 @@
         <address>
             <ul>
                 <li><a href="#">Dashboard</a></li>
-                <li><a href="#">Mis favoritos</a></li>
+                <li><a href="/favoritos">Mis favoritos</a></li>
                 <li><a href="#">Mis planes</a></li>
-                <li><a href="#">Perfil</a></li>
+                <li><a href="<?= $uid !== null ? '/perfil' : '#' ?>">Perfil</a></li>
             </ul>
         </address>
 

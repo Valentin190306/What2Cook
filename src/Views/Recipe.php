@@ -2,6 +2,7 @@
 
 $title  = isset($recipe['title']) ? "What2Cook - {$recipe['title']}" : "What2Cook - Receta";
 $styles = ['receta'];
+$scripts = ['favorites'];
 
 // Helpers
 $readyIn  = $recipe['readyInMinutes'] ?? null;
@@ -44,7 +45,15 @@ foreach ($nutrients as $n) {
             <img class="receta-img" src="/assets/img/placeholder.jpg" alt="Sin imagen">
         <?php endif; ?>
 
-        <button type="button" class="btn-favorito" aria-label="Agregar a favoritos">♡</button>
+        <button type="button" class="btn-favorito"
+                aria-label="<?= !empty($isFavorite) ? 'Quitar de favoritos' : 'Agregar a favoritos' ?>"
+                data-fav-toggle
+                data-spoonacular-id="<?= (int) $id ?>"
+                data-title="<?= htmlspecialchars($recipe['title'] ?? '') ?>"
+                data-image="<?= htmlspecialchars($image ?? '') ?>"
+                data-favorited="<?= !empty($isFavorite) ? 'true' : 'false' ?>">
+            <?= !empty($isFavorite) ? '♥' : '♡' ?>
+        </button>
     </div>
 
     <div class="receta-content">
