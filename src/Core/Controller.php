@@ -2,6 +2,8 @@
 
 namespace App\Core;
 
+use App\Core\Session;
+
 /**
  * Class Controller
  * 
@@ -44,5 +46,31 @@ abstract class Controller
         header('Content-Type: application/json');
         echo json_encode($data);
         exit;
+    }
+
+    /**
+     * Requiere autenticación para endpoints de la API (JSON).
+     */
+    protected function requireAuthApi(): int
+    {
+        $id = Session::userId();
+        if ($id === null) {
+            $this->json(['error' => 'No autenticado.'], 401);
+        }
+        return $id;
+    }
+
+    /**
+     * Requiere autenticación para páginas web (Redirección).
+     */
+    protected function requireAuthWeb(): int
+    {
+        $id = Session::userId();
+        if ($id === null) {
+            Session::flash('error', 'Necesitás iniciar sesión.');
+            header('Location: /login');
+            exit;
+        }
+        return $id;
     }
 }
