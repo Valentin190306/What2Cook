@@ -51,7 +51,7 @@ class AuthController extends Controller
         }
 
         // 2. Leer y limpiar inputs
-        $email = trim($_POST['email'] ?? '');
+        $email = strtolower(trim($_POST['email'] ?? ''));
         $password = $_POST['password'] ?? '';
 
         // 3. Validar presencia y formato
@@ -87,7 +87,7 @@ class AuthController extends Controller
 
         // 2. Leer y limpiar inputs
         $name = trim($_POST['name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        $email = strtolower(trim($_POST['email'] ?? ''));
         $password = $_POST['password'] ?? '';
 
         // 3. Validar
@@ -143,7 +143,10 @@ class AuthController extends Controller
      */
     public function logout(): void
     {
-        Session::validateCsrf($_POST['_csrf'] ?? null);
+        if (!Session::validateCsrf($_POST['_csrf'] ?? null)) {
+            $this->redirect('/');
+        }
+
         Session::logout();
         $this->redirect('/');
     }
