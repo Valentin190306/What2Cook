@@ -37,6 +37,8 @@
    HERO — bloque crema con título y subtítulo
    ============================================================ */
 .catalogo-header {
+  max-width: none !important;
+  margin-top: 0 !important;
   margin: -2rem -1rem 2rem;
   /* sangra al borde del <main> */
   padding: 2.5rem 1.5rem 2rem;
@@ -57,7 +59,7 @@
 .catalogo-header p {
   font-size: 1rem;
   color: var(--color-text-muted);
-  max-width: 480px;
+  max-width: 580px;
   margin: 0 auto;
   line-height: 1.6;
 }
@@ -77,6 +79,7 @@
 .search-bar {
   display: flex;
   align-items: stretch;
+  padding: 1rem 1rem;
   border: 2px solid var(--color-black);
   background: var(--color-white);
   max-width: 580px;
@@ -251,6 +254,7 @@ fieldset.filtros .filtros-opciones label:has(input:checked) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 60px;
   padding: 0.85rem 1.35rem;
   border: 2px solid var(--color-black);
   background: var(--color-cream);
@@ -512,7 +516,7 @@ fieldset.filtros .filtros-opciones label:has(input:checked) {
 
   /* --- Hero --- */
   .catalogo-header {
-    margin: -2rem -1rem 3rem;
+    margin: -2rem -1rem 3rem !important;
     padding: 4rem 2rem 3rem;
   }
 
@@ -541,7 +545,7 @@ fieldset.filtros .filtros-opciones label:has(input:checked) {
 
   /* --- Filtros --- */
   fieldset.filtros {
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
   }
 
   fieldset.filtros legend {
