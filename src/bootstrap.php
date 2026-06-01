@@ -7,8 +7,6 @@ if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once '/var/www/app/vendor/autoload.php';
 }
 
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
 use Whoops\Run;
 use Whoops\Handler\PrettyPageHandler;
 use App\Core\Database;

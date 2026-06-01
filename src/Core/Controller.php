@@ -2,6 +2,7 @@
 
 namespace App\Core;
 
+use App\Core\Log\LoggerInterface;
 use App\Core\Session;
 
 /**
@@ -11,6 +12,20 @@ use App\Core\Session;
  */
 abstract class Controller
 {
+    protected ?LoggerInterface $logger = null;
+
+    public function setLogger(?LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
+    }
+
+    protected function log(string $level, string $message, array $context = []): void
+    {
+        if ($this->logger === null) return;
+        $module = (new \ReflectionClass($this))->getShortName();
+        $this->logger->log($level, "[{$module}] {$message}", $context);
+    }
+
     /**
      * Verifica que la petición tenga Content-Type: application/json.
      * Responde 415 y termina la ejecución si no es así.

@@ -54,8 +54,14 @@ class DietHelperController extends Controller
             return;
         }
 
+        $this->log('info', 'Generando plan de dieta', [
+            'duration_days' => $durationDays,
+            'target_calories' => $targetCalories,
+            'diet_type' => $dietType,
+        ]);
+
         try {
-            $service = new DietHelperService();
+            $service = new DietHelperService($this->logger);
             $plan    = $service->generatePlan(
                 $durationDays,
                 $targetCalories,
@@ -64,8 +70,10 @@ class DietHelperController extends Controller
                 $targetFat,
                 $dietType
             );
+            $this->log('info', 'Plan generado exitosamente', ['days' => count($plan['days'] ?? [])]);
             $this->json($plan);
         } catch (RuntimeException $e) {
+            $this->log('error', 'Error generando plan: ' . $e->getMessage());
             $this->json(['error' => $e->getMessage()], 502);
         }
     }
@@ -92,11 +100,15 @@ class DietHelperController extends Controller
             return;
         }
 
+        $this->log('info', 'Guardando plan', ['user_id' => $userId]);
+
         try {
             $model  = new Plan();
             $planId = $model->createFull($userId, $planData);
+            $this->log('info', 'Plan guardado', ['plan_id' => $planId, 'user_id' => $userId]);
             $this->json(['plan_id' => $planId], 201);
         } catch (\Throwable $e) {
+            $this->log('error', 'Error al guardar plan: ' . $e->getMessage(), ['user_id' => $userId]);
             $this->json(['error' => 'Error al guardar el plan.'], 500);
         }
     }
@@ -116,15 +128,18 @@ class DietHelperController extends Controller
         $plan  = $model->findWithDays($planId);
 
         if ($plan === null) {
+            $this->log('warning', 'Plan no encontrado', ['plan_id' => $planId, 'user_id' => $userId]);
             $this->json(['error' => 'Plan no encontrado.'], 404);
             return;
         }
 
         if ((int) $plan['user_id'] !== $userId) {
+            $this->log('warning', 'Acceso denegado a plan', ['plan_id' => $planId, 'user_id' => $userId]);
             $this->json(['error' => 'Acceso denegado.'], 403);
             return;
         }
 
+        $this->log('info', 'Plan recuperado', ['plan_id' => $planId]);
         $this->json($plan);
     }
 

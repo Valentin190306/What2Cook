@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Services\Translation;
 
+use App\Core\Log\LoggerInterface;
+
 /**
  * Decorador que agrega una capa de caché a cualquier TranslatorInterface.
  *
@@ -25,6 +27,7 @@ class CachedTranslator implements TranslatorInterface
     public function __construct(
         private readonly TranslatorInterface $inner,
         private readonly ?int $ttlSeconds = 60 * 60 * 24 * 7,
+        private readonly ?LoggerInterface $logger = null,
     ) {
         $this->cacheDir  = __DIR__ . '/../../../log/cache/translations';
         $this->providerName = (new \ReflectionClass($inner))->getShortName();

@@ -71,6 +71,7 @@ class AuthController extends Controller
 
         // 6. Login exitoso
         Session::login((int) $user['id']);
+        $this->log('info', 'Login exitoso', ['user_id' => (int) $user['id'], 'email' => $email]);
         $this->redirect('/perfil');
     }
 
@@ -130,11 +131,13 @@ class AuthController extends Controller
         // 6. Éxito: Auto-login
         $user = $userModel->findByEmail($email);
         if ($user === null) {
+            $this->log('error', 'Registro: usuario no encontrado tras crear', ['email' => $email]);
             Session::flash('error', 'Ocurrió un error inesperado al registrar el usuario.');
             $this->redirect('/register');
         }
 
         Session::login((int) $user['id']);
+        $this->log('info', 'Registro exitoso', ['user_id' => (int) $user['id'], 'email' => $email]);
         $this->redirect('/perfil');
     }
 
@@ -147,7 +150,9 @@ class AuthController extends Controller
             $this->redirect('/');
         }
 
+        $userId = Session::userId();
         Session::logout();
+        $this->log('info', 'Logout', ['user_id' => $userId]);
         $this->redirect('/');
     }
 }

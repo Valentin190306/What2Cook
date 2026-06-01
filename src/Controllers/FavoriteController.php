@@ -35,7 +35,13 @@ class FavoriteController extends Controller
             'title' => $title,
             'image' => $image,
         ]);
-        
+
+        $this->log('info', 'Toggle favorito', [
+            'user_id' => $userId,
+            'spoonacular_id' => $spoonacularId,
+            'favorited' => $favorited,
+        ]);
+
         $this->json(['favorited' => $favorited]);
     }
 

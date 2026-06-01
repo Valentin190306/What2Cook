@@ -3,15 +3,19 @@ declare(strict_types=1);
 
 namespace App\Services\Translation;
 
+use App\Core\Log\LoggerInterface;
 use RuntimeException;
 
 class OpenAITranslator implements TranslatorInterface
 {
     private string $apiKey;
+    private ?LoggerInterface $logger = null;
     private const BASE_URL = 'https://api.openai.com/v1/chat/completions';
 
-    public function __construct()
+    public function __construct(?LoggerInterface $logger = null)
     {
+        $this->logger = $logger;
+
         $key = $_ENV['OPENAI_API_KEY'] ?? '';
         if ($key === '') {
             throw new RuntimeException('OPENAI_API_KEY no está definida en las variables de entorno.');
@@ -123,9 +127,17 @@ class OpenAITranslator implements TranslatorInterface
         
         $translatedData = json_decode($translationString, true);
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($translatedData)) {
+            $this->log('error', "Error JSON OpenAI: " . json_last_error_msg());
             return $data;
         }
 
         return $translatedData;
+    }
+
+    private function log(string $level, string $message, array $context = []): void
+    {
+        if ($this->logger === null) return;
+        $module = (new \ReflectionClass($this))->getShortName();
+        $this->logger->log($level, "[{$module}] {$message}", $context);
     }
 }

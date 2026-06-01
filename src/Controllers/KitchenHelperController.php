@@ -24,12 +24,15 @@ class KitchenHelperController extends Controller
         $sort        = $body['sort']        ?? null;
 
         if (!is_array($ingredients) || empty($ingredients)) {
+            $this->log('warning', 'Single search sin ingredientes');
             $this->json(['error' => 'Ingredients required'], 400);
             return;
         }
 
+        $this->log('info', 'Búsqueda single', ['ingredients' => $ingredients, 'sort' => $sort]);
+
         try {
-            $service = new \App\Services\SpoonacularService();
+            $service = new \App\Services\SpoonacularService($this->logger);
 
             if ($sort === 'healthiness' || $sort === 'time') {
                 $results = $service->searchRecipes([
@@ -67,8 +70,10 @@ class KitchenHelperController extends Controller
                 $list = $this->enrichWithNutrition($list, $service);
             }
 
+            $this->log('info', 'Single completada', ['results' => count($list)]);
             $this->json(['success' => true, 'data' => $list]);
         } catch (\RuntimeException $e) {
+            $this->log('error', 'Error en single search: ' . $e->getMessage());
             $this->json(['error' => $e->getMessage()], 502);
         }
     }
@@ -85,14 +90,16 @@ class KitchenHelperController extends Controller
         $sort        = $body['sort'] ?? null;
 
         if (!is_array($ingredients) || empty($ingredients)) {
+            $this->log('warning', 'Meal Prep sin ingredientes');
             $this->json(['error' => 'Ingredients required'], 400);
             return;
         }
 
         $count = max(2, min(5, $count));
+        $this->log('info', 'Búsqueda Meal Prep', ['ingredients' => $ingredients, 'count' => $count, 'sort' => $sort]);
 
         try {
-            $service = new \App\Services\SpoonacularService();
+            $service = new \App\Services\SpoonacularService($this->logger);
             $pool    = $service->searchByIngredients($ingredients, $count * 5, true);
 
             if ($sort === 'time') {
@@ -112,8 +119,10 @@ class KitchenHelperController extends Controller
             $selected = array_slice($pool, 0, $count);
             $selected = $this->enrichWithNutrition($selected, $service);
 
+            $this->log('info', 'Meal Prep completada', ['results' => count($selected)]);
             $this->json(['success' => true, 'data' => $selected]);
         } catch (\RuntimeException $e) {
+            $this->log('error', 'Error en Meal Prep: ' . $e->getMessage());
             $this->json(['error' => $e->getMessage()], 502);
         }
     }
@@ -122,12 +131,16 @@ class KitchenHelperController extends Controller
 
     public function recipeDetail(string $id): void
     {
+        $this->log('info', 'Solicitud de detalle', ['recipe_id' => $id]);
+
         try {
-            $service = new \App\Services\SpoonacularService();
+            $service = new \App\Services\SpoonacularService($this->logger);
             $result  = $service->getRecipeInfo($id, true);
 
+            $this->log('info', 'Detalle completado', ['recipe_id' => $id]);
             $this->json(['success' => true, 'data' => $result]);
         } catch (\RuntimeException $e) {
+            $this->log('error', 'Error en detalle', ['recipe_id' => $id, 'error' => $e->getMessage()]);
             $this->json(['error' => $e->getMessage()], 502);
         }
     }

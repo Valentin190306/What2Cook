@@ -11,10 +11,13 @@ class RecipeController extends Controller
 {
     public function show(string $id): void
     {
+        $this->log('info', 'Viendo receta', ['recipe_id' => $id]);
+
         try {
-            $service = new SpoonacularService();
+            $service = new SpoonacularService($this->logger);
             $recipe  = $service->getRecipeInfo((int) $id, true);
         } catch (\RuntimeException $e) {
+            $this->log('error', 'Error al cargar receta', ['recipe_id' => $id, 'error' => $e->getMessage()]);
             $recipe = null;
         }
 

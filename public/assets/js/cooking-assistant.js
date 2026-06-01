@@ -448,6 +448,24 @@ function setLoading(loading) {
     }
 }
 
+function showLoaderThenNavigate(url) {
+    const status = el('results-status');
+    const grid = el('results-grid');
+
+    grid.innerHTML = '';
+    status.innerHTML = `
+        <div class="ca-loading-newspaper">
+            <span class="ca-loading-spinner"></span>
+            <span class="ca-loading-text">Cargando receta...</span>
+        </div>
+    `;
+    show(status);
+
+    setTimeout(() => {
+        window.location.href = url;
+    }, 100);
+}
+
 
 /* ============================================================
    g) Inicialización
@@ -486,6 +504,13 @@ function init() {
         if (val < parseInt(mpCount.max, 10)) {
             mpCount.value = val + 1;
         }
+    });
+
+    el('results-grid').addEventListener('click', e => {
+        const link = e.target.closest('.recipe-link');
+        if (!link) return;
+        e.preventDefault();
+        showLoaderThenNavigate(link.getAttribute('href'));
     });
 
     el('modal-close-btn').addEventListener('click', closeRecipeModal);

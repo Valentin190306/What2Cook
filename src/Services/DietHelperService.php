@@ -3,23 +3,24 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\Log\LoggerInterface;
+
 class DietHelperService
 {
     private SpoonacularService $spoonacular;
+    private ?LoggerInterface $logger = null;
 
-    private const DIET_MAP = [
-        'vegana'        => 'vegan',
-        'vegetariana'   => 'vegetarian',
-        'keto'          => 'ketogenic',
-        'paleo'         => 'paleo',
-        'pescetariano'  => 'pescetarian',
-        'whole30'       => 'whole30',
-        'sin-gluten'    => 'gluten free',
-    ];
-
-    public function __construct()
+    public function __construct(?LoggerInterface $logger = null)
     {
-        $this->spoonacular = new SpoonacularService();
+        $this->logger = $logger;
+        $this->spoonacular = new SpoonacularService($logger);
+    }
+
+    private function log(string $level, string $message, array $context = []): void
+    {
+        if ($this->logger === null) return;
+        $module = (new \ReflectionClass($this))->getShortName();
+        $this->logger->log($level, "[{$module}] {$message}", $context);
     }
 
     public function generatePlan(

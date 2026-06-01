@@ -142,6 +142,7 @@ class ProfileController extends Controller
             $this->redirect('/perfil/editar');
         }
 
+        $this->log('info', 'Perfil actualizado', ['user_id' => $userId]);
         Session::flash('success', 'Perfil actualizado.');
         $this->redirect('/perfil');
     }

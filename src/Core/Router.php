@@ -59,6 +59,11 @@ class Router
         }
 
         $controller = new $controllerClass();
+
+        if ($this->logger !== null && $controller instanceof \App\Core\Controller) {
+            $controller->setLogger($this->logger);
+        }
+
         if (!method_exists($controller, $method)) {
             throw new \Exception("Method $method not found in $controllerClass");
         }
@@ -69,7 +74,7 @@ class Router
     protected function abort(int $code, string $message = ''): void
     {
         if ($this->logger) {
-            $this->logger->error($message ?: "Abort $code", [
+            $this->logger->error("[Router] {$message}", [
                 'uri' => $_SERVER['REQUEST_URI'] ?? 'unknown',
                 'method' => $_SERVER['REQUEST_METHOD'] ?? 'unknown'
             ], $code);

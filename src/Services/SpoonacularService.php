@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\Log\LoggerInterface;
 use RuntimeException;
 
 class SpoonacularService
@@ -10,9 +11,12 @@ class SpoonacularService
     private const BASE_URL = 'https://api.spoonacular.com';
 
     private string $apiKey;
+    private ?LoggerInterface $logger = null;
 
-    public function __construct()
+    public function __construct(?LoggerInterface $logger = null)
     {
+        $this->logger = $logger;
+
         $key = $_ENV['SPOONACULAR_KEY'] ?? '';
         if ($key === '') {
             throw new RuntimeException('SPOONACULAR_KEY no está definida en las variables de entorno.');
@@ -129,7 +133,9 @@ class SpoonacularService
     {
         // 1. Crear llave de caché basada en el endpoint y los parámetros (sin la API key)
         $cacheParams = $params;
-        $cacheParams['translate'] = $translate; // Para distinguir en caché
+        $cacheParams['translate'] = $translate;
+        $cacheParams['output_translation'] = $_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false';
+        $cacheParams['input_translation'] = $_ENV['ENABLE_INPUT_TRANSLATION'] ?? 'false';
         $cacheKey = md5($endpoint . '?' . http_build_query($cacheParams));
         
         // 2. Definir ruta de caché y tiempo de expiración (ej: 7 días = 604800 segundos)
@@ -193,7 +199,7 @@ class SpoonacularService
                 $translator = $this->getTranslator();
                 $data = $translator->translateArray($data, 'es');
             } catch (\Exception $e) {
-                error_log("Error de traducción (output): " . $e->getMessage());
+                $this->log('error', "Error de traducción (output): " . $e->getMessage());
             }
         }
 
@@ -221,9 +227,16 @@ class SpoonacularService
             }
             return $translator->translate($input, 'en');
         } catch (\Exception $e) {
-            error_log("Error de traducción (input): " . $e->getMessage());
+            $this->log('error', "Error de traducción (input): " . $e->getMessage());
             return $input;
         }
+    }
+
+    private function log(string $level, string $message, array $context = []): void
+    {
+        if ($this->logger === null) return;
+        $module = (new \ReflectionClass($this))->getShortName();
+        $this->logger->log($level, "[{$module}] {$message}", $context);
     }
 
     /**
@@ -234,9 +247,9 @@ class SpoonacularService
     {
         $provider = strtolower($_ENV['TRANSLATION_PROVIDER'] ?? 'gemini');
         $inner = $provider === 'openai'
-            ? new \App\Services\Translation\OpenAITranslator()
-            : new \App\Services\Translation\GeminiTranslator();
+            ? new \App\Services\Translation\OpenAITranslator($this->logger)
+            : new \App\Services\Translation\GeminiTranslator($this->logger);
 
-        return new \App\Services\Translation\CachedTranslator($inner);
+        return new \App\Services\Translation\CachedTranslator($inner, null, $this->logger);
     }
 }
