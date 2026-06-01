@@ -30,8 +30,10 @@ class CachedTranslator implements TranslatorInterface
         $this->providerName = (new \ReflectionClass($inner))->getShortName();
 
         if (!is_dir($this->cacheDir)) {
-            mkdir($this->cacheDir, 0777, true);
+            mkdir($this->cacheDir, 0700, true);
         }
+
+        /** Manejar excepción en caso de error al crear el directorio */
     }
 
     // ── TranslatorInterface ───────────────────────────────────────────────────
@@ -89,7 +91,7 @@ class CachedTranslator implements TranslatorInterface
             return null;
         }
 
-        // Verificar TTL si está configurado
+        // Verificar TTL
         if ($this->ttlSeconds !== null && (time() - filemtime($file)) >= $this->ttlSeconds) {
             @unlink($file);
             return null;
