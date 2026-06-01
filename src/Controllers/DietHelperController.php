@@ -82,7 +82,7 @@ class DietHelperController extends Controller
      */
     public function savePlan(): void
     {
-        $userId = $this->requireAuth();
+        $userId = $this->requireAuthApi();
         $this->requireJson();
 
         $planData = $this->parseBody();
@@ -109,7 +109,7 @@ class DietHelperController extends Controller
      */
     public function getPlan(string $id): void
     {
-        $userId = $this->requireAuth();
+        $userId = $this->requireAuthApi();
         $planId = (int) $id;
 
         $model = new Plan();
@@ -135,7 +135,7 @@ class DietHelperController extends Controller
      */
     public function getActivePlan(): void
     {
-        $userId = $this->requireAuth();
+        $userId = $this->requireAuthApi();
 
         $model      = new Plan();
         $activePlan = $model->findActiveByUser($userId);
@@ -156,7 +156,7 @@ class DietHelperController extends Controller
      */
     public function getShoppingList(string $id): void
     {
-        $userId = $this->requireAuth();
+        $userId = $this->requireAuthApi();
         $planId = (int) $id;
 
         $planModel = new Plan();
@@ -187,7 +187,7 @@ class DietHelperController extends Controller
      */
     public function toggleShoppingItem(string $id): void
     {
-        $this->requireAuth();
+        $this->requireAuthApi();
         $this->requireJson();
 
         $body      = $this->parseBody();
@@ -205,19 +205,4 @@ class DietHelperController extends Controller
         $this->json(['ok' => true]);
     }
 
-    // ── Helpers privados ──────────────────────────────────────────────────────
-
-    private function requireAuth(): int
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-
-        if (empty($_SESSION['user_id'])) {
-            $this->json(['error' => 'No autenticado.'], 401);
-            exit;
-        }
-
-        return (int) $_SESSION['user_id'];
-    }
 }

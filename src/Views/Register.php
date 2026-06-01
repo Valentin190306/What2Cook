@@ -6,7 +6,12 @@ $styles = ['components'];
     <h1>Registrarse</h1>
     <p>Creá tu cuenta gratis y empezá a planificar tus comidas.</p>
 
+    <?php if (!empty($error)): ?>
+        <p class="form-error" role="alert"><?= htmlspecialchars($error) ?></p>
+    <?php endif; ?>
+
     <form action="/register" method="POST">
+        <input type="hidden" name="_csrf" value="<?= htmlspecialchars(\App\Core\Session::csrfToken()) ?>">
         <div class="form-field">
             <label for="name">Nombre</label>
             <input type="text" id="name" name="name" required>
@@ -23,5 +28,5 @@ $styles = ['components'];
             <button type="submit" class="btn-primary">Crear cuenta</button>
         </div>
     </form>
-    <p>¿Ya tenés cuenta? <a href="/login">Iniciá sesión aquí</a></p>
+    <p class="form-link">¿Ya tenés cuenta? <a href="/login">Iniciá sesión aquí</a></p>
 </section>
