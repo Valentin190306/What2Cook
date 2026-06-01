@@ -37,6 +37,8 @@
    HERO — bloque crema con título y subtítulo
    ============================================================ */
 .catalogo-header {
+  max-width: none !important;
+  margin-top: 0 !important;
   margin: -2rem -1rem 2rem;
   /* sangra al borde del <main> */
   padding: 2.5rem 1.5rem 2rem;
@@ -57,7 +59,7 @@
 .catalogo-header p {
   font-size: 1rem;
   color: var(--color-text-muted);
-  max-width: 480px;
+  max-width: 580px;
   margin: 0 auto;
   line-height: 1.6;
 }
@@ -77,6 +79,7 @@
 .search-bar {
   display: flex;
   align-items: stretch;
+  padding: 0.75rem 1rem;
   border: 2px solid var(--color-black);
   background: var(--color-white);
   max-width: 580px;
@@ -211,7 +214,8 @@ fieldset.filtros .filtros-opciones label:hover {
   transform: translate(-1px, -1px);
 }
 
-fieldset.filtros .filtros-opciones input[type="checkbox"] {
+fieldset.filtros .filtros-opciones input[type="checkbox"],
+fieldset.filtros .filtros-opciones input[type="radio"] {
   display: inline-block !important;
   width: 13px !important;
   height: 13px !important;
@@ -226,6 +230,113 @@ fieldset.filtros .filtros-opciones label:has(input:checked) {
   background: var(--color-black) !important;
   color: var(--color-white) !important;
   box-shadow: 3px 3px 0 var(--color-carrot);
+}
+
+.filtros-panel {
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.filtros-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.btn-apply,
+.btn-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  padding: 0.85rem 1.35rem;
+  border: 2px solid var(--color-black);
+  background: var(--color-cream);
+  color: var(--color-black);
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  text-decoration: none;
+}
+
+.btn-apply:hover,
+.btn-clear:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--color-carrot);
+}
+
+.btn-clear {
+  background: transparent;
+}
+
+.results-summary,
+.results-message {
+  max-width: 1100px;
+  margin: 0 auto 1.5rem;
+  padding: 1rem 1rem 1rem 1.25rem;
+  background: var(--color-cream);
+  border: 2px solid var(--color-black);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.05);
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.results-error {
+  border-color: #bf1e2e;
+  background: #fff1f2;
+  color: #741a1d;
+}
+
+.pagination-controls {
+  max-width: 1100px;
+  margin: 1.5rem auto 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.pagination-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  padding: 0.85rem 1.2rem;
+  border: 2px solid var(--color-black);
+  background: var(--color-white);
+  color: var(--color-black);
+  text-decoration: none;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+}
+
+.pagination-button:hover:not(.disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--color-carrot);
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+.pagination-button.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.page-info {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
 }
 
 /* ============================================================
@@ -405,7 +516,7 @@ fieldset.filtros .filtros-opciones label:has(input:checked) {
 
   /* --- Hero --- */
   .catalogo-header {
-    margin: -2rem -1rem 3rem;
+    margin: -2rem -1rem 3rem !important;
     padding: 4rem 2rem 3rem;
   }
 
@@ -434,7 +545,7 @@ fieldset.filtros .filtros-opciones label:has(input:checked) {
 
   /* --- Filtros --- */
   fieldset.filtros {
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
   }
 
   fieldset.filtros legend {

@@ -202,21 +202,28 @@ class DietHelperController extends Controller
      */
     public function toggleShoppingItem(string $id): void
     {
-        $this->requireAuthApi();
+        $userId = $this->requireAuthApi();
         $this->requireJson();
 
-        $body      = $this->parseBody();
-        $itemId    = (int) $id;
-        $purchased = (bool) ($body['purchased'] ?? false);
-
+        $itemId = (int) $id;
         $shoppingList = new ShoppingList();
-        $updated      = $shoppingList->togglePurchased($itemId, $purchased);
 
-        if (!$updated) {
-            $this->json(['error' => 'Ítem no encontrado.'], 404);
-            return;
+        // Verificar que el item existe y pertenece al usuario
+        $item = $shoppingList->findById($itemId);
+        if ($item === null) {
+            $this->json(['error' => 'Item no encontrado.'], 404);
+        }
+        if ((int) $item['user_id'] !== $userId) {
+            $this->json(['error' => 'Acceso denegado.'], 403);
         }
 
+        $body      = $this->parseBody();
+        $purchased = (bool) ($body['purchased'] ?? false);
+        $updated   = $shoppingList->togglePurchased($itemId, $purchased);
+
+        if (!$updated) {
+            $this->json(['error' => 'Item no encontrado.'], 404);
+        }
         $this->json(['ok' => true]);
     }
 
