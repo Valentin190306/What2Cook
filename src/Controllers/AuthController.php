@@ -46,6 +46,7 @@ class AuthController extends Controller
     {
         // 1. Validar CSRF
         if (!Session::validateCsrf($_POST['_csrf'] ?? null)) {
+            $this->log('warning', 'Login: CSRF inválido');
             Session::flash('error', 'Sesión expirada, reintentá.');
             $this->redirect('/login');
         }
@@ -56,6 +57,7 @@ class AuthController extends Controller
 
         // 3. Validar presencia y formato
         if ($email === '' || $password === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->log('warning', 'Login: credenciales inválidas', ['email' => $email]);
             Session::flash('error', 'Credenciales inválidas.');
             $this->redirect('/login');
         }
@@ -65,6 +67,7 @@ class AuthController extends Controller
 
         // 5. Verificar contraseña
         if ($user === null || !password_verify($password, $user['password'])) {
+            $this->log('warning', 'Login: credenciales incorrectas', ['email' => $email]);
             Session::flash('error', 'Credenciales inválidas.');
             $this->redirect('/login');
         }
@@ -82,6 +85,7 @@ class AuthController extends Controller
     {
         // 1. Validar CSRF
         if (!Session::validateCsrf($_POST['_csrf'] ?? null)) {
+            $this->log('warning', 'Register: CSRF inválido');
             Session::flash('error', 'Sesión expirada, reintentá.');
             $this->redirect('/register');
         }
@@ -93,16 +97,19 @@ class AuthController extends Controller
 
         // 3. Validar
         if ($name === '') {
+            $this->log('warning', 'Register: nombre vacío', ['email' => $email]);
             Session::flash('error', 'El nombre es obligatorio.');
             $this->redirect('/register');
         }
 
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->log('warning', 'Register: email inválido', ['email' => $email]);
             Session::flash('error', 'El formato del email es inválido.');
             $this->redirect('/register');
         }
 
         if (strlen($password) < 8) {
+            $this->log('warning', 'Register: contraseña corta', ['email' => $email]);
             Session::flash('error', 'La contraseña debe tener al menos 8 caracteres.');
             $this->redirect('/register');
         }
@@ -110,6 +117,7 @@ class AuthController extends Controller
         // 4. Verificar si el email ya existe
         $userModel = new User();
         if ($userModel->findByEmail($email) !== null) {
+            $this->log('warning', 'Register: email ya registrado', ['email' => $email]);
             Session::flash('error', 'Ese email ya está registrado.');
             $this->redirect('/register');
         }

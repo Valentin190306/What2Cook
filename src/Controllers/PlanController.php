@@ -15,7 +15,8 @@ class PlanController extends Controller
     {
         $userId = $this->requireAuthWeb();
         $plans  = (new Plan())->findAllByUser($userId);
-        
+
+        $this->log('info', 'Viendo mis planes', ['user_id' => $userId, 'count' => count($plans)]);
         View::render('MyPlans', ['plans' => $plans]);
     }
 
@@ -23,12 +24,17 @@ class PlanController extends Controller
     {
         $userId = $this->requireAuthWeb();
         $plan   = (new Plan())->findActiveByUser($userId);
-        
+
         $items = [];
         if ($plan !== null) {
             $items = (new ShoppingList())->findByPlan((int) $plan['id']);
         }
-        
+
+        $this->log('info', 'Viendo lista de compras', [
+            'user_id' => $userId,
+            'plan_id' => $plan !== null ? (int) $plan['id'] : null,
+            'items' => count($items),
+        ]);
         View::render('ShoppingList', [
             'plan'  => $plan,
             'items' => $items

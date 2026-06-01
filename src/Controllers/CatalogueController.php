@@ -50,13 +50,27 @@ class CatalogueController extends Controller
         $totalResults = 0;
         $errorMessage = null;
 
+        $this->log('info', 'Búsqueda en catálogo', [
+            'query' => $query,
+            'cuisine' => $cuisine,
+            'type' => $type,
+            'diet' => $diet,
+            'page' => $page,
+        ]);
+
         try {
             $search = (new SpoonacularService())->searchRecipes($filters);
             $recipes = $search['results'] ?? [];
             $totalResults = (int) ($search['totalResults'] ?? count($recipes));
         } catch (\RuntimeException $e) {
             $errorMessage = $e->getMessage();
+            $this->log('error', 'Error en búsqueda de catálogo: ' . $e->getMessage());
         }
+
+        $this->log('info', 'Búsqueda completada', [
+            'totalResults' => $totalResults,
+            'returned' => count($recipes),
+        ]);
 
         $totalPages = max(1, (int) ceil($totalResults / $perPage));
         if ($totalPages > 0 && $page > $totalPages) {
