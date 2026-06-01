@@ -19,7 +19,7 @@ main > h2 {
   font-style: italic;
   font-weight: 400;
   text-transform: none;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   margin-bottom: 3rem;
   color: var(--color-text-muted);
 }
@@ -28,7 +28,7 @@ main > h2 {
 main > section {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.75rem;
   margin-bottom: 4rem;
   padding-bottom: 2rem;
   border-bottom: 1px solid var(--color-border);
@@ -40,7 +40,7 @@ main > section:last-of-type {
 
 main > section > img {
   width: 100%;
-  height: 300px;
+  height: 100%;
   object-fit: cover;
   border: 1px solid var(--color-black);
   box-shadow: 10px 10px 0px var(--color-spinach);
@@ -51,15 +51,17 @@ main > section > img {
   flex-shrink: 0;
 }
 
-main > section h3 {
+main > section h2 {
   font-size: 2rem;
-  color: var(--color-carrot);
-  margin-bottom: 1rem;
+  color: var(--color-black);
+  margin-bottom: 1.5rem;
 }
 
 main > section p {
-  font-size: 1.1rem;
-  text-align: justify;
+  font-size: 1rem;
+  line-height: 1.6;
+  padding-bottom: 1rem;
+  text-indent: 2rem;
 }
 
 /* ---------- Distribución Desktop ---------- */
@@ -67,7 +69,7 @@ main > section p {
   main > section {
     flex-direction: row;
     align-items: center;
-    gap: 4rem;
+    gap: 3rem;
   }
 
   /* Secciones pares: imagen a la derecha */
@@ -76,17 +78,13 @@ main > section p {
   }
 
   main > section > img {
-    flex: 1;
-    height: 400px;
+    flex: 0 0 350px;
+    height: 300px;
   }
 
   /* div.content ocupa el resto del ancho */
   main > section > div.content {
-    flex: 1.2;
-  }
-
-  main > section p {
-    column-count: 2;
-    column-gap: 2rem;
+    flex: 1;
+    min-width: 0;
   }
 }
