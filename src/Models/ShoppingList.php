@@ -9,6 +9,19 @@ class ShoppingList extends Model
 {
     protected string $table = 'shopping_list_items';
 
+    public function findById(int $itemId): ?array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT s.*, p.user_id 
+             FROM shopping_list_items s
+             JOIN plans p ON p.id = s.plan_id
+             WHERE s.id = :id LIMIT 1"
+        );
+        $stmt->execute(['id' => $itemId]);
+        $row = $stmt->fetch();
+        return $row !== false ? $row : null;
+    }
+
     public function findByPlan(int $planId): array
     {
         $stmt = $this->db->prepare(
