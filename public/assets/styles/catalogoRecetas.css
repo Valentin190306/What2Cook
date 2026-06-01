@@ -79,7 +79,7 @@
 .search-bar {
   display: flex;
   align-items: stretch;
-  padding: 1rem 1rem;
+  padding: 0.75rem 1rem;
   border: 2px solid var(--color-black);
   background: var(--color-white);
   max-width: 580px;
