@@ -7,6 +7,18 @@ use App\Core\Log\LoggerInterface;
 
 class DietHelperService
 {
+    private const DIET_MAP = [
+        'sin-gluten'     => 'gluten free',
+        'keto'           => 'ketogenic',
+        'vegetariana'    => 'vegetarian',
+        'lacto-vegetariana' => 'lacto-vegetarian',
+        'ovo-vegetariana'    => 'ovo-vegetarian',
+        'vegana'         => 'vegan',
+        'pescetariano'   => 'pescetarian',
+        'paleo'          => 'paleo',
+        'primal'         => 'primal',
+        'whole30'        => 'whole30',
+    ];
     private SpoonacularService $spoonacular;
     private ?LoggerInterface $logger = null;
 
