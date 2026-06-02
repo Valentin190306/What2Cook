@@ -42,7 +42,7 @@ $scripts = ['favorites', 'catalogue'];
         </div>
     </details>
 
-    <details class="filters-group" <?= ($cuisine ?? '') !== '' ? 'open' : '' ?> >
+    <details class="filters-group" >
         <summary>
             <span class="summary-title">Cocina</span>
             <div class="summary-chips" aria-hidden="true"></div>
@@ -69,7 +69,7 @@ $scripts = ['favorites', 'catalogue'];
         </div>
     </details>
 
-    <details class="filters-group" <?= ($diet ?? '') !== '' ? 'open' : '' ?> >
+    <details class="filters-group" >
         <summary>
             <span class="summary-title">Dieta</span>
             <div class="summary-chips" aria-hidden="true"></div>
