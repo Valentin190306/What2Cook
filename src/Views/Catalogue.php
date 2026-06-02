@@ -1,7 +1,7 @@
 <?php
 $title = 'Catálogo de Recetas - What2Cook';
 $styles = ['catalogoRecetas'];
-$scripts = ['favorites'];
+$scripts = ['favorites', 'catalogue'];
 ?>
 <section class="catalogo-header">
     <h1>Catálogo de Recetas</h1>
@@ -14,8 +14,11 @@ $scripts = ['favorites'];
 </form>
 
 <section class="filtros-panel">
-    <fieldset class="filtros">
-        <legend>Categoría</legend>
+    <details class="filters-group" open>
+        <summary>
+            <span class="summary-title">Tipo de receta</span>
+            <div class="summary-chips" aria-hidden="true"></div>
+        </summary>
         <div class="filtros-opciones">
             <?php
             $types = [
@@ -31,16 +34,19 @@ $scripts = ['favorites'];
                 'appetizer' => 'Appetizer',
             ];
             foreach ($types as $value => $label): ?>
-                <label>
-                    <input type="radio" name="type" value="<?= htmlspecialchars($value) ?>" <?= ($type ?? '') === $value ? 'checked' : '' ?>>
+                <label tabindex="0">
+                    <input type="checkbox" name="type[]" value="<?= htmlspecialchars($value) ?>" <?= (is_array($type) ? (in_array($value, $type, true) ? 'checked' : '') : (($type ?? '') === $value ? 'checked' : '')) ?>>
                     <span><?= htmlspecialchars($label) ?></span>
                 </label>
             <?php endforeach; ?>
         </div>
-    </fieldset>
+    </details>
 
-    <fieldset class="filtros">
-        <legend>Cocina</legend>
+    <details class="filters-group" <?= ($cuisine ?? '') !== '' ? 'open' : '' ?> >
+        <summary>
+            <span class="summary-title">Cocina</span>
+            <div class="summary-chips" aria-hidden="true"></div>
+        </summary>
         <div class="filtros-opciones">
             <?php
             $cuisines = [
@@ -55,16 +61,19 @@ $scripts = ['favorites'];
                 'spanish' => 'Spanish',
             ];
             foreach ($cuisines as $value => $label): ?>
-                <label>
-                    <input type="radio" name="cuisine" value="<?= htmlspecialchars($value) ?>" <?= ($cuisine ?? '') === $value ? 'checked' : '' ?>>
+                <label tabindex="0">
+                    <input type="checkbox" name="cuisine[]" value="<?= htmlspecialchars($value) ?>" <?= (is_array($cuisine) ? (in_array($value, $cuisine, true) ? 'checked' : '') : (($cuisine ?? '') === $value ? 'checked' : '')) ?>>
                     <span><?= htmlspecialchars($label) ?></span>
                 </label>
             <?php endforeach; ?>
         </div>
-    </fieldset>
+    </details>
 
-    <fieldset class="filtros">
-        <legend>Dieta</legend>
+    <details class="filters-group" <?= ($diet ?? '') !== '' ? 'open' : '' ?> >
+        <summary>
+            <span class="summary-title">Dieta</span>
+            <div class="summary-chips" aria-hidden="true"></div>
+        </summary>
         <div class="filtros-opciones">
             <?php
             $diets = [
@@ -81,17 +90,17 @@ $scripts = ['favorites'];
                 'pescatarian' => 'Pescatarian',
             ];
             foreach ($diets as $value => $label): ?>
-                <label>
-                    <input type="radio" name="diet" value="<?= htmlspecialchars($value) ?>" <?= ($diet ?? '') === $value ? 'checked' : '' ?>>
+                <label tabindex="0">
+                    <input type="checkbox" name="diet[]" value="<?= htmlspecialchars($value) ?>" <?= (is_array($diet) ? (in_array($value, $diet, true) ? 'checked' : '') : (($diet ?? '') === $value ? 'checked' : '')) ?>>
                     <span><?= htmlspecialchars($label) ?></span>
                 </label>
             <?php endforeach; ?>
         </div>
-    </fieldset>
+    </details>
 
     <div class="filtros-actions">
-        <button type="submit" class="btn-apply">Aplicar filtros</button>
-        <a href="/recetas" class="btn-clear">Limpiar filtros</a>
+        <button type="button" class="btn-apply">Aplicar filtros</button>
+        <button type="button" class="btn-clear">Limpiar filtros</button>
     </div>
 </section>
 

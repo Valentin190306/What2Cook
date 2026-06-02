@@ -15,11 +15,30 @@ class CatalogueController extends Controller
     public function index(): void
     {
         $query = trim((string) ($_GET['query'] ?? ''));
-        $cuisine = trim((string) ($_GET['cuisine'] ?? ''));
-        $type = trim((string) ($_GET['type'] ?? ''));
-        $diet = $_GET['diet'] ?? '';
-        if (is_array($diet)) {
-            $diet = trim((string) ($diet[0] ?? ''));
+        // support multiple selections per category (arrays or single values)
+        $cuisineRaw = $_GET['cuisine'] ?? '';
+        $typeRaw = $_GET['type'] ?? '';
+        $dietRaw = $_GET['diet'] ?? '';
+
+        $cuisineArr = [];
+        if (is_array($cuisineRaw)) {
+            $cuisineArr = array_values(array_filter(array_map('trim', $cuisineRaw), static fn($v) => $v !== ''));
+        } elseif (trim((string) $cuisineRaw) !== '') {
+            $cuisineArr = [trim((string) $cuisineRaw)];
+        }
+
+        $typeArr = [];
+        if (is_array($typeRaw)) {
+            $typeArr = array_values(array_filter(array_map('trim', $typeRaw), static fn($v) => $v !== ''));
+        } elseif (trim((string) $typeRaw) !== '') {
+            $typeArr = [trim((string) $typeRaw)];
+        }
+
+        $dietArr = [];
+        if (is_array($dietRaw)) {
+            $dietArr = array_values(array_filter(array_map('trim', $dietRaw), static fn($v) => $v !== ''));
+        } elseif (trim((string) $dietRaw) !== '') {
+            $dietArr = [trim((string) $dietRaw)];
         }
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -36,14 +55,15 @@ class CatalogueController extends Controller
         if ($query !== '') {
             $filters['query'] = $query;
         }
-        if ($cuisine !== '') {
-            $filters['cuisine'] = $cuisine;
+        if (!empty($cuisineArr)) {
+            // join multiple cuisines with comma - Spoonacular accepts comma-separated lists
+            $filters['cuisine'] = implode(',', $cuisineArr);
         }
-        if ($type !== '') {
-            $filters['type'] = $type;
+        if (!empty($typeArr)) {
+            $filters['type'] = implode(',', $typeArr);
         }
-        if ($diet !== '') {
-            $filters['diet'] = $diet;
+        if (!empty($dietArr)) {
+            $filters['diet'] = implode(',', $dietArr);
         }
 
         $recipes = [];
@@ -52,9 +72,10 @@ class CatalogueController extends Controller
 
         $this->log('info', 'Búsqueda en catálogo', [
             'query' => $query,
-            'cuisine' => $cuisine,
-            'type' => $type,
-            'diet' => $diet,
+            // pass arrays to the view so inputs can render checked states
+            'cuisine' => $cuisineArr,
+            'type' => $typeArr,
+            'diet' => $dietArr,
             'page' => $page,
         ]);
 
@@ -86,9 +107,9 @@ class CatalogueController extends Controller
 
         View::render('Catalogue', [
             'query' => $query,
-            'cuisine' => $cuisine,
-            'type' => $type,
-            'diet' => $diet,
+            'cuisine' => $cuisineArr,
+            'type' => $typeArr,
+            'diet' => $dietArr,
             'page' => $page,
             'perPage' => $perPage,
             'totalResults' => $totalResults,
