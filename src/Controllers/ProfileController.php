@@ -26,10 +26,54 @@ class ProfileController extends Controller
 
         // Fetch recent favorites (up to 3) for the dashboard
         $allFavorites = $favoriteModel->findAllByUser($userId);
-        $recentFavorites = array_slice($allFavorites, 0, 3);
+        $recentFavorites = array_slice($allFavorites, 0, 4);
+
+        // Decode dietary preferences
+        $userDiet = $user['preferences'] ?? '';
+        $userAllergies = [];
+        if (!empty($user['allergies'])) {
+            $decoded = json_decode($user['allergies'], true);
+            if (is_array($decoded)) {
+                $userAllergies = $decoded;
+            }
+        }
+
+        $dietLabels = [
+            '' => 'Sin dieta',
+            'vegetarian' => 'Vegetariana',
+            'vegan' => 'Vegana',
+            'ketogenic' => 'Cetogénica',
+            'paleo' => 'Paleo',
+            'primal' => 'Primal',
+            'whole30' => 'Whole30',
+            'gluten free' => 'Libre de Gluten',
+            'pescetarian' => 'Pescetariana',
+            'lacto-vegetarian' => 'Lacto-vegetariana',
+            'ovo-vegetarian' => 'Ovo-vegetariana'
+        ];
+
+        $allergyLabels = [
+            'dairy' => 'Lácteos',
+            'egg' => 'Huevo',
+            'gluten' => 'Gluten',
+            'grain' => 'Granos',
+            'peanut' => 'Maní',
+            'seafood' => 'Pescado',
+            'sesame' => 'Sésamo',
+            'shellfish' => 'Mariscos',
+            'soy' => 'Soya',
+            'sulfite' => 'Sulfito',
+            'tree nut' => 'Frutos secos',
+            'wheat' => 'Trigo'
+        ];
 
         View::render('Profile', [
             'userName' => $user ? $user['name'] : 'Usuario',
+            'userEmail' => $user ? $user['email'] : '',
+            'userDiet' => $userDiet,
+            'userDietLabel' => $dietLabels[$userDiet] ?? 'Sin dieta',
+            'userAllergies' => $userAllergies,
+            'userAllergyLabels' => array_map(fn($a) => $allergyLabels[$a] ?? $a, $userAllergies),
             'favoritesCount' => $favoritesCount,
             'plansCount' => $plansCount,
             'listsCount' => $listsCount,
