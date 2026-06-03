@@ -19,6 +19,7 @@ class CatalogueController extends Controller
         $cuisineRaw = $_GET['cuisine'] ?? '';
         $typeRaw = $_GET['type'] ?? '';
         $dietRaw = $_GET['diet'] ?? '';
+        $intolerancesRaw = $_GET['intolerances'] ?? '';
 
         $cuisineArr = [];
         if (is_array($cuisineRaw)) {
@@ -39,6 +40,13 @@ class CatalogueController extends Controller
             $dietArr = array_values(array_filter(array_map('trim', $dietRaw), static fn($v) => $v !== ''));
         } elseif (trim((string) $dietRaw) !== '') {
             $dietArr = [trim((string) $dietRaw)];
+        }
+
+        $intolerancesArr = [];
+        if (is_array($intolerancesRaw)) {
+            $intolerancesArr = array_values(array_filter(array_map('trim', $intolerancesRaw), static fn($v) => $v !== ''));
+        } elseif (trim((string) $intolerancesRaw) !== '') {
+            $intolerancesArr = [trim((string) $intolerancesRaw)];
         }
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
@@ -65,6 +73,9 @@ class CatalogueController extends Controller
         if (!empty($dietArr)) {
             $filters['diet'] = implode(',', $dietArr);
         }
+        if (!empty($intolerancesArr)) {
+            $filters['intolerances'] = implode(',', $intolerancesArr);
+        }
 
         $recipes = [];
         $totalResults = 0;
@@ -76,6 +87,7 @@ class CatalogueController extends Controller
             'cuisine' => $cuisineArr,
             'type' => $typeArr,
             'diet' => $dietArr,
+            'intolerances' => $intolerancesArr,
             'page' => $page,
         ]);
 
@@ -110,6 +122,7 @@ class CatalogueController extends Controller
             'cuisine' => $cuisineArr,
             'type' => $typeArr,
             'diet' => $dietArr,
+            'intolerances' => $intolerancesArr,
             'page' => $page,
             'perPage' => $perPage,
             'totalResults' => $totalResults,
