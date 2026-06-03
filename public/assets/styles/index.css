@@ -109,6 +109,7 @@
   letter-spacing: -0.01em;
   color: var(--color-black);
   border: 1px solid var(--color-black);
+  background-color: #efede8;
   box-shadow: 4px 4px 0 var(--color-black);
   transition: box-shadow 0.2s, transform 0.2s;
 }
@@ -269,6 +270,7 @@ dl.stats dd:last-child {
     flex-direction: column;
     gap: 0.5rem;
     min-height: 160px;
+    background-color: #efede8;
     box-shadow: 4px 4px 0px var(--color-black);
     transition: box-shadow 0.2s, transform 0.2s, color 0.2s;
   }
