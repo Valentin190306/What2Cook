@@ -98,6 +98,37 @@ $scripts = ['favorites', 'catalogue'];
         </div>
     </details>
 
+    <details class="filters-group" >
+        <summary>
+            <span class="summary-title">Intolerancias</span>
+            <div class="summary-chips" aria-hidden="true"></div>
+        </summary>
+        <div class="filtros-opciones">
+            <?php
+            $intolerancesList = [
+                '' => 'Todas',
+                'dairy' => 'Lácteos',
+                'egg' => 'Huevo',
+                'gluten' => 'Gluten',
+                'grain' => 'Granos',
+                'peanut' => 'Maní',
+                'seafood' => 'Pescado',
+                'sesame' => 'Sésamo',
+                'shellfish' => 'Mariscos',
+                'soy' => 'Soya',
+                'sulfite' => 'Sulfito',
+                'tree nut' => 'Frutos secos',
+                'wheat' => 'Trigo'
+            ];
+            foreach ($intolerancesList as $value => $label): ?>
+                <label tabindex="0">
+                    <input type="checkbox" name="intolerances[]" value="<?= htmlspecialchars($value) ?>" <?= (is_array($intolerances) ? (in_array($value, $intolerances, true) ? 'checked' : '') : (($intolerances ?? '') === $value ? 'checked' : '')) ?>>
+                    <span><?= htmlspecialchars($label) ?></span>
+                </label>
+            <?php endforeach; ?>
+        </div>
+    </details>
+
     <div class="filtros-actions">
         <button type="button" class="btn-apply">Aplicar filtros</button>
         <button type="button" class="btn-clear">Limpiar filtros</button>
