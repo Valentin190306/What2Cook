@@ -22,10 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = qInput ? qInput.value.trim() : '';
         if (q) params.set('query', q);
 
-        // append multiple selections as arrays (type[], cuisine[], diet[])
+        // append multiple selections as arrays (type[], cuisine[], diet[], intolerances[])
         document.querySelectorAll('.filtros-opciones input[name="type[]"]:checked').forEach((el) => params.append('type[]', el.value));
         document.querySelectorAll('.filtros-opciones input[name="cuisine[]"]:checked').forEach((el) => params.append('cuisine[]', el.value));
         document.querySelectorAll('.filtros-opciones input[name="diet[]"]:checked').forEach((el) => params.append('diet[]', el.value));
+        document.querySelectorAll('.filtros-opciones input[name="intolerances[]"]:checked').forEach((el) => params.append('intolerances[]', el.value));
 
         return params.toString();
     }
