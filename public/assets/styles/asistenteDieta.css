@@ -208,6 +208,7 @@
 
 .plan-actions {
   margin-top: 2.5rem;
+  gap: 1rem;
 }
 
 .config-form .btn-primary,
@@ -229,6 +230,32 @@
   border-color: var(--color-carrot) !important;
   transform: translate(-2px, -2px);
   box-shadow: 4px 4px 0 var(--color-black);
+}
+
+.plan-panel .btn-shopping-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.8rem 2rem !important;
+  font-size: 0.85rem !important;
+  letter-spacing: 0.05em;
+  background: var(--color-white) !important;
+  color: var(--color-fish) !important;
+  border: 2px solid var(--color-fish) !important;
+  cursor: pointer;
+  transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+}
+
+.plan-panel .btn-shopping-list:hover {
+  background: var(--color-fish) !important;
+  color: var(--color-white) !important;
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--color-black);
+}
+
+.plan-panel .btn-shopping-list svg {
+  fill: currentColor;
 }
 
 /* ============================================================

@@ -2,7 +2,7 @@
 
 $title  = isset($recipe['title']) ? "What2Cook - {$recipe['title']}" : "What2Cook - Receta";
 $styles = ['receta'];
-$scripts = ['favorites'];
+$scripts = ['favorites', 'shopping-lists'];
 
 // Helpers
 $readyIn  = $recipe['readyInMinutes'] ?? null;
@@ -119,7 +119,18 @@ foreach ($nutrients as $n) {
     <!-- ── Ingredientes ── -->
     <?php if (!empty($ingredients)): ?>
     <section class="ingredientes">
-        <h2>Ingredientes</h2>
+        <div class="ingredientes-header">
+            <h2>Ingredientes</h2>
+            <button type="button" class="btn-save-list" id="btn-save-list" 
+                    data-sl-save 
+                    data-source-type="recipe" 
+                    data-source-id="<?= (int) $id ?>">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14c-2.33 0-7-1.17-7-3.5V19h14v-2.5c0 2.33-4.67 3.5-7 3.5z"/>
+                </svg>
+                Guardar lista
+            </button>
+        </div>
         <fieldset class="porciones">
             <legend>Porciones:</legend>
             <button type="button" id="btn-menos" aria-label="Reducir porciones">−</button>

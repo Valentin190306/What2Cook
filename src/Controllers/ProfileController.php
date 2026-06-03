@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Models\Plan;
 use App\Models\ShoppingList;
 use App\Models\Favorite;
+use App\Models\MealPrepFavorite;
+use App\Models\SavedShoppingList;
 use App\Core\View;
 
 class ProfileController extends Controller
@@ -24,9 +26,18 @@ class ProfileController extends Controller
         $plansCount = (new Plan())->countByUser($userId);
         $listsCount = (new ShoppingList())->countByUser($userId);
 
-        // Fetch recent favorites (up to 3) for the dashboard
+        // Fetch recent favorites (up to 4) for the dashboard
         $allFavorites = $favoriteModel->findAllByUser($userId);
         $recentFavorites = array_slice($allFavorites, 0, 4);
+        
+        // Fetch recent meal prep favorites (up to 4)
+        $recentMealPreps = (new MealPrepFavorite())->findRecentByUser($userId, 4);
+        
+        // Fetch recent shopping lists (up to 3)
+        $recentShoppingLists = (new SavedShoppingList())->findRecentByUser($userId, 3);
+        
+        // Fetch recent diet plans (up to 3)
+        $recentDietPlans = (new Plan())->findRecentByUser($userId, 3);
 
         // Decode dietary preferences
         $userDiet = $user['preferences'] ?? '';
@@ -78,6 +89,9 @@ class ProfileController extends Controller
             'plansCount' => $plansCount,
             'listsCount' => $listsCount,
             'recentFavorites' => $recentFavorites,
+            'recentMealPreps' => $recentMealPreps,
+            'recentShoppingLists' => $recentShoppingLists,
+            'recentDietPlans' => $recentDietPlans,
             'success' => Session::getFlash('success'),
         ]);
     }

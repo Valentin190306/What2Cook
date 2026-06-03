@@ -29,20 +29,46 @@ class KitchenHelperController extends Controller
             return;
         }
 
-        $this->log('info', 'Búsqueda single', ['ingredients' => $ingredients, 'sort' => $sort]);
+        // Get user dietary preferences if authenticated
+        $userId = \App\Core\Session::userId();
+        $userDiet = '';
+        $userIntolerances = [];
+        if ($userId !== null) {
+            $user = (new \App\Models\User())->find($userId);
+            if ($user) {
+                $userDiet = $user['preferences'] ?? '';
+                if (!empty($user['allergies'])) {
+                    $decoded = json_decode($user['allergies'], true);
+                    if (is_array($decoded)) {
+                        $userIntolerances = $decoded;
+                    }
+                }
+            }
+        }
+
+        $this->log('info', 'Búsqueda single', ['ingredients' => $ingredients, 'sort' => $sort, 'diet' => $userDiet, 'intolerances' => $userIntolerances]);
 
         try {
             $service = new \App\Services\SpoonacularService($this->logger);
 
             if ($sort === 'healthiness' || $sort === 'time') {
-                $results = $service->searchRecipes([
+                $filters = [
                     'includeIngredients'   => implode(',', $ingredients),
                     'sort'                 => $sort,
                     'sortDirection'        => 'desc',
                     'addRecipeNutrition'   => 'true',
                     'fillIngredients'      => 'true',
                     'addRecipeInformation' => 'true',
-                ]);
+                ];
+                
+                if (!empty($userDiet)) {
+                    $filters['diet'] = $userDiet;
+                }
+                if (!empty($userIntolerances)) {
+                    $filters['intolerances'] = implode(',', $userIntolerances);
+                }
+                
+                $results = $service->searchRecipes($filters);
                 $list = $results['results'] ?? $results;
 
                 foreach ($list as &$recipe) {
@@ -95,12 +121,46 @@ class KitchenHelperController extends Controller
             return;
         }
 
+        // Get user dietary preferences if authenticated
+        $userId = \App\Core\Session::userId();
+        $userDiet = '';
+        $userIntolerances = [];
+        if ($userId !== null) {
+            $user = (new \App\Models\User())->find($userId);
+            if ($user) {
+                $userDiet = $user['preferences'] ?? '';
+                if (!empty($user['allergies'])) {
+                    $decoded = json_decode($user['allergies'], true);
+                    if (is_array($decoded)) {
+                        $userIntolerances = $decoded;
+                    }
+                }
+            }
+        }
+
         $count = max(2, min(5, $count));
-        $this->log('info', 'Búsqueda Meal Prep', ['ingredients' => $ingredients, 'count' => $count, 'sort' => $sort]);
+        $this->log('info', 'Búsqueda Meal Prep', ['ingredients' => $ingredients, 'count' => $count, 'sort' => $sort, 'diet' => $userDiet, 'intolerances' => $userIntolerances]);
 
         try {
             $service = new \App\Services\SpoonacularService($this->logger);
-            $pool    = $service->searchByIngredients($ingredients, $count * 5, true);
+            
+            // Use searchRecipes with dietary filters instead of searchByIngredients
+            $filters = [
+                'includeIngredients'   => implode(',', $ingredients),
+                'number'               => $count * 5,
+                'addRecipeNutrition'   => 'true',
+                'addRecipeInformation' => 'true',
+            ];
+            
+            if (!empty($userDiet)) {
+                $filters['diet'] = $userDiet;
+            }
+            if (!empty($userIntolerances)) {
+                $filters['intolerances'] = implode(',', $userIntolerances);
+            }
+            
+            $results = $service->searchRecipes($filters);
+            $pool = $results['results'] ?? $results;
 
             if ($sort === 'time') {
                 usort($pool, function (array $a, array $b): int {

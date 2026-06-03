@@ -350,3 +350,22 @@
         grid-template-columns: repeat(4, 1fr);
     }
 }
+
+/* Flex column layout for recent lists */
+.flex-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mealprep-card,
+.list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.date {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}

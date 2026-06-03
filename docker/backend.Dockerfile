@@ -9,9 +9,10 @@ RUN printf "session.save_path=/var/lib/php/sessions\n" > /usr/local/etc/php/conf
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint \
+    && sed -i 's/\r$//' /usr/local/bin/docker-entrypoint
 
-ENTRYPOINT ["docker-entrypoint"]
+ENTRYPOINT ["sh", "/usr/local/bin/docker-entrypoint"]
 CMD ["php-fpm"]
 
 WORKDIR /var/www/app

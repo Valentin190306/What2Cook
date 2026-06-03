@@ -20,7 +20,7 @@ $router->add('GET', '/receta/{id}', 'RecipeController@show');
 $router->add('GET', '/perfil', 'ProfileController@index');
 $router->add('GET', '/favoritos', 'FavoriteController@index');
 $router->add('GET', '/mis-planes', 'PlanController@myPlans');
-$router->add('GET', '/lista-compras', 'PlanController@shoppingList');
+$router->add('GET', '/lista-compras', 'ShoppingListController@index');
 $router->add('GET', '/perfil/editar', 'ProfileController@editForm');
 $router->add('POST', '/perfil/editar', 'ProfileController@update');
 $router->add('GET', '/login', 'AuthController@loginForm');
@@ -44,5 +44,13 @@ $router->add('PATCH', '/api/diet-helper/shopping-list/item/{id}',     'DietHelpe
 
 // Rutas de API — Favoritos
 $router->add('POST', '/api/favorites', 'FavoriteController@toggle');
+$router->add('GET', '/api/favorites', 'FavoriteController@indexApi');
+$router->add('POST', '/api/meal-prep-favorites', 'FavoriteController@toggleMealPrep');
+$router->add('GET', '/api/meal-prep-favorites', 'FavoriteController@mealPrepIndexApi');
+
+// Rutas de API — Listas de Compra
+$router->add('POST', '/api/shopping-lists', 'ShoppingListController@save');
+$router->add('GET', '/api/shopping-lists', 'ShoppingListController@indexApi');
+$router->add('DELETE', '/api/shopping-lists', 'ShoppingListController@delete');
 
 return $router;

@@ -21,15 +21,6 @@ class Plan extends Model
         return $result ?: null;
     }
 
-    public function findAllByUser(int $userId): array
-    {
-        $stmt = $this->db->prepare(
-            "SELECT * FROM {$this->table} WHERE user_id = :user_id ORDER BY created_at DESC"
-        );
-        $stmt->execute(['user_id' => $userId]);
-        return $stmt->fetchAll();
-    }
-
     /**
      * Devuelve un plan completo con sus días y comidas.
      */
@@ -159,5 +150,30 @@ class Plan extends Model
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM plans WHERE user_id = :user_id");
         $stmt->execute(['user_id' => $userId]);
         return (int) $stmt->fetchColumn();
+    }
+    
+    public function findAllByUser(int $userId): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT id, user_id, duration_days, diet_type, target_calories, target_protein, target_carbs, target_fat, created_at
+             FROM plans 
+             WHERE user_id = :user_id 
+             ORDER BY created_at DESC"
+        );
+        $stmt->execute(['user_id' => $userId]);
+        return $stmt->fetchAll();
+    }
+    
+    public function findRecentByUser(int $userId, int $limit = 3): array
+    {
+        $stmt = $this->db->prepare(
+            "SELECT id, user_id, duration_days, diet_type, target_calories, target_protein, target_carbs, target_fat, created_at
+             FROM plans 
+             WHERE user_id = :user_id 
+             ORDER BY created_at DESC 
+             LIMIT :limit"
+        );
+        $stmt->execute(['user_id' => $userId, 'limit' => $limit]);
+        return $stmt->fetchAll();
     }
 }

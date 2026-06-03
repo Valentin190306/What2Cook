@@ -97,8 +97,73 @@ $styles = ['perfil'];
                                 <img src="<?= htmlspecialchars($fav['image']) ?>" alt="<?= htmlspecialchars($fav['title']) ?>" class="recipe-thumb">
                             <?php endif; ?>
                             <h3><?= htmlspecialchars($fav['title']) ?></h3>
-                            <!-- <p>Hacé clic para ver los detalles de la receta.</p> -->
                         </a>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <section id="recent-meal-preps" class="profile-section">
+            <h2>Mealpreps Recientes</h2>
+            <p>Tus últimos meal preps guardados</p>
+            <?php if (empty($recentMealPreps)): ?>
+                <article class="empty-state">
+                    <p>Aún no tenés meal preps guardados</p>
+                    <a href="/asistente-cocina" class="btn-link">Crear meal prep</a>
+                </article>
+            <?php else: ?>
+                <div class="grid-container">
+                    <?php foreach ($recentMealPreps as $mp): ?>
+                        <article class="action-card mealprep-card">
+                            <h3>Meal Prep</h3>
+                            <p><?= count(json_decode($mp['ingredients'], true) ?? []) ?> ingredientes</p>
+                            <p class="date"><?= date('d/m/Y', strtotime($mp['created_at'])) ?></p>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <section id="recent-shopping-lists" class="profile-section">
+            <h2>Listas Recientes</h2>
+            <p>Tus últimas listas de compras</p>
+            <?php if (empty($recentShoppingLists)): ?>
+                <article class="empty-state">
+                    <p>Aún no tenés listas de compras</p>
+                    <a href="/lista-compras" class="btn-link">Ver todas</a>
+                </article>
+            <?php else: ?>
+                <div class="flex-column">
+                    <?php foreach ($recentShoppingLists as $list): ?>
+                        <article class="action-card list-card">
+                            <h3><?= htmlspecialchars($list['source_type'] === 'recipe' ? 'Lista de receta' : ($list['source_type'] === 'meal_prep' ? 'Lista de meal prep' : 'Lista de plan de dieta')) ?></h3>
+                            <p><?= count($list['items'] ?? []) ?> ingredientes</p>
+                            <p class="date"><?= date('d/m/Y', strtotime($list['created_at'])) ?></p>
+                            <a href="/lista-compras" class="btn-link">Ver todas</a>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <section id="recent-diet-plans" class="profile-section">
+            <h2>Planes Recientes</h2>
+            <p>Tus últimos planes de dieta</p>
+            <?php if (empty($recentDietPlans)): ?>
+                <article class="empty-state">
+                    <p>Aún no tenés planes de dieta</p>
+                    <a href="/asistente-dieta" class="btn-link">Crear plan</a>
+                </article>
+            <?php else: ?>
+                <div class="flex-column">
+                    <?php foreach ($recentDietPlans as $plan): ?>
+                        <article class="action-card plan-card">
+                            <h3>Plan de <?= (int) $plan['duration_days'] ?> días</h3>
+                            <p><?= $plan['diet_type'] ? htmlspecialchars($plan['diet_type']) : 'Sin dieta específica' ?></p>
+                            <p><?= (int) $plan['target_calories'] ?> kcal/día</p>
+                            <p class="date"><?= date('d/m/Y', strtotime($plan['created_at'])) ?></p>
+                            <a href="/mis-planes" class="btn-link">Ver todos</a>
+                        </article>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>

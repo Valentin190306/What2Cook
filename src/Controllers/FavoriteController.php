@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Favorite;
+use App\Models\MealPrepFavorite;
 
 class FavoriteController extends Controller
 {
@@ -49,9 +50,57 @@ class FavoriteController extends Controller
     {
         $userId = $this->requireAuthWeb();
         $favorites = (new Favorite())->findAllByUser($userId);
+        $mealPrepFavorites = (new MealPrepFavorite())->findAllByUser($userId);
         
         \App\Core\View::render('Favorites', [
             'favorites' => $favorites,
+            'mealPrepFavorites' => $mealPrepFavorites,
         ]);
+    }
+    
+    public function indexApi(): void
+    {
+        $userId = $this->requireAuthApi();
+        $favorites = (new Favorite())->findAllByUser($userId);
+        
+        $this->json(['favorites' => $favorites]);
+    }
+    
+    // Meal Prep Favorites
+    public function toggleMealPrep(): void
+    {
+        $userId = $this->requireAuthApi();
+        $this->requireJson();
+        
+        $body = $this->parseBody();
+        $ingredients = $body['ingredients'] ?? [];
+        $recipeIds = $body['recipe_ids'] ?? [];
+        $servings = $body['servings'] ?? [];
+        
+        if (empty($ingredients) || empty($recipeIds)) {
+            $this->json(['error' => 'Datos de meal prep inválidos.'], 422);
+            return;
+        }
+        
+        $favorited = (new MealPrepFavorite())->toggle($userId, [
+            'ingredients' => $ingredients,
+            'recipe_ids' => $recipeIds,
+            'servings' => $servings,
+        ]);
+
+        $this->log('info', 'Toggle favorito de meal prep', [
+            'user_id' => $userId,
+            'favorited' => $favorited,
+        ]);
+
+        $this->json(['favorited' => $favorited]);
+    }
+    
+    public function mealPrepIndexApi(): void
+    {
+        $userId = $this->requireAuthApi();
+        $favorites = (new MealPrepFavorite())->findAllByUser($userId);
+        
+        $this->json(['favorites' => $favorites]);
     }
 }

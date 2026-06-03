@@ -1,7 +1,7 @@
 <?php
 $title = 'Asistente de Dietas - What2Cook';
 $styles = ['asistenteDieta'];
-$scripts = ['utils', 'api', 'diet-helper'];
+$scripts = ['utils', 'api', 'diet-helper', 'shopping-lists'];
 ?>
 <style>
 .ca-loading-newspaper {
@@ -86,16 +86,16 @@ $scripts = ['utils', 'api', 'diet-helper'];
                 <label for="dieta">Tipo de dieta <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
                 <select id="dieta" name="dieta">
                     <option value="">Sin restricción — dieta variada</option>
-                    <option value="sin-gluten">Libre de Gluten</option>
-                    <option value="keto">Cetogénica (Keto)</option>
-                    <option value="vegetariana">Vegetariana</option>
-                    <option value="lacto-vegetariana">Lacto-Vegetariana</option>
-                    <option value="ovo-vegetariana">Ovo-Vegetariana</option>
-                    <option value="vegana">Vegana</option>
-                    <option value="pescetariano">Pescetariana</option>
-                    <option value="paleo">Paleo</option>
-                    <option value="primal">Primal</option>
-                    <option value="whole30">Whole30</option>
+                    <option value="sin-gluten" <?= $userDiet === 'gluten free' ? 'selected' : '' ?>>Libre de Gluten</option>
+                    <option value="keto" <?= $userDiet === 'ketogenic' ? 'selected' : '' ?>>Cetogénica (Keto)</option>
+                    <option value="vegetariana" <?= $userDiet === 'vegetarian' ? 'selected' : '' ?>>Vegetariana</option>
+                    <option value="lacto-vegetariana" <?= $userDiet === 'lacto-vegetarian' ? 'selected' : '' ?>>Lacto-Vegetariana</option>
+                    <option value="ovo-vegetariana" <?= $userDiet === 'ovo-vegetarian' ? 'selected' : '' ?>>Ovo-Vegetariana</option>
+                    <option value="vegana" <?= $userDiet === 'vegan' ? 'selected' : '' ?>>Vegana</option>
+                    <option value="pescetariano" <?= $userDiet === 'pescetarian' ? 'selected' : '' ?>>Pescetariana</option>
+                    <option value="paleo" <?= $userDiet === 'paleo' ? 'selected' : '' ?>>Paleo</option>
+                    <option value="primal" <?= $userDiet === 'primal' ? 'selected' : '' ?>>Primal</option>
+                    <option value="whole30" <?= $userDiet === 'whole30' ? 'selected' : '' ?>>Whole30</option>
                 </select>
             </div>
         </div>
@@ -177,5 +177,14 @@ $scripts = ['utils', 'api', 'diet-helper'];
 
     <div class="plan-actions">
         <button type="button" class="btn-save" id="btn-guardar">Guardar plan</button>
+        <button type="button" class="btn-shopping-list" id="btn-shopping-list" 
+                data-sl-save 
+                data-source-type="diet_plan" 
+                data-source-id="">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14c-2.33 0-7-1.17-7-3.5V19h14v-2.5c0 2.33-4.67 3.5-7 3.5z"/>
+            </svg>
+            Guardar lista
+        </button>
     </div>
 </section>

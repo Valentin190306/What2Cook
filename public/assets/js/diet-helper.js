@@ -1,4 +1,4 @@
-let planData = null;
+window.dietHelperPlanData = null;
 
 const dictMeals = {
     'breakfast': 'Desayuno',
@@ -17,7 +17,49 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectSemana = document.getElementById('semana-select');
     const tabsContainer = document.getElementById('tabs-dias');
     const btnGuardar = document.getElementById('btn-guardar');
+    const btnShoppingList = document.getElementById('btn-shopping-list');
     const btnGenerar = form.querySelector('button[type="submit"]');
+
+    const updateDietPlanButtons = () => {
+        const planId = window.dietHelperPlanData?.meta?.plan_id || '';
+        if (btnShoppingList) {
+            btnShoppingList.dataset.sourceId = planId;
+        }
+        if (btnGuardar) {
+            btnGuardar.disabled = !window.dietHelperPlanData;
+        }
+    };
+
+    const saveDietPlan = async () => {
+        if (!window.dietHelperPlanData) {
+            alert('Generá primero un plan antes de guardarlo.');
+            return null;
+        }
+
+        btnGuardar.disabled = true;
+        const originalText = btnGuardar.textContent;
+        btnGuardar.textContent = 'Guardando...';
+
+        try {
+            const result = await BackendAPI.saveDietPlan(window.dietHelperPlanData);
+            window.dietHelperPlanData.meta = window.dietHelperPlanData.meta || {};
+            window.dietHelperPlanData.meta.plan_id = result.plan_id;
+            updateDietPlanButtons();
+            btnGuardar.textContent = '¡Guardado!';
+            setTimeout(() => {
+                btnGuardar.textContent = originalText;
+            }, 1500);
+            return result;
+        } catch (err) {
+            console.error('Error al guardar el plan:', err);
+            alert('Error al guardar el plan. Por favor intentá de nuevo.');
+            return null;
+        } finally {
+            btnGuardar.disabled = false;
+        }
+    };
+
+    updateDietPlanButtons();
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -51,11 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            planData = await BackendAPI.generateDiet(data);
+            window.dietHelperPlanData = await BackendAPI.generateDiet(data);
             
             status.textContent = '';
             status.style.display = 'none';
-            renderPlan(planData);
+            updateDietPlanButtons();
+            renderPlan(window.dietHelperPlanData);
         } catch (err) {
             status.textContent = err.message;
             status.style.display = 'block';
@@ -66,8 +109,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    btnGuardar.addEventListener('click', () => {
-        alert('Función en Desarrollo');
+    btnGuardar.addEventListener('click', async () => {
+        await saveDietPlan();
     });
 
     selectSemana.addEventListener('change', () => {

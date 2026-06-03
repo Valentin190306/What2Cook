@@ -15,7 +15,17 @@ class DietHelperController extends Controller
 
     public function index(): void
     {
-        \App\Core\View::render('DietHelper');
+        // Get user's dietary preference to use as default in the form
+        $userId = \App\Core\Session::userId();
+        $userDiet = '';
+        if ($userId !== null) {
+            $user = (new \App\Models\User())->find($userId);
+            if ($user) {
+                $userDiet = $user['preferences'] ?? '';
+            }
+        }
+        
+        \App\Core\View::render('DietHelper', ['userDiet' => $userDiet]);
     }
 
     // ── API: Generación ───────────────────────────────────────────────────────

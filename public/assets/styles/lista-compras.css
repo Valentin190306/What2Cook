@@ -1,0 +1,131 @@
+.lista-compras-hero {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: var(--color-cream);
+  border-bottom: 2px solid var(--color-black);
+}
+
+.lista-compras-hero h1 {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.lista-compras-hero p {
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+.lista-compras-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 1rem;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-black);
+  box-shadow: 4px 4px 0 var(--color-black);
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.lists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+.shopping-list-card {
+  border: 2px solid var(--color-black);
+  background-color: var(--color-white);
+  box-shadow: 4px 4px 0 var(--color-black);
+  overflow: hidden;
+}
+
+.shopping-list-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--color-fish);
+  color: var(--color-white);
+}
+
+.shopping-list-card__header h3 {
+  font-family: var(--font-title);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.shopping-list-card__date {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.shopping-list-card__items {
+  padding: 1rem;
+}
+
+.shopping-list-card__items ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.shopping-list-card__items li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.shopping-list-card__items li:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-weight: 500;
+}
+
+.item-amount {
+  font-weight: 700;
+  color: var(--color-fish);
+}
+
+.shopping-list-card__actions {
+  padding: 1rem;
+  border-top: 2px solid var(--color-black);
+}
+
+.btn-delete {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background-color: var(--color-white);
+  color: var(--color-black);
+  border: 2px solid var(--color-black);
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: var(--color-carrot);
+  color: var(--color-white);
+  border-color: var(--color-carrot);
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--color-black);
+}

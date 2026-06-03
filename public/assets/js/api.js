@@ -107,5 +107,25 @@ const BackendAPI = {
         sessionStorage.setItem(cacheKey, JSON.stringify(json));
         
         return json;
+    },
+
+    async saveDietPlan(planData) {
+        if (!planData) {
+            throw new Error('No hay un plan generado para guardar.');
+        }
+
+        const response = await fetch('/api/diet-helper/plan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(planData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            const detail = errorData.error || errorData.message || '';
+            throw new Error(`Error ${response.status}${detail ? ': ' + detail : ''}`);
+        }
+
+        return response.json();
     }
 };

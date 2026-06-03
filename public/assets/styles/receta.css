@@ -86,6 +86,16 @@ main>article.receta-detalle {
   color: var(--color-white);
 }
 
+.btn-favorito.clicking {
+  animation: pulse 0.2s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
 
 /* --- Content Wrapper --- */
 .receta-content {
@@ -260,6 +270,41 @@ section.ingredientes h2 {
   padding-bottom: 0.5rem;
   display: inline-block;
   text-transform: uppercase;
+}
+
+.ingredientes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.btn-save-list {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--color-fish);
+  background-color: var(--color-white);
+  color: var(--color-fish);
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 2px 2px 0 var(--color-fish);
+}
+
+.btn-save-list:hover {
+  background-color: var(--color-fish);
+  color: var(--color-white);
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--color-black);
+}
+
+.btn-save-list svg {
+  fill: currentColor;
 }
 
 /* Contador de porciones */

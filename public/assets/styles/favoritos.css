@@ -1,0 +1,35 @@
+.section-title {
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 2rem 0 1rem;
+  color: var(--color-black);
+}
+
+.mealprep-card {
+  border: 2px solid var(--color-black);
+  background-color: var(--color-white);
+  box-shadow: 4px 4px 0 var(--color-black);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+}
+
+.mealprep-info h2 {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.mealprep-info p {
+  margin: 0.25rem 0;
+  color: var(--color-text-muted);
+}
+
+.mealprep-card .btn-favorito {
+  align-self: flex-end;
+}
