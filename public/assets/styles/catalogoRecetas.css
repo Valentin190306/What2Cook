@@ -600,7 +600,7 @@ fieldset.filtros .filtros-opciones label:focus-within {
     transform: scale(1.15);
   }
 
-  .recipe-grid article>button.clicking {
+  .recipe-grid article button.clicking {
     animation: pulse 0.2s ease;
   }
 
@@ -1009,7 +1009,7 @@ fieldset.filtros .filtros-opciones label:focus-within {
     transform: scale(1.1);
   }
 
-  .recipe-grid article>button.clicking {
+  .recipe-grid article button.clicking {
     animation: pulse 0.2s ease;
   }
 

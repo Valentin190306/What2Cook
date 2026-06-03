@@ -1,6 +1,6 @@
 <?php
 $title = 'Editar Perfil - What2Cook';
-$styles = ['components'];
+$styles = ['perfilEdit'];
 
 $diets = [
     '' => 'Sin dieta',
@@ -126,11 +126,8 @@ if (!empty($user['allergies'])) {
         <div class="form-section">
             <div class="form-actions">
                 <button type="submit" class="btn-primary">Guardar cambios</button>
+                <a href="/perfil" class="btn-link">Volver al perfil</a>
             </div>
         </div>
     </form>
-
-    <div class="form-link">
-        <a href="/perfil">Volver al perfil</a>
-    </div>
 </section>

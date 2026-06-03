@@ -1,17 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
     const favoriteButtons = document.querySelectorAll('[data-fav-toggle]');
     
+    // Initialize favorited state on page load
+    favoriteButtons.forEach(btn => {
+        const isFavorited = btn.dataset.favorited === 'true';
+        if (isFavorited) {
+            btn.classList.add('favorited');
+        }
+    });
+    
     favoriteButtons.forEach(btn => {
         btn.addEventListener('click', async (event) => {
             // Detener la propagación para no activar clics en contenedores/tarjetas
             event.stopPropagation();
-            
+
             if (btn.disabled) return;
-            
+
+            // Immediate visual feedback on click
+            btn.classList.add('clicking');
+            setTimeout(() => btn.classList.remove('clicking'), 200);
+
             const spoonacularId = parseInt(btn.dataset.spoonacularId, 10);
             const title = btn.dataset.title || '';
             const image = btn.dataset.image || null;
-            
+
             btn.disabled = true;
             
             try {
@@ -44,6 +56,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.dataset.favorited = favorited ? 'true' : 'false';
                 btn.textContent = favorited ? '♥' : '♡';
                 btn.setAttribute('aria-label', favorited ? 'Quitar de favoritos' : 'Agregar a favoritos');
+                
+                // Aplicar estilo visual de favorito
+                if (favorited) {
+                    btn.classList.add('favorited');
+                } else {
+                    btn.classList.remove('favorited');
+                }
                 
                 // Si estamos en la página de favoritos y desmarcar, removemos la tarjeta
                 if (btn.hasAttribute('data-fav-remove-card') && !favorited) {
