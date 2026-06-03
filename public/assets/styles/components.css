@@ -298,3 +298,68 @@ textarea:focus {
   color: var(--color-carrot);
   text-decoration: none;
 }
+
+/* ---------- Collapsible Sections ---------- */
+.collapsible-section {
+  border: 2px solid var(--color-black);
+  background: #efede8;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.collapsible-section summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: var(--color-white);
+  cursor: pointer;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-black);
+  border-bottom: 2px solid var(--color-black);
+  transition: background 0.2s, color 0.2s;
+}
+
+.collapsible-section summary:hover {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
+.collapsible-section summary::marker,
+.collapsible-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.collapsible-section[open] .toggle-icon {
+  transform: rotate(180deg);
+}
+
+.collapsible-content {
+  padding: 1.5rem 1.25rem;
+}
+
+.form-section {
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: auto;
+  margin-bottom: 0;
+}
