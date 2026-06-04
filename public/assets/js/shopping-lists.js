@@ -8,6 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
             errEl.style.color = '#e53e3e';
             errEl.style.fontSize = '0.9rem';
             errEl.style.marginTop = '0.5rem';
+            errEl.style.width = '100%';
+            errEl.style.flexBasis = '100%';
+            errEl.style.textAlign = 'center';
             btn.parentNode.appendChild(errEl);
         }
         errEl.textContent = message;
@@ -26,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn.disabled) return;
 
         const sourceType = btn.dataset.sourceType;
-        const sourceId = parseInt(btn.dataset.sourceId, 10);
+        let sourceId = parseInt(btn.dataset.sourceId, 10);
         
         let itemsToSend = [];
         
@@ -54,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 planId = parseInt(window.dietHelperPlanData.meta.plan_id, 10);
                 if (planId) {
                     btn.dataset.sourceId = planId;
+                    sourceId = planId;
                 }
             }
 
@@ -63,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     planId = result.plan_id;
                     if (planId) {
                         btn.dataset.sourceId = planId;
+                        sourceId = planId;
                     }
                 } catch (error) {
                     console.error('Error al guardar plan antes de obtener la lista de compras:', error);
@@ -74,11 +79,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     const response = await fetch(`/api/diet-helper/shopping-list/${planId}`);
                     if (response.ok) {
                         const data = await response.json();
-                        itemsToSend = data.items || [];
+                        itemsToSend = (data.items || []).map(item => ({
+                            name: item.ingredient_name || item.name,
+                            amount: parseFloat(item.amount),
+                            unit: item.unit || ''
+                        }));
                     }
                 } catch (error) {
                     console.error('Error al obtener lista de compras del plan:', error);
                 }
+            }
+
+            // Fallback: aggregate directly from window.dietHelperPlanData in JS if still empty
+            if (itemsToSend.length === 0 && window.dietHelperPlanData?.days) {
+                const aggregated = {};
+                window.dietHelperPlanData.days.forEach(day => {
+                    if (!day.meals) return;
+                    day.meals.forEach(meal => {
+                        const ingredients = meal.ingredients || [];
+                        ingredients.forEach(ing => {
+                            const name = (ing.name || '').trim();
+                            const unit = (ing.unit || '').trim();
+                            const amount = parseFloat(ing.amount) || 0;
+                            if (!name) return;
+
+                            const key = name.toLowerCase() + '|' + unit.toLowerCase();
+                            if (!aggregated[key]) {
+                                aggregated[key] = { name, amount: 0, unit };
+                            }
+                            aggregated[key].amount += amount;
+                        });
+                    });
+                });
+                itemsToSend = Object.values(aggregated);
             }
         }
         
@@ -91,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const originalText = btn.innerHTML;
         btn.textContent = 'Guardando...';
         
+        let success = false;
         try {
             const response = await fetch('/api/shopping-lists', {
                 method: 'POST',
@@ -126,18 +160,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             btn.innerHTML = '¡Guardado!';
             btn.classList.add('saved');
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.classList.remove('saved');
-            }, 2000);
+            success = true;
             
         } catch (error) {
             console.error('Error de red al guardar lista de compras:', error);
             showNonBlockingError(btn, 'Error al guardar la lista de compras.');
             btn.innerHTML = originalText;
         } finally {
-            btn.disabled = false;
+            if (!success) {
+                btn.disabled = false;
+            }
         }
     });
     
@@ -367,5 +399,18 @@ document.addEventListener('DOMContentLoaded', () => {
         closeBtn.addEventListener('click', closeModal);
         input.addEventListener('keydown', handleKeydown);
         modal.addEventListener('click', handleOverlayClick);
+    });
+
+    // Toggle card expansion in /lista-compras
+    document.addEventListener('click', (event) => {
+        const card = event.target.closest('.shopping-list-card');
+        if (!card) return;
+
+        // If the click is on interactive components, do nothing
+        if (event.target.closest('button, input, select, textarea, a, .modal-card, .modal-overlay')) {
+            return;
+        }
+
+        card.classList.toggle('is-expanded');
     });
 });

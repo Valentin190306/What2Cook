@@ -48,6 +48,22 @@
   background-color: var(--color-white);
   box-shadow: 4px 4px 0 var(--color-black);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 380px;
+  transition: transform 0.2s, box-shadow 0.2s, height 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.shopping-list-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-black);
+}
+
+.shopping-list-card.is-expanded {
+  height: auto !important;
+  cursor: default;
 }
 
 .shopping-list-card__header {
@@ -58,6 +74,7 @@
   background-color: var(--color-spinach);
   color: var(--color-white);
   border-bottom: 2px solid var(--color-black);
+  cursor: pointer;
 }
 
 .shopping-list-card__header h3 {
@@ -68,13 +85,56 @@
   margin: 0;
 }
 
+.shopping-list-card__header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .shopping-list-card__date {
   font-size: 0.85rem;
   font-weight: 600;
 }
 
+.expand-icon {
+  transition: transform 0.3s ease;
+  color: var(--color-white);
+}
+
+.shopping-list-card.is-expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
 .shopping-list-card__items {
   padding: 1rem;
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+  max-height: 230px;
+  transition: max-height 0.3s ease;
+}
+
+/* Gradient fade overlay for collapsed cards */
+.shopping-list-card__items::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(transparent, var(--color-white));
+  pointer-events: none;
+  transition: opacity 0.2s;
+  opacity: 1;
+}
+
+.shopping-list-card.is-expanded .shopping-list-card__items {
+  max-height: none;
+  overflow: visible;
+}
+
+.shopping-list-card.is-expanded .shopping-list-card__items::after {
+  opacity: 0;
 }
 
 .shopping-list-card__items ul {

@@ -20,7 +20,12 @@ $scripts = ['shopping-lists'];
         <article class="shopping-list-card">
             <div class="shopping-list-card__header">
                 <h3 class="list-title" data-list-id="<?= (int) $list['id'] ?>"><?= htmlspecialchars(!empty($list['name']) ? $list['name'] : ($list['source_type'] === 'recipe' ? 'Lista de receta' : ($list['source_type'] === 'meal_prep' ? 'Lista de meal prep' : 'Lista de plan de dieta'))) ?></h3>
-                <span class="shopping-list-card__date"><?= date('d/m/Y', strtotime($list['created_at'])) ?></span>
+                <div class="shopping-list-card__header-right">
+                    <span class="shopping-list-card__date"><?= date('d/m/Y', strtotime($list['created_at'])) ?></span>
+                    <svg class="expand-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
             </div>
             <div class="shopping-list-card__items">
                 <ul>

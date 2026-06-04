@@ -10,6 +10,14 @@ const dictMeals = {
 const diasSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Clear old diet plan cache keys to prevent stale structures without ingredients
+    for (let i = sessionStorage.length - 1; i >= 0; i--) {
+        const key = sessionStorage.key(i);
+        if (key && key.startsWith('diet_plan_')) {
+            sessionStorage.removeItem(key);
+        }
+    }
+
     const form = document.getElementById('diet-form');
     const status = document.getElementById('plan-status');
     const panel = document.getElementById('plan-panel');
@@ -26,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             btnShoppingList.dataset.sourceId = planId;
         }
         if (btnGuardar) {
-            btnGuardar.disabled = !window.dietHelperPlanData;
+            btnGuardar.disabled = !window.dietHelperPlanData || !!planId;
         }
     };
 
