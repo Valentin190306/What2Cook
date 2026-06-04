@@ -23,7 +23,7 @@ $scripts = ['api', 'perfil', 'carousel'];
         <div class="dietary-info">
             <div class="dietary-item">
                 <h3>Dieta:</h3>
-                <p><?= htmlspecialchars($userDietLabel ?? 'Sin dieta') ?></p>
+                <p><?= htmlspecialchars($userDietLabel ? ucwords(strtolower($userDietLabel)) : 'Sin dieta') ?></p>
             </div>
             <?php if (!empty($userAllergyLabels)): ?>
                 <div class="dietary-item">
@@ -158,19 +158,38 @@ $scripts = ['api', 'perfil', 'carousel'];
             <?php else: ?>
                 <div class="flex-column">
                     <?php foreach ($recentDietPlans as $plan): ?>
-                        <article class="action-card plan-card">
+                <article class="action-card plan-card">
+                    <div class="plan-card-inner">
+                        <div class="plan-card-info">
                             <h3>Plan de <?= (int) $plan['duration_days'] ?> días</h3>
-                            <p><?= $plan['diet_type'] ? htmlspecialchars($plan['diet_type']) : 'Sin dieta específica' ?></p>
-                            <p><?= (int) $plan['target_calories'] ?> kcal/día</p>
-                            <p class="date"><?= date('d/m/Y', strtotime($plan['created_at'])) ?></p>
-
+                            <p><strong>Tipo de dieta:</strong> <?= $plan['diet_type'] ? htmlspecialchars($plan['diet_type']) : 'Sin dieta específica' ?></p>
+                            <p><strong>Objetivos nutricionales:</strong></p>
+                            <ul>
+                                <?php if ($plan['target_calories'] !== null): ?>
+                                    <li>Calorías: <?= (int) $plan['target_calories'] ?> kcal</li>
+                                <?php endif; ?>
+                                <?php if ($plan['target_protein'] !== null): ?>
+                                    <li>Proteínas: <?= (int) $plan['target_protein'] ?>g</li>
+                                <?php endif; ?>
+                                <?php if ($plan['target_carbs'] !== null): ?>
+                                    <li>Carbohidratos: <?= (int) $plan['target_carbs'] ?>g</li>
+                                <?php endif; ?>
+                                <?php if ($plan['target_fat'] !== null): ?>
+                                    <li>Grasas: <?= (int) $plan['target_fat'] ?>g</li>
+                                <?php endif; ?>
+                            </ul>
+                            <p><strong>Creado el: <?= date('d/m/Y', strtotime($plan['created_at'])) ?></strong></p>
+                        </div>
+                        <div class="plan-carousel-panel">
                             <div class="plan-carousel" data-plan-id="<?= (int) $plan['id'] ?>">
                                 <button class="carousel-prev" aria-label="Anterior">‹</button>
                                 <div class="carousel-slides">
                                     <?php foreach ($plan['days'] as $day): ?>
                                         <?php $week = (int) ceil($day['day_index'] / 7); $dayNames = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']; $dayName = ucfirst($dayNames[($day['day_index'] - 1) % 7]); ?>
                                         <div class="carousel-slide" data-day-index="<?= (int) $day['day_index'] ?>">
-                                            <header><strong><?= htmlspecialchars($dayName) ?> - Semana <?= $week ?></strong></header>
+                                            <header class="carousel-header">
+                                                <h2><?= htmlspecialchars($dayName) ?> - Semana <?= $week ?></h2>
+                                            </header>
                                             <div class="carousel-meals">
                                                 <?php foreach ($day['meals'] as $meal): ?>
                                                     <a class="meal-thumb" href="/receta/<?= (int) $meal['spoonacular_id'] ?>">
@@ -188,7 +207,9 @@ $scripts = ['api', 'perfil', 'carousel'];
                                 </div>
                                 <button class="carousel-next" aria-label="Siguiente">›</button>
                             </div>
-                        </article>
+                        </div>
+                    </div>
+                </article>
                     <?php endforeach; ?>
                     <div class="ver-todos-wrapper">
                         <a href="/mis-planes" class="btn-link">Ver todos</a>
