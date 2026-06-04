@@ -1,6 +1,7 @@
 <?php
 $title = 'Mi Perfil - What2Cook';
-$styles = ['perfil'];
+$styles = ['perfil','carousel'];
+$scripts = ['api', 'perfil', 'carousel'];
 ?>
 <?php /* Hidden success message for now
 <?php if (!empty($success)): ?>
@@ -162,9 +163,36 @@ $styles = ['perfil'];
                             <p><?= $plan['diet_type'] ? htmlspecialchars($plan['diet_type']) : 'Sin dieta específica' ?></p>
                             <p><?= (int) $plan['target_calories'] ?> kcal/día</p>
                             <p class="date"><?= date('d/m/Y', strtotime($plan['created_at'])) ?></p>
-                            <a href="/mis-planes" class="btn-link">Ver todos</a>
+
+                            <div class="plan-carousel" data-plan-id="<?= (int) $plan['id'] ?>">
+                                <button class="carousel-prev" aria-label="Anterior">‹</button>
+                                <div class="carousel-slides">
+                                    <?php foreach ($plan['days'] as $day): ?>
+                                        <?php $week = (int) ceil($day['day_index'] / 7); $dayNames = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo']; $dayName = ucfirst($dayNames[($day['day_index'] - 1) % 7]); ?>
+                                        <div class="carousel-slide" data-day-index="<?= (int) $day['day_index'] ?>">
+                                            <header><strong><?= htmlspecialchars($dayName) ?> - Semana <?= $week ?></strong></header>
+                                            <div class="carousel-meals">
+                                                <?php foreach ($day['meals'] as $meal): ?>
+                                                    <a class="meal-thumb" href="/receta/<?= (int) $meal['spoonacular_id'] ?>">
+                                                        <?php if (!empty($meal['image'])): ?>
+                                                            <img src="<?= htmlspecialchars($meal['image']) ?>" alt="<?= htmlspecialchars($meal['title']) ?>">
+                                                        <?php else: ?>
+                                                            <img src="/assets/img/placeholder_RecetaSinFoto.png" alt="Sin imagen">
+                                                        <?php endif; ?>
+                                                        <span class="meal-title"><?= htmlspecialchars($meal['title']) ?></span>
+                                                    </a>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <button class="carousel-next" aria-label="Siguiente">›</button>
+                            </div>
                         </article>
                     <?php endforeach; ?>
+                    <div class="ver-todos-wrapper">
+                        <a href="/mis-planes" class="btn-link">Ver todos</a>
+                    </div>
                 </div>
             <?php endif; ?>
         </section>

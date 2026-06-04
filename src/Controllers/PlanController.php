@@ -14,7 +14,15 @@ class PlanController extends Controller
     public function myPlans(): void
     {
         $userId = $this->requireAuthWeb();
-        $plans  = (new Plan())->findAllByUser($userId);
+        $planModel = new Plan();
+        $summaries = $planModel->findAllByUser($userId);
+        $plans = [];
+        foreach ($summaries as $p) {
+            $full = $planModel->findWithDays((int) $p['id']);
+            if ($full !== null) {
+                $plans[] = $full;
+            }
+        }
 
         $this->log('info', 'Viendo mis planes', ['user_id' => $userId, 'count' => count($plans)]);
         View::render('MyPlans', ['plans' => $plans]);

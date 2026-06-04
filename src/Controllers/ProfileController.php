@@ -36,8 +36,16 @@ class ProfileController extends Controller
         // Fetch recent shopping lists (up to 3)
         $recentShoppingLists = (new SavedShoppingList())->findRecentByUser($userId, 3);
         
-        // Fetch recent diet plans (up to 3)
-        $recentDietPlans = (new Plan())->findRecentByUser($userId, 3);
+        // Fetch recent diet plans (up to 3) and load full days/meals for each
+        $planModel = new Plan();
+        $recentSummaries = $planModel->findRecentByUser($userId, 3);
+        $recentDietPlans = [];
+        foreach ($recentSummaries as $p) {
+            $full = $planModel->findWithDays((int) $p['id']);
+            if ($full !== null) {
+                $recentDietPlans[] = $full;
+            }
+        }
 
         // Decode dietary preferences
         $userDiet = $user['preferences'] ?? '';

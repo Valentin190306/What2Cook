@@ -151,7 +151,7 @@ function renderPlan(data) {
 }
 
 function renderActiveDay() {
-    if (!planData) return;
+    if (!window.dietHelperPlanData) return;
 
     const selectSemana = document.getElementById('semana-select');
     const week = parseInt(selectSemana.value) || 1;
@@ -166,12 +166,14 @@ function renderActiveDay() {
 }
 
 function renderDay(dayIndex) {
+    if (!window.dietHelperPlanData) return;
+
     const grid = document.getElementById('comidas-grid');
     const divTotales = document.getElementById('dia-totales');
     grid.innerHTML = '';
     divTotales.innerHTML = '';
 
-    const day = planData.days.find(d => d.day_index === dayIndex);
+    const day = window.dietHelperPlanData.days.find(d => d.day_index === dayIndex);
     
     if (!day) {
         grid.innerHTML = '<p>No hay datos para este día.</p>';

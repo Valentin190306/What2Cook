@@ -1,0 +1,10 @@
+.plan-carousel{display:flex;align-items:center;gap:8px}
+.carousel-slides{flex:1;overflow:hidden}
+.carousel-slide{display:none;padding:8px 0}
+.carousel-slide.active{display:block}
+.carousel-meals{display:flex;gap:8px;flex-wrap:wrap}
+.meal-thumb{display:flex;flex-direction:column;align-items:center;text-decoration:none;color:inherit;width:96px}
+.meal-thumb img{width:96px;height:64px;object-fit:cover;border-radius:6px}
+.meal-title{font-size:12px;text-align:center;margin-top:6px}
+.carousel-prev,.carousel-next{background:#eee;border:0;padding:6px 10px;border-radius:6px;cursor:pointer}
+.ver-todos-wrapper{margin-top:12px;text-align:center}
