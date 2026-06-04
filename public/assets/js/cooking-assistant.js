@@ -229,9 +229,10 @@ async function renderMealPrep(recipes) {
     shoppingListBtn.setAttribute('aria-label', 'Guardar lista de compras');
     shoppingListBtn.setAttribute('data-sl-save', '');
     shoppingListBtn.innerHTML = `
-        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14c-2.33 0-7-1.17-7-3.5V19h14v-2.5c0 2.33-4.67 3.5-7 3.5z"/>
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
         </svg>
+        Guardar lista
     `;
     
     // Store meal prep data for like and shopping list functionality
