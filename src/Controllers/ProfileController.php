@@ -24,7 +24,7 @@ class ProfileController extends Controller
         $favoriteModel = new Favorite();
         $favoritesCount = $favoriteModel->countByUser($userId);
         $plansCount = (new Plan())->countByUser($userId);
-        $listsCount = (new ShoppingList())->countByUser($userId);
+        $listsCount = (new SavedShoppingList())->countByUser($userId);
 
         // Fetch recent favorites (up to 4) for the dashboard
         $allFavorites = $favoriteModel->findAllByUser($userId);
@@ -34,7 +34,13 @@ class ProfileController extends Controller
         $recentMealPreps = (new MealPrepFavorite())->findRecentByUser($userId, 4);
         
         // Fetch recent shopping lists (up to 3)
-        $recentShoppingLists = (new SavedShoppingList())->findRecentByUser($userId, 3);
+        $savedListModel = new SavedShoppingList();
+        $recentShoppingLists = $savedListModel->findRecentByUser($userId, 3);
+        foreach ($recentShoppingLists as &$list) {
+            $listWithItems = $savedListModel->findWithItems((int) $list['id']);
+            $list['items'] = $listWithItems['items'] ?? [];
+        }
+        unset($list);
         
         // Fetch recent diet plans (up to 3) and load full days/meals for each
         $planModel = new Plan();
