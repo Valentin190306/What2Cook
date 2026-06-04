@@ -54,16 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
             window.dietHelperPlanData.meta.plan_id = result.plan_id;
             updateDietPlanButtons();
             btnGuardar.textContent = '¡Guardado!';
-            setTimeout(() => {
-                btnGuardar.textContent = originalText;
-            }, 1500);
             return result;
         } catch (err) {
             console.error('Error al guardar el plan:', err);
             alert('Error al guardar el plan. Por favor intentá de nuevo.');
-            return null;
-        } finally {
             btnGuardar.disabled = false;
+            btnGuardar.textContent = originalText;
+            return null;
         }
     };
 
