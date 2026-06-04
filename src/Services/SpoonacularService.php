@@ -193,18 +193,24 @@ class SpoonacularService
             throw new RuntimeException("Spoonacular respondió {$httpCode}: {$message}");
         }
 
+        $translationSucceeded = false;
         $enableTranslation = $translate && ($_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false') === 'true';
         if ($enableTranslation) {
             try {
                 $translator = $this->getTranslator();
                 $data = $translator->translateArray($data, 'es');
+                $translationSucceeded = true;
             } catch (\Exception $e) {
                 $this->log('error', "Error de traducción (output): " . $e->getMessage());
             }
+        } else {
+            $translationSucceeded = true;
         }
 
         // 4. Guardar en caché antes de retornar (ya traducido, ahorra doble coste)
-        file_put_contents($cacheFile, json_encode($data));
+        if ($translationSucceeded) {
+            file_put_contents($cacheFile, json_encode($data));
+        }
 
         return $data;
     }

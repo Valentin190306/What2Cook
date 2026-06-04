@@ -236,7 +236,7 @@ async function renderMealPrep(recipes) {
     
     // Store meal prep data for like and shopping list functionality
     const mealPrepData = {
-        ingredients: activeIngredients,
+        ingredients: ingredients,
         recipe_ids: recipes.map(r => r.id),
         servings: recipes.map(r => r.servings || 1)
     };
