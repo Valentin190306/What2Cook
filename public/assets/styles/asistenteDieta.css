@@ -209,6 +209,7 @@
 .plan-actions {
   margin-top: 2.5rem;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .config-form .btn-primary,

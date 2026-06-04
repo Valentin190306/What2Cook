@@ -11,6 +11,7 @@ final class CreateSavedShoppingListsTable extends AbstractMigration
         $table->addColumn('user_id', 'integer')
               ->addColumn('source_type', 'string', ['limit' => 20]) // 'recipe', 'meal_prep', 'diet_plan'
               ->addColumn('source_id', 'integer')
+              ->addColumn('name', 'string', ['limit' => 255, 'null' => true, 'default' => null])
               ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
               ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
               ->create();

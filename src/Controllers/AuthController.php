@@ -114,6 +114,13 @@ class AuthController extends Controller
             $this->redirect('/register');
         }
 
+        $passwordConfirm = $_POST['password_confirm'] ?? '';
+        if ($password !== $passwordConfirm) {
+            $this->log('warning', 'Register: contraseñas no coinciden', ['email' => $email]);
+            Session::flash('error', 'Las contraseñas no coinciden.');
+            $this->redirect('/register');
+        }
+
         // 4. Verificar si el email ya existe
         $userModel = new User();
         if ($userModel->findByEmail($email) !== null) {

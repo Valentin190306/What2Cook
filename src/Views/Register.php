@@ -1,6 +1,7 @@
 <?php
 $title = 'Registrarse - What2Cook';
 $styles = ['components'];
+$scripts = ['auth'];
 ?>
 <section class="form-panel">
     <h1>Registrarse</h1>
@@ -23,6 +24,10 @@ $styles = ['components'];
         <div class="form-field">
             <label for="password">Contraseña</label>
             <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-field">
+            <label for="password_confirm">Confirmar contraseña</label>
+            <input type="password" id="password_confirm" name="password_confirm" required>
         </div>
         <div class="form-actions">
             <button type="submit" class="btn-primary">Crear cuenta</button>

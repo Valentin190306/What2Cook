@@ -134,14 +134,13 @@ $scripts = ['api', 'perfil', 'carousel'];
                     <a href="/lista-compras" class="btn-link">Ver todas</a>
                 </article>
             <?php else: ?>
-                <div class="flex-column">
+                <div class="grid-container">
                     <?php foreach ($recentShoppingLists as $list): ?>
-                        <article class="action-card list-card">
-                            <h3><?= htmlspecialchars($list['source_type'] === 'recipe' ? 'Lista de receta' : ($list['source_type'] === 'meal_prep' ? 'Lista de meal prep' : 'Lista de plan de dieta')) ?></h3>
+                        <a href="/lista-compras" class="action-card list-card">
+                            <h3><?= htmlspecialchars(!empty($list['name']) ? $list['name'] : ($list['source_type'] === 'recipe' ? 'Lista de receta' : ($list['source_type'] === 'meal_prep' ? 'Lista de meal prep' : 'Lista de plan de dieta'))) ?></h3>
                             <p><?= count($list['items'] ?? []) ?> ingredientes</p>
                             <p class="date"><?= date('d/m/Y', strtotime($list['created_at'])) ?></p>
-                            <a href="/lista-compras" class="btn-link">Ver todas</a>
-                        </article>
+                        </a>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -216,24 +215,6 @@ $scripts = ['api', 'perfil', 'carousel'];
                     </div>
                 </div>
             <?php endif; ?>
-        </section>
-
-        <section id="meal-plans" class="profile-section">
-            <h2>Planes de Comidas</h2>
-            <p>Tus planificaciones semanales</p>
-            <article class="empty-state">
-                <p>Aún no tenés planes creados</p>
-                <a href="/asistente-dieta" class="btn-link">Crear plan</a>
-            </article>
-        </section>
-
-        <section id="shopping-lists" class="profile-section">
-            <h2>Listas de Compras</h2>
-            <p>Tus listas de ingredientes a comprar</p>
-            <article class="empty-state">
-                <p>Aún no tenés listas de compras</p>
-                <a href="/asistente-cocina" class="btn-link">Crear lista</a>
-            </article>
-        </section>
+        </section>        
     </div>
 </section>

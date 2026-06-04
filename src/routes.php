@@ -52,5 +52,6 @@ $router->add('GET', '/api/meal-prep-favorites', 'FavoriteController@mealPrepInde
 $router->add('POST', '/api/shopping-lists', 'ShoppingListController@save');
 $router->add('GET', '/api/shopping-lists', 'ShoppingListController@indexApi');
 $router->add('DELETE', '/api/shopping-lists', 'ShoppingListController@delete');
+$router->add('PATCH', '/api/shopping-lists/rename', 'ShoppingListController@rename');
 
 return $router;

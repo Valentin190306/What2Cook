@@ -93,6 +93,17 @@ class SavedShoppingList extends Model
         return $stmt->rowCount() > 0;
     }
 
+    public function rename(int $id, int $userId, string $name): bool
+    {
+        $stmt = $this->db->prepare("UPDATE {$this->table} SET name = :name WHERE id = :id AND user_id = :user_id");
+        $stmt->execute([
+            'name' => trim($name),
+            'id' => $id,
+            'user_id' => $userId
+        ]);
+        return $stmt->rowCount() > 0;
+    }
+
     public function countByUser(int $userId): int
     {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM {$this->table} WHERE user_id = :user_id");

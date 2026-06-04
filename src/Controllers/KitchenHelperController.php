@@ -71,6 +71,12 @@ class KitchenHelperController extends Controller
                 $results = $service->searchRecipes($filters);
                 $list = $results['results'] ?? $results;
 
+                if (!is_array($list)) {
+                    $this->log('error', 'Single search: respuesta inválida de Spoonacular');
+                    $this->json(['error' => 'Error al obtener recetas.'], 502);
+                    return;
+                }
+
                 foreach ($list as &$recipe) {
                     if (isset($recipe['nutrition']['nutrients'])) {
                         $map = [];
@@ -91,16 +97,22 @@ class KitchenHelperController extends Controller
                         $recipe['missedIngredientCount'] = count($recipe['missedIngredients']);
                     }
                 }
+                unset($recipe);
             } else {
                 $list = $service->searchByIngredients($ingredients, 12, true);
+                if (!is_array($list)) {
+                    $this->log('error', 'Single search: respuesta inválida de searchByIngredients');
+                    $this->json(['error' => 'Error al obtener recetas.'], 502);
+                    return;
+                }
                 $list = $this->enrichWithNutrition($list, $service);
             }
 
             $this->log('info', 'Single completada', ['results' => count($list)]);
             $this->json(['success' => true, 'data' => $list]);
-        } catch (\RuntimeException $e) {
+        } catch (\Throwable $e) {
             $this->log('error', 'Error en single search: ' . $e->getMessage());
-            $this->json(['error' => $e->getMessage()], 502);
+            $this->json(['error' => 'Error interno del servidor.'], 502);
         }
     }
 
@@ -162,6 +174,12 @@ class KitchenHelperController extends Controller
             $results = $service->searchRecipes($filters);
             $pool = $results['results'] ?? $results;
 
+            if (!is_array($pool)) {
+                $this->log('error', 'Meal Prep: respuesta inválida de Spoonacular');
+                $this->json(['error' => 'Error al obtener recetas.'], 502);
+                return;
+            }
+
             if ($sort === 'time') {
                 usort($pool, function (array $a, array $b): int {
                     return ($a['readyInMinutes'] ?? 9999) <=> ($b['readyInMinutes'] ?? 9999);
@@ -181,9 +199,9 @@ class KitchenHelperController extends Controller
 
             $this->log('info', 'Meal Prep completada', ['results' => count($selected)]);
             $this->json(['success' => true, 'data' => $selected]);
-        } catch (\RuntimeException $e) {
+        } catch (\Throwable $e) {
             $this->log('error', 'Error en Meal Prep: ' . $e->getMessage());
-            $this->json(['error' => $e->getMessage()], 502);
+            $this->json(['error' => 'Error interno del servidor.'], 502);
         }
     }
 
@@ -199,9 +217,9 @@ class KitchenHelperController extends Controller
 
             $this->log('info', 'Detalle completado', ['recipe_id' => $id]);
             $this->json(['success' => true, 'data' => $result]);
-        } catch (\RuntimeException $e) {
+        } catch (\Throwable $e) {
             $this->log('error', 'Error en detalle', ['recipe_id' => $id, 'error' => $e->getMessage()]);
-            $this->json(['error' => $e->getMessage()], 502);
+            $this->json(['error' => 'Error al obtener la receta.'], 502);
         }
     }
 
@@ -251,6 +269,7 @@ class KitchenHelperController extends Controller
                 $recipe['nutrition'] = ['calories' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0];
             }
         }
+        unset($recipe);
 
         return $recipes;
     }

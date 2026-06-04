@@ -62,6 +62,7 @@ class DietHelperService
                 'number' => max(30, $durationDays),
                 'addRecipeNutrition' => 'true',
                 'addRecipeInformation' => 'true',
+                'fillIngredients' => 'true',
             ];
 
             if ($spoonacularDiet !== '') {
@@ -94,6 +95,7 @@ class DietHelperService
                     'number' => max(30, $durationDays),
                     'addRecipeNutrition' => 'true',
                     'addRecipeInformation' => 'true',
+                    'fillIngredients' => 'true',
                 ];
                 if ($spoonacularDiet !== '') {
                     $fallbackFilters['diet'] = $spoonacularDiet;
@@ -112,6 +114,7 @@ class DietHelperService
                     'number' => max(30, $durationDays),
                     'addRecipeNutrition' => 'true',
                     'addRecipeInformation' => 'true',
+                    'fillIngredients' => 'true',
                 ];
                 if ($spoonacularDiet !== '') {
                     $fallbackFilters2['diet'] = $spoonacularDiet;
@@ -200,6 +203,16 @@ class DietHelperService
                         $multiplier = max(1, (int) round($targetMealCals / $nutrition['calories']));
                     }
 
+                    $scaledIngredients = [];
+                    $ingredientsList = $recipe['extendedIngredients'] ?? [];
+                    foreach ($ingredientsList as $ing) {
+                        $scaledIngredients[] = [
+                            'name'   => $ing['name'] ?? '',
+                            'amount' => ((float) ($ing['amount'] ?? 0.0)) * $multiplier,
+                            'unit'   => $ing['unit'] ?? '',
+                        ];
+                    }
+
                     $meals[] = [
                         'meal_type'        => $mealName,
                         'spoonacular_id'   => (int) $recipe['id'],
@@ -211,6 +224,7 @@ class DietHelperService
                         'protein'          => $nutrition['protein'] * $multiplier,
                         'carbs'            => $nutrition['carbs'] * $multiplier,
                         'fat'              => $nutrition['fat'] * $multiplier,
+                        'ingredients'      => $scaledIngredients,
                     ];
                 } else {
                     $meals[] = $this->emptyMeal($mealName);

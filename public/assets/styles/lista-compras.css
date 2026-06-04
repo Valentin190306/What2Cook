@@ -48,6 +48,22 @@
   background-color: var(--color-white);
   box-shadow: 4px 4px 0 var(--color-black);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 380px;
+  transition: transform 0.2s, box-shadow 0.2s, height 0.3s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.shopping-list-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--color-black);
+}
+
+.shopping-list-card.is-expanded {
+  height: auto !important;
+  cursor: default;
 }
 
 .shopping-list-card__header {
@@ -55,8 +71,10 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background-color: var(--color-fish);
+  background-color: var(--color-spinach);
   color: var(--color-white);
+  border-bottom: 2px solid var(--color-black);
+  cursor: pointer;
 }
 
 .shopping-list-card__header h3 {
@@ -67,13 +85,56 @@
   margin: 0;
 }
 
+.shopping-list-card__header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .shopping-list-card__date {
   font-size: 0.85rem;
   font-weight: 600;
 }
 
+.expand-icon {
+  transition: transform 0.3s ease;
+  color: var(--color-white);
+}
+
+.shopping-list-card.is-expanded .expand-icon {
+  transform: rotate(180deg);
+}
+
 .shopping-list-card__items {
   padding: 1rem;
+  flex-grow: 1;
+  overflow: hidden;
+  position: relative;
+  max-height: 230px;
+  transition: max-height 0.3s ease;
+}
+
+/* Gradient fade overlay for collapsed cards */
+.shopping-list-card__items::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: linear-gradient(transparent, var(--color-white));
+  pointer-events: none;
+  transition: opacity 0.2s;
+  opacity: 1;
+}
+
+.shopping-list-card.is-expanded .shopping-list-card__items {
+  max-height: none;
+  overflow: visible;
+}
+
+.shopping-list-card.is-expanded .shopping-list-card__items::after {
+  opacity: 0;
 }
 
 .shopping-list-card__items ul {
@@ -104,12 +165,14 @@
 }
 
 .shopping-list-card__actions {
+  display: flex;
+  gap: 0.5rem;
   padding: 1rem;
   border-top: 2px solid var(--color-black);
 }
 
-.btn-delete {
-  width: 100%;
+.btn-delete, .btn-rename {
+  flex: 1;
   padding: 0.6rem 1rem;
   background-color: var(--color-white);
   color: var(--color-black);
@@ -120,6 +183,7 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s;
+  text-align: center;
 }
 
 .btn-delete:hover {
@@ -127,5 +191,195 @@
   color: var(--color-white);
   border-color: var(--color-carrot);
   transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--color-black);
+  box-shadow: 2px 2px 0 var(--color-black);
+}
+
+.btn-rename:hover {
+  background-color: var(--color-fish);
+  color: var(--color-white);
+  border-color: var(--color-fish);
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 var(--color-black);
+}
+
+/* Modal overlay styling */
+.modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  max-width: none !important;
+  height: 100vh !important;
+  padding: 0 !important;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay[aria-hidden="false"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Modal Card styling in brutalist theme */
+.modal-card {
+  background-color: var(--color-white);
+  border: 3px solid var(--color-black);
+  box-shadow: 8px 8px 0 var(--color-black);
+  width: 90%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  animation: modalSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSlideIn {
+  from {
+    transform: translateY(20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.modal-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--color-fish);
+  color: var(--color-white);
+  border-bottom: 3px solid var(--color-black);
+}
+
+.modal-card__header h2 {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.btn-close-modal {
+  background: none;
+  border: none;
+  color: var(--color-white);
+  font-size: 1.7rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 900;
+  transition: color 0.1s;
+}
+
+.btn-close-modal:hover {
+  color: var(--color-carrot);
+}
+
+.modal-card__body {
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.modal-card__body label {
+  font-family: var(--font-title);
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-black);
+}
+
+.modal-card__body input[type="text"] {
+  padding: 0.8rem;
+  border: 2px solid var(--color-black);
+  font-size: 1rem;
+  font-family: inherit;
+  box-shadow: 2px 2px 0 var(--color-black);
+  outline: none;
+}
+
+.modal-card__body input[type="text"]:focus {
+  border-color: var(--color-fish);
+  box-shadow: 2px 2px 0 var(--color-fish);
+}
+
+.modal-card__footer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-top: 3px solid var(--color-black);
+  background-color: var(--color-cream);
+}
+
+.btn-modal-cancel, .btn-modal-save {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  border: 2px solid var(--color-black);
+}
+
+.btn-modal-cancel {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+.btn-modal-cancel:hover {
+  background-color: #eee;
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 var(--color-black);
+}
+
+.btn-modal-save {
+  background-color: var(--color-fish);
+  color: var(--color-white);
+}
+
+.btn-modal-save:hover {
+  background-color: var(--color-white);
+  color: var(--color-fish);
+  border-color: var(--color-fish);
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 var(--color-black);
+}
+
+/* Estilos de peligro (Delete modal) */
+.modal-card__header--danger {
+  background-color: var(--color-carrot) !important;
+}
+
+.btn-modal-delete {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  font-family: var(--font-title);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  border: 2px solid var(--color-black);
+  background-color: var(--color-carrot);
+  color: var(--color-white);
+}
+
+.btn-modal-delete:hover {
+  background-color: var(--color-white);
+  color: var(--color-carrot);
+  border-color: var(--color-carrot);
+  transform: translate(-2px, -2px);
+  box-shadow: 2px 2px 0 var(--color-black);
 }

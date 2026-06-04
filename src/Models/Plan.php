@@ -97,6 +97,7 @@ class Plan extends Model
             ]);
             $planId = (int) $stmt->fetchColumn();
 
+            $aggregatedIngredients = [];
             // Insertar días y comidas
             foreach ($days as $day) {
                 $stmt = $this->db->prepare(
@@ -133,7 +134,38 @@ class Plan extends Model
                         'carbs'            => $meal['carbs'],
                         'fat'              => $meal['fat'],
                     ]);
+
+                    $mealIngredients = $meal['ingredients'] ?? [];
+                    foreach ($mealIngredients as $ing) {
+                        $name = trim(mb_strtolower($ing['name'] ?? ''));
+                        $unit = trim(mb_strtolower($ing['unit'] ?? ''));
+                        $amount = (float) ($ing['amount'] ?? 0.0);
+                        if ($name === '') continue;
+
+                        $key = $name . '|' . $unit;
+                        if (!isset($aggregatedIngredients[$key])) {
+                            $aggregatedIngredients[$key] = [
+                                'name'   => $ing['name'],
+                                'unit'   => $ing['unit'],
+                                'amount' => 0.0
+                            ];
+                        }
+                        $aggregatedIngredients[$key]['amount'] += $amount;
+                    }
                 }
+            }
+
+            foreach ($aggregatedIngredients as $item) {
+                $stmt = $this->db->prepare(
+                    "INSERT INTO shopping_list_items (plan_id, ingredient_name, amount, unit, purchased)
+                     VALUES (:plan_id, :ingredient_name, :amount, :unit, false)"
+                );
+                $stmt->execute([
+                    'plan_id'         => $planId,
+                    'ingredient_name' => $item['name'],
+                    'amount'          => $item['amount'],
+                    'unit'            => $item['unit'] ?: null,
+                ]);
             }
 
             $this->db->commit();

@@ -52,7 +52,7 @@ class GeminiTranslator implements TranslatorInterface
             CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
             ],
-            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_TIMEOUT        => 30,
         ]);
 
         $body  = curl_exec($ch);
@@ -112,7 +112,7 @@ class GeminiTranslator implements TranslatorInterface
             CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
             ],
-            CURLOPT_TIMEOUT        => 30,
+            CURLOPT_TIMEOUT        => 120,
         ]);
 
         $body  = curl_exec($ch);
