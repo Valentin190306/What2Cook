@@ -6,48 +6,42 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Session;
+use App\Core\Validator;
 use App\Core\View;
 use App\Models\Favorite;
 use App\Services\SpoonacularService;
 
 class CatalogueController extends Controller
 {
+    private const VALID_CUISINES = [
+        'italian', 'mexican', 'asian', 'american', 'mediterranean',
+        'french', 'thai', 'spanish',
+    ];
+
+    private const VALID_TYPES = [
+        'breakfast', 'lunch', 'dinner', 'dessert', 'snack',
+        'soup', 'salad', 'main course', 'appetizer',
+    ];
+
+    private const VALID_DIETS = [
+        'keto', 'vegan', 'vegetarian', 'gluten-free', 'paleo',
+        'primal', 'whole30', 'lacto-vegetarian', 'ovo-vegetarian', 'pescatarian',
+    ];
+
+    private const VALID_INTOLERANCES = [
+        'dairy', 'egg', 'gluten', 'grain', 'peanut', 'seafood',
+        'sesame', 'shellfish', 'soy', 'sulfite', 'tree nut', 'wheat',
+    ];
+
     public function index(): void
     {
-        $query = trim((string) ($_GET['query'] ?? ''));
-        // support multiple selections per category (arrays or single values)
-        $cuisineRaw = $_GET['cuisine'] ?? '';
-        $typeRaw = $_GET['type'] ?? '';
-        $dietRaw = $_GET['diet'] ?? '';
-        $intolerancesRaw = $_GET['intolerances'] ?? '';
+        $query = Validator::string($_GET['query'] ?? null, 0, 200);
+        $query = $query ?? '';
 
-        $cuisineArr = [];
-        if (is_array($cuisineRaw)) {
-            $cuisineArr = array_values(array_filter(array_map('trim', $cuisineRaw), static fn($v) => $v !== ''));
-        } elseif (trim((string) $cuisineRaw) !== '') {
-            $cuisineArr = [trim((string) $cuisineRaw)];
-        }
-
-        $typeArr = [];
-        if (is_array($typeRaw)) {
-            $typeArr = array_values(array_filter(array_map('trim', $typeRaw), static fn($v) => $v !== ''));
-        } elseif (trim((string) $typeRaw) !== '') {
-            $typeArr = [trim((string) $typeRaw)];
-        }
-
-        $dietArr = [];
-        if (is_array($dietRaw)) {
-            $dietArr = array_values(array_filter(array_map('trim', $dietRaw), static fn($v) => $v !== ''));
-        } elseif (trim((string) $dietRaw) !== '') {
-            $dietArr = [trim((string) $dietRaw)];
-        }
-
-        $intolerancesArr = [];
-        if (is_array($intolerancesRaw)) {
-            $intolerancesArr = array_values(array_filter(array_map('trim', $intolerancesRaw), static fn($v) => $v !== ''));
-        } elseif (trim((string) $intolerancesRaw) !== '') {
-            $intolerancesArr = [trim((string) $intolerancesRaw)];
-        }
+        $cuisineArr = Validator::stringArray($_GET['cuisine'] ?? [], self::VALID_CUISINES);
+        $typeArr = Validator::stringArray($_GET['type'] ?? [], self::VALID_TYPES);
+        $dietArr = Validator::stringArray($_GET['diet'] ?? [], self::VALID_DIETS);
+        $intolerancesArr = Validator::stringArray($_GET['intolerances'] ?? [], self::VALID_INTOLERANCES);
 
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $perPage = 12;
@@ -64,7 +58,6 @@ class CatalogueController extends Controller
             $filters['query'] = $query;
         }
         if (!empty($cuisineArr)) {
-            // join multiple cuisines with comma - Spoonacular accepts comma-separated lists
             $filters['cuisine'] = implode(',', $cuisineArr);
         }
         if (!empty($typeArr)) {
@@ -83,7 +76,6 @@ class CatalogueController extends Controller
 
         $this->log('info', 'Búsqueda en catálogo', [
             'query' => $query,
-            // pass arrays to the view so inputs can render checked states
             'cuisine' => $cuisineArr,
             'type' => $typeArr,
             'diet' => $dietArr,

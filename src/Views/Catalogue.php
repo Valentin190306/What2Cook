@@ -209,11 +209,12 @@ $scripts = ['favorites', 'catalogue'];
     <nav class="pagination-controls" aria-label="Paginación de recetas">
         <?php
         $baseParams = array_filter([
-            'query' => $query ?? '',
-            'cuisine' => $cuisine ?? '',
-            'type' => $type ?? '',
-            'diet' => $diet ?? '',
-        ], static fn($value) => $value !== '');
+            'query' => $query,
+            'cuisine' => $cuisine,
+            'type' => $type,
+            'diet' => $diet,
+            'intolerances' => $intolerances,
+        ]);
         $prevUrl = '/recetas?' . http_build_query(array_merge($baseParams, ['page' => max(1, $page - 1)]));
         $nextUrl = '/recetas?' . http_build_query(array_merge($baseParams, ['page' => min($totalPages, $page + 1)]));
         ?>

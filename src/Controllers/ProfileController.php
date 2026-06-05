@@ -6,6 +6,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Core\Session;
+use App\Core\Validator;
 use App\Models\User;
 use App\Models\Plan;
 use App\Models\ShoppingList;
@@ -125,44 +126,30 @@ class ProfileController extends Controller
     {
         $userId = $this->requireAuthWeb();
 
-        // 1. Validar CSRF
         if (!Session::validateCsrf($_POST['_csrf'] ?? null)) {
             Session::flash('error', 'Sesión expirada, reintentá.');
             $this->redirect('/perfil/editar');
         }
 
-        // 2. Leer y limpiar inputs
-        $name = trim($_POST['name'] ?? '');
-        $email = strtolower(trim($_POST['email'] ?? ''));
-        $diet = trim($_POST['diet'] ?? '');
-        
-        $intolerancesRaw = $_POST['intolerances'] ?? [];
-        $intolerances = is_array($intolerancesRaw) ? $intolerancesRaw : [];
-        $validAllergies = ['dairy', 'egg', 'gluten', 'grain', 'peanut', 'seafood', 'sesame', 'shellfish', 'soy', 'sulfite', 'tree nut', 'wheat'];
-        $filteredIntolerances = array_intersect($intolerances, $validAllergies);
+        $name = Validator::string($_POST['name'] ?? null, 1, 100);
+        $email = Validator::email($_POST['email'] ?? null);
 
-        $currentPassword = $_POST['current_password'] ?? '';
-        $newPassword = $_POST['new_password'] ?? '';
-        $confirmPassword = $_POST['confirm_password'] ?? '';
-
-        // 3. Validaciones
-        if ($name === '') {
+        if ($name === null) {
             Session::flash('error', 'El nombre es obligatorio.');
             $this->redirect('/perfil/editar');
         }
 
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if ($email === null) {
             Session::flash('error', 'El formato del email es inválido.');
             $this->redirect('/perfil/editar');
         }
 
         $validDiets = ['vegetarian', 'vegan', 'ketogenic', 'paleo', 'primal', 'whole30', 'gluten free', 'pescetarian', 'lacto-vegetarian', 'ovo-vegetarian'];
-        if ($diet !== '' && !in_array($diet, $validDiets, true)) {
-            Session::flash('error', 'Dieta inválida.');
-            $this->redirect('/perfil/editar');
-        }
+        $diet = Validator::inList($_POST['diet'] ?? null, $validDiets);
 
-        // 4. Unicidad de email
+        $validAllergies = ['dairy', 'egg', 'gluten', 'grain', 'peanut', 'seafood', 'sesame', 'shellfish', 'soy', 'sulfite', 'tree nut', 'wheat'];
+        $filteredIntolerances = Validator::stringArray($_POST['intolerances'] ?? [], $validAllergies);
+
         $userModel = new User();
         $existing = $userModel->findByEmail($email);
         if ($existing !== null && (int) $existing['id'] !== $userId) {
@@ -170,12 +157,14 @@ class ProfileController extends Controller
             $this->redirect('/perfil/editar');
         }
 
-        // 5. Preparar datos
-        $preferences = ($diet !== '') ? $diet : null;
+        $preferences = $diet;
         $allergies = json_encode(array_values($filteredIntolerances));
 
-        // 6. Cambio de contraseña opcional
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
         $newPasswordVal = null;
+
         if ($currentPassword !== '' || $newPassword !== '' || $confirmPassword !== '') {
             $user = $userModel->find($userId);
             if ($user === null) {
@@ -183,17 +172,18 @@ class ProfileController extends Controller
                 $this->redirect('/perfil/editar');
             }
 
-            if (!password_verify($currentPassword, $user['password'])) {
+            if (!password_verify((string) $currentPassword, $user['password'])) {
                 Session::flash('error', 'La contraseña actual es incorrecta.');
                 $this->redirect('/perfil/editar');
             }
 
-            if (strlen($newPassword) < 8) {
-                Session::flash('error', 'La nueva contraseña debe tener al menos 8 caracteres.');
+            $newPassword = Validator::password($newPassword);
+            if ($newPassword === null) {
+                Session::flash('error', 'La nueva contraseña debe tener entre 8 y 255 caracteres.');
                 $this->redirect('/perfil/editar');
             }
 
-            if ($newPassword !== $confirmPassword) {
+            if ($newPassword !== (is_string($confirmPassword) ? $confirmPassword : '')) {
                 Session::flash('error', 'Las contraseñas no coinciden.');
                 $this->redirect('/perfil/editar');
             }
@@ -201,7 +191,6 @@ class ProfileController extends Controller
             $newPasswordVal = $newPassword;
         }
 
-        // 7. Persistir
         try {
             $userModel->updateProfile($userId, [
                 'name' => $name,

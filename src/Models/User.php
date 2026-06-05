@@ -24,7 +24,7 @@ class User extends Model
         return $stmt->execute([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_BCRYPT),
+            'password' => password_hash((string) ($data['password'] ?? ''), PASSWORD_BCRYPT),
             'preferences' => $data['preferences'] ?? null,
             'allergies' => $data['allergies'] ?? null
         ]);
@@ -42,7 +42,7 @@ class User extends Model
                 'email' => $data['email'],
                 'preferences' => $data['preferences'],
                 'allergies' => $data['allergies'],
-                'password' => password_hash($newPlainPassword, PASSWORD_BCRYPT),
+                'password' => password_hash((string) $newPlainPassword, PASSWORD_BCRYPT),
                 'id' => $id
             ]);
         } else {

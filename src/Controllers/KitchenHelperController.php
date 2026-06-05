@@ -3,34 +3,34 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Session;
+use App\Core\Validator;
 
 class KitchenHelperController extends Controller
 {
-    // ── Vista ─────────────────────────────────────────────────────────────────
+    private const VALID_SORTS = ['healthiness', 'time'];
+    private const MAX_INGREDIENTS = 20;
 
     public function index(): void
     {
         \App\Core\View::render('KitchenHelper');
     }
 
-    // ── API: Búsqueda por ingredientes ────────────────────────────────────────
-
     public function single(): void
     {
         $this->requireJson();
         $body = $this->parseBody();
 
-        $ingredients = $body['ingredients'] ?? [];
-        $sort        = $body['sort']        ?? null;
-
-        if (!is_array($ingredients) || empty($ingredients)) {
+        $ingredients = Validator::stringArray($body['ingredients'] ?? [], null, self::MAX_INGREDIENTS);
+        if (empty($ingredients)) {
             $this->log('warning', 'Single search sin ingredientes');
             $this->json(['error' => 'Ingredients required'], 400);
             return;
         }
 
-        // Get user dietary preferences if authenticated
-        $userId = \App\Core\Session::userId();
+        $sort = Validator::inList($body['sort'] ?? null, self::VALID_SORTS);
+
+        $userId = Session::userId();
         $userDiet = '';
         $userIntolerances = [];
         if ($userId !== null) {
@@ -51,7 +51,7 @@ class KitchenHelperController extends Controller
         try {
             $service = new \App\Services\SpoonacularService($this->logger);
 
-            if ($sort === 'healthiness' || $sort === 'time') {
+            if ($sort !== null) {
                 $filters = [
                     'includeIngredients'   => implode(',', $ingredients),
                     'sort'                 => $sort,
@@ -60,14 +60,14 @@ class KitchenHelperController extends Controller
                     'fillIngredients'      => 'true',
                     'addRecipeInformation' => 'true',
                 ];
-                
+
                 if (!empty($userDiet)) {
                     $filters['diet'] = $userDiet;
                 }
                 if (!empty($userIntolerances)) {
                     $filters['intolerances'] = implode(',', $userIntolerances);
                 }
-                
+
                 $results = $service->searchRecipes($filters);
                 $list = $results['results'] ?? $results;
 
@@ -116,25 +116,22 @@ class KitchenHelperController extends Controller
         }
     }
 
-    // ── API: Meal Prep ────────────────────────────────────────────────────────
-
     public function mealPrep(): void
     {
         $this->requireJson();
         $body = $this->parseBody();
 
-        $ingredients = $body['ingredients'] ?? [];
-        $count       = (int) ($body['count'] ?? 3);
-        $sort        = $body['sort'] ?? null;
-
-        if (!is_array($ingredients) || empty($ingredients)) {
+        $ingredients = Validator::stringArray($body['ingredients'] ?? [], null, self::MAX_INGREDIENTS);
+        if (empty($ingredients)) {
             $this->log('warning', 'Meal Prep sin ingredientes');
             $this->json(['error' => 'Ingredients required'], 400);
             return;
         }
 
-        // Get user dietary preferences if authenticated
-        $userId = \App\Core\Session::userId();
+        $count = Validator::integer($body['count'] ?? null, 2, 5) ?? 3;
+        $sort = Validator::inList($body['sort'] ?? null, self::VALID_SORTS);
+
+        $userId = Session::userId();
         $userDiet = '';
         $userIntolerances = [];
         if ($userId !== null) {
@@ -150,27 +147,25 @@ class KitchenHelperController extends Controller
             }
         }
 
-        $count = max(2, min(5, $count));
         $this->log('info', 'Búsqueda Meal Prep', ['ingredients' => $ingredients, 'count' => $count, 'sort' => $sort, 'diet' => $userDiet, 'intolerances' => $userIntolerances]);
 
         try {
             $service = new \App\Services\SpoonacularService($this->logger);
-            
-            // Use searchRecipes with dietary filters instead of searchByIngredients
+
             $filters = [
                 'includeIngredients'   => implode(',', $ingredients),
                 'number'               => $count * 5,
                 'addRecipeNutrition'   => 'true',
                 'addRecipeInformation' => 'true',
             ];
-            
+
             if (!empty($userDiet)) {
                 $filters['diet'] = $userDiet;
             }
             if (!empty($userIntolerances)) {
                 $filters['intolerances'] = implode(',', $userIntolerances);
             }
-            
+
             $results = $service->searchRecipes($filters);
             $pool = $results['results'] ?? $results;
 
@@ -205,30 +200,29 @@ class KitchenHelperController extends Controller
         }
     }
 
-    // ── API: Detalle de receta ─────────────────────────────────────────────────
-
     public function recipeDetail(string $id): void
     {
-        $this->log('info', 'Solicitud de detalle', ['recipe_id' => $id]);
+        $recipeId = Validator::integer($id, 1);
+        if ($recipeId === null) {
+            $this->log('warning', 'Detalle: ID inválido', ['recipe_id' => $id]);
+            $this->json(['error' => 'ID de receta inválido.'], 400);
+            return;
+        }
+
+        $this->log('info', 'Solicitud de detalle', ['recipe_id' => $recipeId]);
 
         try {
             $service = new \App\Services\SpoonacularService($this->logger);
-            $result  = $service->getRecipeInfo($id, true);
+            $result  = $service->getRecipeInfo($recipeId, true);
 
-            $this->log('info', 'Detalle completado', ['recipe_id' => $id]);
+            $this->log('info', 'Detalle completado', ['recipe_id' => $recipeId]);
             $this->json(['success' => true, 'data' => $result]);
         } catch (\Throwable $e) {
-            $this->log('error', 'Error en detalle', ['recipe_id' => $id, 'error' => $e->getMessage()]);
+            $this->log('error', 'Error en detalle', ['recipe_id' => $recipeId, 'error' => $e->getMessage()]);
             $this->json(['error' => 'Error al obtener la receta.'], 502);
         }
     }
 
-    // ── Helpers privados ──────────────────────────────────────────────────────
-
-    /**
-     * Agrega macros a cada receta de un array de resultados de findByIngredients.
-     * nutritionWidget devuelve: calories (int), protein/carbs/fat (strings "15g").
-     */
     private function enrichWithNutrition(array $recipes, \App\Services\SpoonacularService $service): array
     {
         if (empty($recipes)) {
@@ -238,7 +232,6 @@ class KitchenHelperController extends Controller
         $ids = array_column($recipes, 'id');
 
         try {
-            // Bulk request sin traducir porque solo nos interesan los números de nutrición
             $bulkInfo = $service->getRecipeInfoBulk($ids, true, false);
             $infoMap = [];
             foreach ($bulkInfo as $info) {
