@@ -143,6 +143,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (card) {
                     card.remove();
                 }
+
+                // También removemos del DOM las tarjetas de recetas individuales que pertenecían al meal prep
+                if (mealPrepData.recipe_ids && Array.isArray(mealPrepData.recipe_ids)) {
+                    mealPrepData.recipe_ids.forEach(rid => {
+                        const recipeCardBtn = document.querySelector(`[data-fav-toggle][data-spoonacular-id="${rid}"]`);
+                        if (recipeCardBtn) {
+                            const recipeCard = recipeCardBtn.closest('article');
+                            if (recipeCard) {
+                                recipeCard.remove();
+                            }
+                        }
+                    });
+                }
                 
                 // Si no quedan tarjetas, recargar para mostrar el estado vacío
                 const remainingCards = document.querySelectorAll('.recipe-grid article');

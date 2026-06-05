@@ -49,7 +49,37 @@ class FavoriteController extends Controller
     public function index(): void
     {
         $userId = $this->requireAuthWeb();
-        $favorites = (new Favorite())->findAllByUser($userId);
+        $favoritesData = (new Favorite())->findAllByUser($userId);
+        
+        $favorites = [];
+        if (!empty($favoritesData)) {
+            $spoonacularIds = array_map(function($fav) {
+                return (int) $fav['spoonacular_id'];
+            }, $favoritesData);
+            
+            try {
+                $service = new \App\Services\SpoonacularService($this->logger);
+                $favorites = $service->getRecipeInfoBulk($spoonacularIds, true, false);
+            } catch (\Throwable $e) {
+                $this->log('error', 'Error fetching bulk recipe info for favorites', [
+                    'error' => $e->getMessage()
+                ]);
+                // Fallback to basic database data if API bulk fetch fails
+                $favorites = array_map(function($fav) {
+                    return [
+                        'id' => (int) $fav['spoonacular_id'],
+                        'title' => $fav['title'],
+                        'image' => $fav['image'],
+                        'readyInMinutes' => null,
+                        'servings' => null,
+                        'diets' => [],
+                        'dishTypes' => [],
+                        'nutrition' => ['nutrients' => []]
+                    ];
+                }, $favoritesData);
+            }
+        }
+        
         $mealPrepFavorites = (new MealPrepFavorite())->findAllByUser($userId);
         
         \App\Core\View::render('Favorites', [
@@ -99,6 +129,14 @@ class FavoriteController extends Controller
                         'title' => trim((string) ($recipeDetail['title'] ?? '')),
                         'image' => $recipeDetail['image'] ?? null,
                     ]);
+                }
+            }
+        } else {
+            $favoriteModel = new Favorite();
+            foreach ($recipeIds as $rid) {
+                $sid = (int) $rid;
+                if ($sid > 0 && $favoriteModel->existsForUser($userId, $sid)) {
+                    $favoriteModel->deleteForUser($userId, $sid);
                 }
             }
         }

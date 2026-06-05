@@ -1,7 +1,7 @@
 <?php
 
 $title = 'Mis Favoritos - What2Cook';
-$styles = ['catalogoRecetas', 'receta', 'favoritos'];
+$styles = ['catalogoRecetas', 'receta', 'perfil', 'favoritos'];
 $scripts = ['favorites'];
 
 ?>
@@ -12,32 +12,74 @@ $scripts = ['favorites'];
 </section>
 
 <?php if (empty($favorites) && empty($mealPrepFavorites)): ?>
-    <div class="form-panel">
-        <h1>No tenés favoritos</h1>
-        <p>Explorá recetas en el asistente de cocina para agregarlas a tu lista.</p>
-        <a href="/asistente-cocina" class="btn btn-carrot">Ir al Asistente</a>
-    </div>
+    <article class="empty-state">
+        <p>Aún no tenés favoritos guardados.</p>
+        <a href="/asistente-cocina" class="btn-link">Ir al Asistente</a>
+    </article>
 <?php else: ?>
     <?php if (!empty($favorites)): ?>
     <h2 class="section-title">Recetas</h2>
     <div class="recipe-grid">
-        <?php foreach ($favorites as $fav): ?>
-            <article onclick="window.location='/receta/<?= (int) $fav['spoonacular_id'] ?>'" role="link" tabindex="0">
-                <img src="<?= htmlspecialchars($fav['image'] ?: '/assets/img/placeholder.jpg') ?>" alt="<?= htmlspecialchars($fav['title']) ?>">
+        <?php foreach ($favorites as $recipe): 
+            $id = (int) ($recipe['id'] ?? 0);
+            $image = $recipe['image'] ?? '/assets/img/placeholder.jpg';
+            $readyIn = $recipe['readyInMinutes'] ?? null;
+            $servings = $recipe['servings'] ?? null;
+            $diets = $recipe['diets'] ?? [];
+            $dishTypes = $recipe['dishTypes'] ?? [];
+            $tags = array_slice(array_merge($dishTypes, $diets), 0, 3);
+            $nutrition = $recipe['nutrition']['nutrients'] ?? [];
+            $nutritionMap = [];
+            foreach ($nutrition as $nutrient) {
+                if (!empty($nutrient['name'])) {
+                    $nutritionMap[$nutrient['name']] = $nutrient;
+                }
+            }
+        ?>
+            <article onclick="if (!event.target.closest('button')) window.location='/receta/<?= $id ?>'" role="link" tabindex="0">
+                <img src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($recipe['title'] ?? 'Receta') ?>">
                 
-                <div>
-                    <button type="button" class="btn-favorito"
-                            aria-label="Quitar de favoritos"
-                            data-fav-toggle data-fav-remove-card
-                            data-spoonacular-id="<?= (int) $fav['spoonacular_id'] ?>"
-                            data-title="<?= htmlspecialchars($fav['title']) ?>"
-                            data-image="<?= htmlspecialchars($fav['image'] ?? '') ?>"
-                            data-favorited="true">♥</button>
+                <button type="button" class="btn-favorito"
+                        aria-label="Quitar de favoritos"
+                        data-fav-toggle data-fav-remove-card
+                        data-spoonacular-id="<?= $id ?>"
+                        data-title="<?= htmlspecialchars($recipe['title'] ?? '') ?>"
+                        data-image="<?= htmlspecialchars($image) ?>"
+                        data-favorited="true">♥</button>
+                
+                <h2><?= htmlspecialchars($recipe['title'] ?? 'Sin título') ?></h2>
+                
+                <div class="recipe-meta">
+                    <?php if ($readyIn !== null): ?><span class="recipe-time">Tiempo: <?= htmlspecialchars((string) $readyIn) ?> min</span><?php endif; ?>
+                    <?php if ($servings !== null): ?><span>Porciones: <?= htmlspecialchars((string) $servings) ?></span><?php endif; ?>
                 </div>
+
+                <div class="recipe-tags">
+                    <?php foreach ($tags as $tag): ?>
+                        <span><?= htmlspecialchars(ucfirst($tag)) ?></span>
+                    <?php endforeach; ?>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kcal</th>
+                            <th>Proteína</th>
+                            <th>Carbs</th>
+                            <th>Grasa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><?= round($nutritionMap['Calories']['amount'] ?? 0) ?></td>
+                            <td><?= round($nutritionMap['Protein']['amount'] ?? 0) ?>g</td>
+                            <td><?= round($nutritionMap['Carbohydrates']['amount'] ?? 0) ?>g</td>
+                            <td><?= round($nutritionMap['Fat']['amount'] ?? 0) ?>g</td>
+                        </tr>
+                    </tbody>
+                </table>
                 
-                <h2><?= htmlspecialchars($fav['title']) ?></h2>
-                
-                <a class="recipe-link" href="/receta/<?= (int) $fav['spoonacular_id'] ?>" aria-hidden="true" tabindex="-1"></a>
+                <a class="recipe-link" href="/receta/<?= $id ?>" aria-hidden="true" tabindex="-1"></a>
             </article>
         <?php endforeach; ?>
     </div>
@@ -53,7 +95,7 @@ $scripts = ['favorites'];
                 $servings = json_decode($mp['servings'], true) ?? [];
                 $recipeCount = count($recipeIds);
             ?>
-            <article class="mealprep-card" onclick="window.location='/asistente-cocina?meal_prep=<?= (int) $mp['id'] ?>'" role="link" tabindex="0">
+            <article class="mealprep-card" onclick="if (!event.target.closest('button')) window.location='/asistente-cocina?meal_prep=<?= (int) $mp['id'] ?>'" role="link" tabindex="0">
                 <div class="mealprep-card__header">
                     <span class="mealprep-card__badge">Meal Prep</span>
                     <button type="button" class="btn-favorito"

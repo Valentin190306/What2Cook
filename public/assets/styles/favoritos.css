@@ -1,10 +1,13 @@
 .section-title {
   font-family: var(--font-title);
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 900;
   text-transform: uppercase;
-  margin: 2rem 0 1rem;
+  margin: 3rem 0 1.5rem;
   color: var(--color-black);
+  border-bottom: 3px double var(--color-black);
+  padding-bottom: 0.5rem;
+  letter-spacing: -0.02em;
 }
 
 .mealprep-card {
@@ -27,8 +30,8 @@
 
 @media (max-width: 899px) {
   .mealprep-card {
-    min-height: 220px !important;
-    padding: 1rem !important;
+    min-height: 240px !important;
+    padding: 1.25rem !important;
   }
 }
 
@@ -80,10 +83,11 @@
 }
 
 .mealprep-card .btn-favorito:hover,
-.mealprep-card .btn-favorito.favorited {
-  background-color: var(--color-carrot);
-  color: var(--color-white);
-  border-color: var(--color-carrot);
+.mealprep-card .btn-favorito.favorited,
+.mealprep-card .btn-favorito[data-favorited="true"] {
+  background-color: var(--color-carrot) !important;
+  color: var(--color-white) !important;
+  border-color: var(--color-carrot) !important;
 }
 
 .mealprep-card__body {
@@ -119,8 +123,9 @@
 
 .mealprep-card__ingredients {
   width: 100%;
-  text-align: left;
+  text-align: center;
   font-size: 0.75rem;
+  margin-top: auto;
 }
 
 .mealprep-card__ingredients strong {
@@ -136,6 +141,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
+  justify-content: center;
 }
 
 .mealprep-card__chip {
@@ -164,4 +170,13 @@
   text-transform: uppercase;
   color: var(--color-carrot);
   letter-spacing: 0.05em;
+  transition: color 0.2s;
+}
+
+.mealprep-card:hover .mealprep-card__link-text {
+  color: var(--color-black);
+}
+
+.empty-state {
+  margin-bottom: 4rem;
 }
