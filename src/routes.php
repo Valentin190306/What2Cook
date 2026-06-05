@@ -47,6 +47,7 @@ $router->add('POST', '/api/favorites', 'FavoriteController@toggle');
 $router->add('GET', '/api/favorites', 'FavoriteController@indexApi');
 $router->add('POST', '/api/meal-prep-favorites', 'FavoriteController@toggleMealPrep');
 $router->add('GET', '/api/meal-prep-favorites', 'FavoriteController@mealPrepIndexApi');
+$router->add('GET', '/api/meal-prep-favorites/{id}', 'FavoriteController@showMealPrepApi');
 
 // Rutas de API — Listas de Compra
 $router->add('POST', '/api/shopping-lists', 'ShoppingListController@save');

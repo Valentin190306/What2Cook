@@ -259,7 +259,12 @@ async function renderMealPrep(recipes) {
         ingredients: ingredients,
         recipe_ids: recipes.map(r => r.id),
         servings: recipes.map(r => r.servings || 1),
-        shopping_list_items: aggregatedIngredients
+        shopping_list_items: aggregatedIngredients,
+        recipes_details: recipes.map(r => ({
+            spoonacular_id: r.id,
+            title: r.title,
+            image: r.image
+        }))
     };
     likeBtn.dataset.mealPrepData = JSON.stringify(mealPrepData);
     shoppingListBtn.dataset.sourceType = 'meal_prep';
@@ -733,6 +738,49 @@ function showLoaderThenNavigate(url) {
     }, 100);
 }
 
+async function loadSavedMealPrep(mealPrepId) {
+    setStatus('Cargando tu Meal Prep...', false);
+    setLoading(true);
+    try {
+        const response = await fetch(`/api/meal-prep-favorites/${mealPrepId}`);
+        if (!response.ok) {
+            throw new Error('Error al cargar el meal prep.');
+        }
+        const json = await response.json();
+        if (json.success === true) {
+            // Set ingredients array
+            ingredients = json.ingredients || [];
+            renderIngredientList();
+            
+            // Set active mode to meal-prep
+            activeMode = 'meal-prep';
+            const radioMealPrep = document.querySelector('input[name="mode"][value="meal-prep"]');
+            if (radioMealPrep) {
+                radioMealPrep.checked = true;
+                // Trigger change event to toggle forms
+                const event = new Event('change');
+                radioMealPrep.dispatchEvent(event);
+            }
+            
+            // Set servings/quantity count if needed
+            const mpCount = el('meal-prep-count');
+            if (mpCount && json.recipe_ids) {
+                mpCount.value = json.recipe_ids.length;
+            }
+            
+            // Render the recipes
+            renderResults(json.recipes);
+        } else {
+            setStatus(json.error || 'No se pudo cargar el meal prep.', true);
+        }
+    } catch (err) {
+        console.error('[CookingAssistant] loadSavedMealPrep error:', err);
+        setStatus(`Error al cargar el meal prep: ${err.message}`, true);
+    } finally {
+        setLoading(false);
+    }
+}
+
 
 /* ============================================================
    g) Inicialización
@@ -791,6 +839,13 @@ function init() {
             closeRecipeModal();
         }
     });
+
+    // Cargar meal prep si viene por query param
+    const urlParams = new URLSearchParams(window.location.search);
+    const mealPrepId = urlParams.get('meal_prep');
+    if (mealPrepId) {
+        loadSavedMealPrep(mealPrepId);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', init);

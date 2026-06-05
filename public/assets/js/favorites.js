@@ -136,6 +136,20 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 btn.classList.remove('favorited');
             }
+
+            // Si estamos en la página de favoritos y desmarcar, removemos la tarjeta
+            if (btn.hasAttribute('data-fav-remove-card') && !favorited) {
+                const card = btn.closest('article');
+                if (card) {
+                    card.remove();
+                }
+                
+                // Si no quedan tarjetas, recargar para mostrar el estado vacío
+                const remainingCards = document.querySelectorAll('.recipe-grid article');
+                if (remainingCards.length === 0) {
+                    window.location.reload();
+                }
+            }
         } catch (error) {
             console.error('Error de red al alternar favorito de meal prep:', error);
         } finally {

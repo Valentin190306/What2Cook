@@ -88,6 +88,21 @@ class FavoriteController extends Controller
             'servings' => $servings,
         ]);
 
+        if ($favorited) {
+            $recipesDetails = $body['recipes_details'] ?? [];
+            $favoriteModel = new Favorite();
+            foreach ($recipesDetails as $recipeDetail) {
+                $sid = (int) ($recipeDetail['spoonacular_id'] ?? 0);
+                if ($sid > 0 && !$favoriteModel->existsForUser($userId, $sid)) {
+                    $favoriteModel->toggle($userId, [
+                        'spoonacular_id' => $sid,
+                        'title' => trim((string) ($recipeDetail['title'] ?? '')),
+                        'image' => $recipeDetail['image'] ?? null,
+                    ]);
+                }
+            }
+        }
+
         $this->log('info', 'Toggle favorito de meal prep', [
             'user_id' => $userId,
             'favorited' => $favorited,
@@ -102,5 +117,60 @@ class FavoriteController extends Controller
         $favorites = (new MealPrepFavorite())->findAllByUser($userId);
         
         $this->json(['favorites' => $favorites]);
+    }
+
+    public function showMealPrepApi(string $id): void
+    {
+        $userId = $this->requireAuthApi();
+        $mpId = (int) $id;
+        
+        if ($mpId <= 0) {
+            $this->json(['error' => 'ID inválido.'], 400);
+            return;
+        }
+        
+        $mp = (new MealPrepFavorite())->find($mpId);
+        if ($mp === null || (int)$mp['user_id'] !== $userId) {
+            $this->json(['error' => 'Meal prep no encontrado.'], 404);
+            return;
+        }
+        
+        $recipeIds = json_decode($mp['recipe_ids'], true) ?? [];
+        
+        try {
+            $service = new \App\Services\SpoonacularService($this->logger);
+            $recipes = $service->getRecipeInfoBulk($recipeIds, true, false);
+            
+            foreach ($recipes as &$recipe) {
+                if (isset($recipe['nutrition']['nutrients'])) {
+                    $map = [];
+                    foreach ($recipe['nutrition']['nutrients'] as $n) {
+                        $map[$n['name']] = (float) ($n['amount'] ?? 0);
+                    }
+                    $recipe['nutrition'] = [
+                        'calories' => $map['Calories']     ?? 0.0,
+                        'protein'  => $map['Protein']       ?? 0.0,
+                        'carbs'    => $map['Carbohydrates'] ?? 0.0,
+                        'fat'      => $map['Fat']           ?? 0.0,
+                    ];
+                }
+            }
+            unset($recipe);
+            
+            $this->json([
+                'success' => true,
+                'ingredients' => json_decode($mp['ingredients'], true) ?? [],
+                'recipe_ids' => $recipeIds,
+                'servings' => json_decode($mp['servings'], true) ?? [],
+                'recipes' => $recipes
+            ]);
+        } catch (\Throwable $e) {
+            $this->log('error', 'Error al obtener recetas de meal prep favorito', [
+                'user_id' => $userId,
+                'meal_prep_id' => $mpId,
+                'error' => $e->getMessage()
+            ]);
+            $this->json(['error' => 'Error al obtener las recetas del meal prep.'], 500);
+        }
     }
 }

@@ -8,28 +8,160 @@
 }
 
 .mealprep-card {
-  border: 2px solid var(--color-black);
-  background-color: var(--color-white);
-  box-shadow: 4px 4px 0 var(--color-black);
-  padding: 1.5rem;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
+  padding: 1.25rem !important;
+  min-height: 340px !important;
+  height: 100% !important;
+  border: 2px solid var(--color-black) !important;
+  background-color: var(--color-cream) !important;
+  box-shadow: 6px 6px 0 var(--color-black) !important;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.2s;
+  position: relative;
+  box-sizing: border-box;
+}
+
+@media (max-width: 899px) {
+  .mealprep-card {
+    min-height: 220px !important;
+    padding: 1rem !important;
+  }
+}
+
+.mealprep-card:hover {
+  transform: translate(-4px, -4px) !important;
+  box-shadow: 10px 10px 0 var(--color-carrot) !important;
+  background-color: rgba(230, 126, 34, 0.04) !important;
+}
+
+.mealprep-card__header {
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
-  min-height: 200px;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  width: 100%;
 }
 
-.mealprep-info h2 {
+.mealprep-card__badge {
   font-family: var(--font-title);
-  font-size: 1.2rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  margin: 0 0 0.5rem;
-}
-
-.mealprep-info p {
-  margin: 0.25rem 0;
-  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--color-black);
+  padding: 0.15rem 0.5rem;
+  background-color: var(--color-white);
+  color: var(--color-black);
 }
 
 .mealprep-card .btn-favorito {
-  align-self: flex-end;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--color-black);
+  background-color: var(--color-white);
+  box-shadow: 3px 3px 0 var(--color-black);
+  font-size: 1.3rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, color 0.2s;
+  color: var(--color-black);
+  z-index: 2;
+  padding-top: 2px;
+}
+
+.mealprep-card .btn-favorito:hover,
+.mealprep-card .btn-favorito.favorited {
+  background-color: var(--color-carrot);
+  color: var(--color-white);
+  border-color: var(--color-carrot);
+}
+
+.mealprep-card__body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  width: 100%;
+}
+
+.mealprep-card__icon-wrapper {
+  margin-bottom: 0.5rem;
+  color: var(--color-carrot);
+}
+
+.mealprep-card__title {
+  font-family: var(--font-title);
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin: 0 0 0.25rem;
+  color: var(--color-black);
+}
+
+.mealprep-card__date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.mealprep-card__ingredients {
+  width: 100%;
+  text-align: left;
+  font-size: 0.75rem;
+}
+
+.mealprep-card__ingredients strong {
+  display: block;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  font-family: var(--font-title);
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+.mealprep-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.mealprep-card__chip {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  padding: 0.1rem 0.35rem;
+  background-color: var(--color-white);
+  border: 1.5px solid var(--color-black);
+  box-shadow: 1.5px 1.5px 0 var(--color-black);
+  color: var(--color-black);
+  border-radius: 0;
+  text-transform: uppercase;
+}
+
+.mealprep-card__footer {
+  width: 100%;
+  border-top: 2px dashed var(--color-black);
+  padding-top: 0.75rem;
+  text-align: center;
+}
+
+.mealprep-card__link-text {
+  font-family: var(--font-title);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-carrot);
+  letter-spacing: 0.05em;
 }
