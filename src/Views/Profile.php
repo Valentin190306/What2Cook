@@ -36,7 +36,7 @@ $scripts = ['api', 'perfil', 'carousel'];
                 </div>
             <?php else: ?>
                 <div class="dietary-item">
-                    <h3>Intolerancias</h3>
+                    <h3>Intolerancias:</h3>
                     <p>Ninguna</p>
                 </div>
             <?php endif; ?>
