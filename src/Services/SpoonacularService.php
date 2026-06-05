@@ -3,15 +3,18 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Core\FileCache;
 use App\Core\Log\LoggerInterface;
 use RuntimeException;
 
 class SpoonacularService
 {
     private const BASE_URL = 'https://api.spoonacular.com';
+    private const CACHE_TTL = 604800; // 7 días
 
     private string $apiKey;
     private ?LoggerInterface $logger = null;
+    private FileCache $cache;
 
     public function __construct(?LoggerInterface $logger = null)
     {
@@ -22,13 +25,16 @@ class SpoonacularService
             throw new RuntimeException('SPOONACULAR_KEY no está definida en las variables de entorno.');
         }
         $this->apiKey = $key;
+
+        $this->cache = new FileCache(
+            __DIR__ . '/../../log/cache',
+            self::CACHE_TTL,
+            $this->logger
+        );
     }
 
     // ── Meal Planner (descontinuado) ─────────────────────────────────────────
 
-    /**
-     * Genera un plan de comidas semanal desde Spoonacular.
-     */
     public function generateWeeklyPlan(int $targetCalories, string $diet = '', string $exclude = ''): array
     {
         $params = ['targetCalories' => $targetCalories];
@@ -45,9 +51,6 @@ class SpoonacularService
 
     // ── Recetas ───────────────────────────────────────────────────────────────
 
-    /**
-     * Busca recetas por ingredientes disponibles.
-     */
     public function searchByIngredients(array $ingredients, int $number = 10, bool $maximize = true): array
     {
         $ingredients = $this->maybeTranslateInput($ingredients);
@@ -60,9 +63,6 @@ class SpoonacularService
         ]);
     }
 
-    /**
-     * Obtiene información completa de una receta (incluye nutrición).
-     */
     public function getRecipeInfo(int $id, bool $includeNutrition = true): array
     {
         return $this->get("/recipes/{$id}/information", [
@@ -70,30 +70,21 @@ class SpoonacularService
         ]);
     }
 
-    /**
-     * Obtiene información completa de múltiples recetas de una sola vez.
-     */
     public function getRecipeInfoBulk(array $ids, bool $includeNutrition = true, bool $translate = true): array
     {
         if (empty($ids)) return [];
-        
+
         return $this->get("/recipes/informationBulk", [
             'ids' => implode(',', $ids),
             'includeNutrition' => $includeNutrition ? 'true' : 'false',
         ], $translate);
     }
 
-    /**
-     * Obtiene información nutricional de una receta.
-     */
     public function getRecipeNutrition(int $id): array
     {
         return $this->get("/recipes/{$id}/nutritionWidget.json", []);
     }
 
-    /**
-     * Busca recetas con filtros generales.
-     */
     public function searchRecipes(array $filters = []): array
     {
         $defaults = [
@@ -103,11 +94,10 @@ class SpoonacularService
 
         $filters = array_merge($defaults, $filters);
 
-        // Traducir campos de búsqueda si existen
         if (isset($filters['query'])) {
             $filters['query'] = $this->maybeTranslateInput($filters['query']);
         }
-        
+
         if (isset($filters['includeIngredients'])) {
             $ingredients = explode(',', $filters['includeIngredients']);
             $translated = $this->maybeTranslateInput($ingredients);
@@ -123,38 +113,15 @@ class SpoonacularService
         return $this->get('/recipes/complexSearch', $filters);
     }
 
-
     // ── HTTP ──────────────────────────────────────────────────────────────────
 
-    /**
-     * GET a la API de Spoonacular.
-     */
     private function get(string $endpoint, array $params, bool $translate = true): array
     {
-        // 1. Crear llave de caché basada en el endpoint y los parámetros (sin la API key)
-        $cacheParams = $params;
-        $cacheParams['translate'] = $translate;
-        $cacheParams['output_translation'] = $_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false';
-        $cacheParams['input_translation'] = $_ENV['ENABLE_INPUT_TRANSLATION'] ?? 'false';
-        $cacheKey = md5($endpoint . '?' . http_build_query($cacheParams));
-        
-        // 2. Definir ruta de caché y tiempo de expiración (ej: 7 días = 604800 segundos)
-        $cacheDir = __DIR__ . '/../../log/cache';
-        if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0777, true);
-        }
-        $cacheFile = $cacheDir . '/' . $cacheKey . '.json';
-        $cacheTime = 60 * 60 * 24 * 7;
-        
-        // 3. Revisar si tenemos un archivo en caché válido
-        if (file_exists($cacheFile) && (time() - filemtime($cacheFile) < $cacheTime)) {
-            $cachedContent = file_get_contents($cacheFile);
-            if ($cachedContent !== false) {
-                $cachedData = json_decode($cachedContent, true);
-                if (json_last_error() === JSON_ERROR_NONE) {
-                    return $cachedData;
-                }
-            }
+        $cacheKey = $this->buildCacheKey($endpoint, $params, $translate);
+
+        $cached = $this->cache->get($cacheKey);
+        if ($cached !== null) {
+            return $cached;
         }
 
         $params['apiKey'] = $this->apiKey;
@@ -207,17 +174,22 @@ class SpoonacularService
             $translationSucceeded = true;
         }
 
-        // 4. Guardar en caché antes de retornar (ya traducido, ahorra doble coste)
         if ($translationSucceeded) {
-            file_put_contents($cacheFile, json_encode($data));
+            $this->cache->set($cacheKey, $data);
         }
 
         return $data;
     }
 
-    /**
-     * Traduce el input (ES -> EN) si la traducción está habilitada.
-     */
+    private function buildCacheKey(string $endpoint, array $params, bool $translate): string
+    {
+        $cacheParams = $params;
+        $cacheParams['translate'] = $translate;
+        $cacheParams['output_translation'] = $_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false';
+        $cacheParams['input_translation'] = $_ENV['ENABLE_INPUT_TRANSLATION'] ?? 'false';
+        return $endpoint . '?' . http_build_query($cacheParams);
+    }
+
     private function maybeTranslateInput(array|string $input): array|string
     {
         $enableTranslation = ($_ENV['ENABLE_INPUT_TRANSLATION'] ?? 'false') === 'true';
@@ -226,7 +198,6 @@ class SpoonacularService
         }
 
         try {
-            // CachedTranslator se encarga del caching automáticamente
             $translator = $this->getTranslator();
             if (is_array($input)) {
                 return $translator->translateArray($input, 'en');
@@ -245,10 +216,6 @@ class SpoonacularService
         $this->logger->log($level, "[{$module}] {$message}", $context);
     }
 
-    /**
-     * Helper para instanciar el traductor configurado, envuelto en caché.
-     * CachedTranslator evita llamadas repetidas a la API para el mismo contenido.
-     */
     private function getTranslator(): \App\Services\Translation\TranslatorInterface
     {
         $provider = strtolower($_ENV['TRANSLATION_PROVIDER'] ?? 'gemini');

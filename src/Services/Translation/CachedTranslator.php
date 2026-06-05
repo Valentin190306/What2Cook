@@ -26,7 +26,7 @@ class CachedTranslator implements TranslatorInterface
     /** @param int|null $ttlSeconds null = sin expiración */
     public function __construct(
         private readonly TranslatorInterface $inner,
-        private readonly ?int $ttlSeconds = 60 * 60 * 24 * 7,
+        private readonly ?int $ttlSeconds = null,
         private readonly ?LoggerInterface $logger = null,
     ) {
         $this->cacheDir  = __DIR__ . '/../../../log/cache/translations';
