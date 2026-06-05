@@ -235,11 +235,31 @@ async function renderMealPrep(recipes) {
         Guardar lista
     `;
     
+    // Aggregate ingredients from all recipes for the shopping list
+    const aggregated = {};
+    recipes.forEach(recipe => {
+        const ingredientsList = recipe.extendedIngredients || [];
+        ingredientsList.forEach(ing => {
+            const name = (ing.name || '').trim();
+            const unit = (ing.unit || '').trim();
+            const amount = parseFloat(ing.amount) || 0;
+            if (!name) return;
+
+            const key = name.toLowerCase() + '|' + unit.toLowerCase();
+            if (!aggregated[key]) {
+                aggregated[key] = { name, amount: 0, unit };
+            }
+            aggregated[key].amount += amount;
+        });
+    });
+    const aggregatedIngredients = Object.values(aggregated);
+
     // Store meal prep data for like and shopping list functionality
     const mealPrepData = {
         ingredients: ingredients,
         recipe_ids: recipes.map(r => r.id),
-        servings: recipes.map(r => r.servings || 1)
+        servings: recipes.map(r => r.servings || 1),
+        shopping_list_items: aggregatedIngredients
     };
     likeBtn.dataset.mealPrepData = JSON.stringify(mealPrepData);
     shoppingListBtn.dataset.sourceType = 'meal_prep';

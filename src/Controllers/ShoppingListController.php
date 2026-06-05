@@ -21,7 +21,9 @@ class ShoppingListController extends Controller
         $sourceId = (int) ($body['source_id'] ?? 0);
         $items = $body['items'] ?? [];
         
-        if (empty($sourceType) || $sourceId <= 0 || empty($items)) {
+        $isValidSourceId = ($sourceType === 'meal_prep') ? ($sourceId >= 0) : ($sourceId > 0);
+        
+        if (empty($sourceType) || !$isValidSourceId || empty($items)) {
             $this->json(['error' => 'Datos inválidos.'], 422);
             return;
         }

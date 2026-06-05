@@ -246,6 +246,10 @@ class KitchenHelperController extends Controller
             $info = $infoMap[$id] ?? null;
 
             if ($info) {
+                if (isset($info['extendedIngredients'])) {
+                    $recipe['extendedIngredients'] = $info['extendedIngredients'];
+                }
+
                 $nutrients = $info['nutrition']['nutrients'] ?? [];
                 $map = [];
                 foreach ($nutrients as $n) {

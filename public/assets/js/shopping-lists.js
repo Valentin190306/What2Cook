@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (sourceType === 'meal_prep') {
             // Get meal prep data from button
             const mealPrepData = JSON.parse(btn.dataset.mealPrepData || '{}');
-            itemsToSend = mealPrepData.ingredients || [];
+            itemsToSend = mealPrepData.shopping_list_items || [];
         } else if (sourceType === 'diet_plan') {
             // Get diet plan shopping list
             let planId = sourceId;
