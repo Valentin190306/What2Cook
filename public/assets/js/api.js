@@ -16,7 +16,7 @@ const BackendAPI = {
         // 1. Create cache key
         const sortVal = sort || 'none';
         const cacheKey = `recipes_${mode}_${translatedIngredients.slice().sort().join(',')}_${sortVal}_${count || 'none'}`;
-        
+
         // 2. Check cache
         const cached = sessionStorage.getItem(cacheKey);
         if (cached) {
@@ -46,18 +46,18 @@ const BackendAPI = {
         }
 
         const json = await response.json();
-        
+
         // 4. Save to cache before returning
         if (json && json.success === true) {
             sessionStorage.setItem(cacheKey, JSON.stringify(json));
         }
-        
+
         return json;
     },
 
     async getRecipeDetail(id) {
         const cacheKey = `recipe_detail_${id}`;
-        
+
         const cached = sessionStorage.getItem(cacheKey);
         if (cached) {
             return JSON.parse(cached);
@@ -72,18 +72,18 @@ const BackendAPI = {
         }
 
         const json = await response.json();
-        
+
         if (json && json.success === true) {
             sessionStorage.setItem(cacheKey, JSON.stringify(json));
         }
-        
+
         return json;
     },
 
     async generateDiet(data) {
         // Obtenemos una cadena única para este set de datos
         const cacheKey = `diet_plan_${JSON.stringify(data)}`;
-        
+
         const cached = sessionStorage.getItem(cacheKey);
         if (cached) {
             return JSON.parse(cached);
@@ -102,10 +102,10 @@ const BackendAPI = {
         }
 
         const json = await response.json();
-        
+
         // Asumiendo que diet-helper no usa wrapper "success" sino data directa
         sessionStorage.setItem(cacheKey, JSON.stringify(json));
-        
+
         return json;
     },
 
