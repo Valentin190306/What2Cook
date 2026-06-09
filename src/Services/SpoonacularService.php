@@ -218,10 +218,13 @@ class SpoonacularService
 
     private function getTranslator(): \App\Services\Translation\TranslatorInterface
     {
-        $provider = strtolower($_ENV['TRANSLATION_PROVIDER'] ?? 'gemini');
-        $inner = $provider === 'openai'
-            ? new \App\Services\Translation\OpenAITranslator($this->logger)
-            : new \App\Services\Translation\GeminiTranslator($this->logger);
+        $provider = strtolower($_ENV['TRANSLATION_PROVIDER'] ?? 'libretranslate');
+
+        $inner = match ($provider) {
+            'openai' => new \App\Services\Translation\OpenAITranslator($this->logger),
+            'gemini' => new \App\Services\Translation\GeminiTranslator($this->logger),
+            default => new \App\Services\Translation\LibreTranslateTranslator($this->logger),
+        };
 
         return new \App\Services\Translation\CachedTranslator($inner, null, $this->logger);
     }

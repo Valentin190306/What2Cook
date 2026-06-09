@@ -31,6 +31,16 @@ services:
     ports:
       - "5432:5432"
 
+  libretranslate:
+    image: libretranslate/libretranslate:latest
+    command: --load-only en,es
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    volumes:
+      - libretranslate_data:/home/libretranslate/.local
+
 volumes:
   db_data:
   php_sessions:
+  libretranslate_data:
