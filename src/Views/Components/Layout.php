@@ -1,10 +1,51 @@
-<?php $uid = \App\Core\Session::userId(); ?>
+<?php
+$uid = \App\Core\Session::userId();
+
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host   = $_SERVER['HTTP_HOST'] ?? 'what2cook.app';
+$baseUrl = "{$scheme}://{$host}";
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'What2Cook' ?></title>
+
+    <!-- Schema: WebSite + SearchAction -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "What2Cook",
+        "url": "<?= $baseUrl ?>",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "<?= $baseUrl ?>/recetas?query={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+
+    <!-- Schema: Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "What2Cook",
+        "url": "<?= $baseUrl ?>",
+        "logo": "<?= $baseUrl ?>/assets/img/LogoW2C_1.png",
+        "description": "Tu plataforma de recetas y planificación de comidas",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Buenos Aires",
+            "addressCountry": "AR"
+        }
+    }
+    </script>
     
     <!-- Estilos base y comunes -->
     <link rel="stylesheet" href="/assets/styles/base.css?v=<?= time() ?>">

@@ -14,6 +14,7 @@ $summary  = strip_tags($summary);
 
 $diets        = $recipe['diets']        ?? [];
 $dishTypes    = $recipe['dishTypes']    ?? [];
+$cuisines     = $recipe['cuisines']      ?? [];
 $tags         = array_merge($dishTypes, $diets);
 
 $ingredients  = $recipe['extendedIngredients'] ?? [];
@@ -36,6 +37,34 @@ foreach ($nutrients as $n) {
 <?php else: ?>
 
 <article class="receta-detalle">
+
+    <!-- Schema: Recipe -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Recipe",
+        "name": <?= json_encode($recipe['title'] ?? '', JSON_UNESCAPED_UNICODE) ?>,
+        "image": <?= json_encode($image, JSON_UNESCAPED_UNICODE) ?>,
+        "description": <?= json_encode(mb_substr($summary, 0, 400), JSON_UNESCAPED_UNICODE) ?>,
+        <?php if ($readyIn): ?>"totalTime": "PT<?= $readyIn ?>M",<?php endif; ?>
+        <?php if ($servings): ?>"recipeYield": "<?= $servings ?>",<?php endif; ?>
+        <?php if (!empty($cuisines)): ?>"recipeCuisine": <?= json_encode($cuisines, JSON_UNESCAPED_UNICODE) ?>,<?php endif; ?>
+        "recipeCategory": <?= json_encode($dishTypes, JSON_UNESCAPED_UNICODE) ?>,
+        "nutrition": {
+            "@type": "NutritionInformation",
+            "calories": "<?= round($nutriMap['Calories']['amount'] ?? 0) ?>",
+            "proteinContent": "<?= round($nutriMap['Protein']['amount'] ?? 0) ?> g",
+            "carbohydrateContent": "<?= round($nutriMap['Carbohydrates']['amount'] ?? 0) ?> g",
+            "fatContent": "<?= round($nutriMap['Fat']['amount'] ?? 0) ?> g"
+        },
+        "recipeIngredient": <?= json_encode(array_map(fn($i) => $i['original'] ?? $i['name'], $ingredients), JSON_UNESCAPED_UNICODE) ?>,
+        "recipeInstructions": <?= json_encode(array_map(fn($s, $i) => [
+            '@type' => 'HowToStep',
+            'position' => $i + 1,
+            'text' => $s['step']
+        ], $steps, array_keys($steps)), JSON_UNESCAPED_UNICODE) ?>
+    }
+    </script>
 
     <!-- ── Imagen + título ── -->
     <div class="receta-hero">

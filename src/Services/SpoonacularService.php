@@ -11,6 +11,7 @@ class SpoonacularService
 {
     private const BASE_URL = 'https://api.spoonacular.com';
     private const CACHE_TTL = 604800; // 7 días
+    private const API_TIMEOUT = 20;
 
     private string $apiKey;
     private ?LoggerInterface $logger = null;
@@ -55,29 +56,40 @@ class SpoonacularService
     {
         $ingredients = $this->maybeTranslateInput($ingredients);
 
-        return $this->get('/recipes/findByIngredients', [
+        $data = $this->get('/recipes/findByIngredients', [
             'ingredients'          => implode(',', $ingredients),
             'number'               => $number,
             'ranking'              => $maximize ? 2 : 1,
             'ignorePantry'         => 'true',
         ]);
+
+        return $this->translateResults($data);
     }
 
     public function getRecipeInfo(int $id, bool $includeNutrition = true): array
     {
-        return $this->get("/recipes/{$id}/information", [
+        $data = $this->get("/recipes/{$id}/information", [
             'includeNutrition' => $includeNutrition ? 'true' : 'false',
         ]);
+
+        $translated = $this->translateResults([$data]);
+        return $translated[0] ?? $data;
     }
 
     public function getRecipeInfoBulk(array $ids, bool $includeNutrition = true, bool $translate = true): array
     {
         if (empty($ids)) return [];
 
-        return $this->get("/recipes/informationBulk", [
+        $data = $this->get("/recipes/informationBulk", [
             'ids' => implode(',', $ids),
             'includeNutrition' => $includeNutrition ? 'true' : 'false',
-        ], $translate);
+        ]);
+
+        if ($translate && is_array($data)) {
+            return $this->translateResults($data);
+        }
+
+        return $data;
     }
 
     public function getRecipeNutrition(int $id): array
@@ -110,14 +122,42 @@ class SpoonacularService
             $filters['excludeIngredients'] = implode(',', $translated);
         }
 
-        return $this->get('/recipes/complexSearch', $filters);
+        $data = $this->get('/recipes/complexSearch', $filters);
+
+        if (isset($data['results']) && is_array($data['results'])) {
+            $data['results'] = $this->translateResults($data['results']);
+        }
+
+        return $data;
+    }
+
+    // ── Traducción granular por receta ───────────────────────────────────────
+
+    private function translateResults(array $items): array
+    {
+        $enableTranslation = ($_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false') === 'true';
+        if (!$enableTranslation) return $items;
+
+        $translator = $this->getTranslator();
+
+        foreach ($items as &$item) {
+            if (!is_array($item) || !isset($item['id'])) continue;
+
+            try {
+                $item = $translator->translateArray($item, 'es');
+            } catch (\Exception $e) {
+                $this->log('warning', "Error traduciendo receta {$item['id']}: " . $e->getMessage());
+            }
+        }
+
+        return $items;
     }
 
     // ── HTTP ──────────────────────────────────────────────────────────────────
 
-    private function get(string $endpoint, array $params, bool $translate = true): array
+    private function get(string $endpoint, array $params): array
     {
-        $cacheKey = $this->buildCacheKey($endpoint, $params, $translate);
+        $cacheKey = $this->buildCacheKey($endpoint, $params);
 
         $cached = $this->cache->get($cacheKey);
         if ($cached !== null) {
@@ -132,7 +172,7 @@ class SpoonacularService
         curl_setopt_array($ch, [
             CURLOPT_URL            => $url,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_TIMEOUT        => self::API_TIMEOUT,
             CURLOPT_HTTPHEADER     => ['Accept: application/json'],
         ]);
 
@@ -160,34 +200,14 @@ class SpoonacularService
             throw new RuntimeException("Spoonacular respondió {$httpCode}: {$message}");
         }
 
-        $translationSucceeded = false;
-        $enableTranslation = $translate && ($_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false') === 'true';
-        if ($enableTranslation) {
-            try {
-                $translator = $this->getTranslator();
-                $data = $translator->translateArray($data, 'es');
-                $translationSucceeded = true;
-            } catch (\Exception $e) {
-                $this->log('error', "Error de traducción (output): " . $e->getMessage());
-            }
-        } else {
-            $translationSucceeded = true;
-        }
-
-        if ($translationSucceeded) {
-            $this->cache->set($cacheKey, $data);
-        }
+        $this->cache->set($cacheKey, $data);
 
         return $data;
     }
 
-    private function buildCacheKey(string $endpoint, array $params, bool $translate): string
+    private function buildCacheKey(string $endpoint, array $params): string
     {
-        $cacheParams = $params;
-        $cacheParams['translate'] = $translate;
-        $cacheParams['output_translation'] = $_ENV['ENABLE_OUTPUT_TRANSLATION'] ?? 'false';
-        $cacheParams['input_translation'] = $_ENV['ENABLE_INPUT_TRANSLATION'] ?? 'false';
-        return $endpoint . '?' . http_build_query($cacheParams);
+        return $endpoint . '?' . http_build_query($params);
     }
 
     private function maybeTranslateInput(array|string $input): array|string

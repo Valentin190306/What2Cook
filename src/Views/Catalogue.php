@@ -2,7 +2,43 @@
 $title = 'Catálogo de Recetas - What2Cook';
 $styles = ['catalogoRecetas'];
 $scripts = ['favorites', 'catalogue'];
+
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host   = $_SERVER['HTTP_HOST'] ?? 'what2cook.app';
+$baseUrl = "{$scheme}://{$host}";
 ?>
+<!-- Schema: BreadcrumbList -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"},
+        {"@type": "ListItem", "position": 2, "name": "Catálogo de Recetas", "item": "<?= $baseUrl ?>/recetas"}
+    ]
+}
+</script>
+
+<?php if (!empty($recipes)): ?>
+<!-- Schema: ItemList -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+        <?php foreach ($recipes as $i => $recipe): ?>
+        {
+            "@type": "ListItem",
+            "position": <?= ($page - 1) * $perPage + $i + 1 ?>,
+            "url": "<?= $baseUrl ?>/receta/<?= (int) ($recipe['id'] ?? 0) ?>",
+            "name": <?= json_encode($recipe['title'] ?? '', JSON_UNESCAPED_UNICODE) ?>
+        }<?= $i < count($recipes) - 1 ? ',' : '' ?>
+        <?php endforeach; ?>
+    ]
+}
+</script>
+<?php endif; ?>
+
 <section class="catalogo-header">
     <h1>Catálogo de Recetas</h1>
     <p>Explorá nuestra colección de recetas deliciosas y saludables.</p>
