@@ -7,9 +7,13 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Favorite;
 use App\Models\MealPrepFavorite;
+use App\Models\RecipeTranslation;
+use App\Services\Traits\NutritionNormalizer;
+use App\Services\Translation\DeferredTranslator;
 
 class FavoriteController extends Controller
 {
+    use NutritionNormalizer;
     public function toggle(): void
     {
         $userId = $this->requireAuthApi();
@@ -56,28 +60,9 @@ class FavoriteController extends Controller
             $spoonacularIds = array_map(function($fav) {
                 return (int) $fav['spoonacular_id'];
             }, $favoritesData);
-            
-            try {
-                $service = new \App\Services\SpoonacularService($this->logger);
-                $favorites = $service->getRecipeInfoBulk($spoonacularIds, true, false);
-            } catch (\Throwable $e) {
-                $this->log('error', 'Error fetching bulk recipe info for favorites', [
-                    'error' => $e->getMessage()
-                ]);
-                // Fallback to basic database data if API bulk fetch fails
-                $favorites = array_map(function($fav) {
-                    return [
-                        'id' => (int) $fav['spoonacular_id'],
-                        'title' => $fav['title'],
-                        'image' => $fav['image'],
-                        'readyInMinutes' => null,
-                        'servings' => null,
-                        'diets' => [],
-                        'dishTypes' => [],
-                        'nutrition' => ['nutrients' => []]
-                    ];
-                }, $favoritesData);
-            }
+
+            $needsTranslation = [];
+            $favorites = $this->resolveBulkFromDbOrApi($spoonacularIds, $needsTranslation);
         }
         
         $mealPrepFavorites = (new MealPrepFavorite())->findAllByUser($userId);
@@ -86,6 +71,14 @@ class FavoriteController extends Controller
             'favorites' => $favorites,
             'mealPrepFavorites' => $mealPrepFavorites,
         ]);
+
+        if (isset($needsTranslation) && !empty($needsTranslation)) {
+            DeferredTranslator::afterResponse(function () use ($needsTranslation) {
+                foreach ($needsTranslation as $sid) {
+                    DeferredTranslator::translate($sid);
+                }
+            });
+        }
     }
     
     public function indexApi(): void
@@ -174,41 +167,125 @@ class FavoriteController extends Controller
         }
         
         $recipeIds = json_decode($mp['recipe_ids'], true) ?? [];
-        
-        try {
-            $service = new \App\Services\SpoonacularService($this->logger);
-            $recipes = $service->getRecipeInfoBulk($recipeIds, true, false);
-            
-            foreach ($recipes as &$recipe) {
-                if (isset($recipe['nutrition']['nutrients'])) {
-                    $map = [];
-                    foreach ($recipe['nutrition']['nutrients'] as $n) {
-                        $map[$n['name']] = (float) ($n['amount'] ?? 0);
+        $needsTranslation = [];
+        $recipes = $this->resolveBulkFromDbOrApi($recipeIds, $needsTranslation);
+
+        http_response_code(200);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'ingredients' => json_decode($mp['ingredients'], true) ?? [],
+            'recipe_ids' => $recipeIds,
+            'servings' => json_decode($mp['servings'], true) ?? [],
+            'recipes' => $recipes,
+        ]);
+
+        if (!empty($needsTranslation)) {
+            DeferredTranslator::afterResponse(function () use ($needsTranslation) {
+                foreach ($needsTranslation as $sid) {
+                    DeferredTranslator::translate($sid);
+                }
+            });
+        }
+        exit;
+    }
+
+    private function isCompleteRecipe(?array $data): bool
+    {
+        return $data !== null && isset($data['extendedIngredients']);
+    }
+
+    /**
+     * Para una lista de spoonacular_ids, resuelve cada receta desde la BD local
+     * (recipe_translations) si existe, o desde Spoonacular API como fallback.
+     *
+     * @param array $spoonacularIds
+     * @param array &$needsTranslation Se llena con los IDs que requieren traducción background
+     * @return array
+     */
+    private function resolveBulkFromDbOrApi(array $spoonacularIds, array &$needsTranslation = []): array
+    {
+        $enabled = ($_ENV['RECIPES_TABLE_ENABLED'] ?? 'true') === 'true';
+        $result = [];
+        $missingIds = [];
+
+        if ($enabled) {
+            $model = new RecipeTranslation();
+            foreach ($spoonacularIds as $sid) {
+                $sid = (int) $sid;
+                try {
+                    $row = $model->findBySpoonacularId($sid);
+                    if ($row) {
+                        $originalEn = $row['raw_response_en'] ? json_decode($row['raw_response_en'], true) : null;
+
+                        if (!empty($row['raw_response_es'])) {
+                            $decoded = json_decode($row['raw_response_es'], true);
+                            if (is_array($decoded) && $this->isCompleteRecipe($decoded)) {
+                                $result[] = $this->normalizeRecipe($decoded, $originalEn);
+                                continue;
+                            }
+                        }
+                        if ($originalEn !== null && $this->isCompleteRecipe($originalEn)) {
+                            $result[] = $this->normalizeRecipe($originalEn);
+                            $needsTranslation[] = $sid;
+                            continue;
+                        }
                     }
-                    $recipe['nutrition'] = [
-                        'calories' => $map['Calories']     ?? 0.0,
-                        'protein'  => $map['Protein']       ?? 0.0,
-                        'carbs'    => $map['Carbohydrates'] ?? 0.0,
-                        'fat'      => $map['Fat']           ?? 0.0,
+                } catch (\Throwable $e) {
+                    $this->log('error', 'Error consultando recipe_translations', ['id' => $sid, 'error' => $e->getMessage()]);
+                }
+                $missingIds[] = $sid;
+            }
+        } else {
+            $missingIds = $spoonacularIds;
+        }
+
+        if (!empty($missingIds)) {
+            try {
+                $service = new \App\Services\SpoonacularService($this->logger);
+                $fetched = $service->getRecipeInfoBulk($missingIds, true, false);
+                foreach ($fetched as $recipe) {
+                    $sid = (int) ($recipe['id'] ?? 0);
+                    (new RecipeTranslation())->saveRaw($sid, $recipe);
+                    $result[] = $recipe;
+                    $needsTranslation[] = $sid;
+                }
+            } catch (\Throwable $e) {
+                $this->log('error', 'Error fetching bulk recipe info', ['error' => $e->getMessage()]);
+
+                foreach ($missingIds as $sid) {
+                    $result[] = [
+                        'id' => $sid,
+                        'title' => '',
+                        'image' => null,
+                        'readyInMinutes' => null,
+                        'servings' => null,
+                        'diets' => [],
+                        'dishTypes' => [],
+                        'nutrition' => ['nutrients' => []],
                     ];
                 }
             }
-            unset($recipe);
-            
-            $this->json([
-                'success' => true,
-                'ingredients' => json_decode($mp['ingredients'], true) ?? [],
-                'recipe_ids' => $recipeIds,
-                'servings' => json_decode($mp['servings'], true) ?? [],
-                'recipes' => $recipes
-            ]);
-        } catch (\Throwable $e) {
-            $this->log('error', 'Error al obtener recetas de meal prep favorito', [
-                'user_id' => $userId,
-                'meal_prep_id' => $mpId,
-                'error' => $e->getMessage()
-            ]);
-            $this->json(['error' => 'Error al obtener las recetas del meal prep.'], 500);
         }
+
+        // Re-index by spoonacular id to preserve original order
+        $ordered = [];
+        $resultMap = [];
+        foreach ($result as $r) {
+            $resultMap[(int) ($r['id'] ?? 0)] = $r;
+        }
+        foreach ($spoonacularIds as $sid) {
+            if (isset($resultMap[(int) $sid])) {
+                $ordered[] = $resultMap[(int) $sid];
+            }
+        }
+
+        // Normalize nutrition for all recipes (including API fallback data)
+        foreach ($ordered as &$recipe) {
+            $recipe = $this->normalizeRecipe($recipe);
+        }
+        unset($recipe);
+
+        return $ordered;
     }
 }

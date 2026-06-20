@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+crond -b -l 2
+
 chmod 733 /var/lib/php/sessions
 chown www-data:www-data /var/lib/php/sessions
 

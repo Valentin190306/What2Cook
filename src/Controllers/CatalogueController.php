@@ -9,6 +9,7 @@ use App\Core\Session;
 use App\Core\Validator;
 use App\Core\View;
 use App\Models\Favorite;
+use App\Models\RecipeTranslation;
 use App\Services\SpoonacularService;
 
 class CatalogueController extends Controller
@@ -84,9 +85,25 @@ class CatalogueController extends Controller
         ]);
 
         try {
-            $search = (new SpoonacularService())->searchRecipes($filters);
+            $service = new SpoonacularService($this->logger);
+            $search = $service->searchRecipes($filters, true);
             $recipes = $search['results'] ?? [];
             $totalResults = (int) ($search['totalResults'] ?? count($recipes));
+
+            $model = new RecipeTranslation();
+            foreach ($recipes as &$recipe) {
+                $sid = (int) ($recipe['id'] ?? 0);
+                if ($sid === 0) continue;
+                $row = $model->findBySpoonacularId($sid);
+                if ($row && !empty($row['raw_response_es'])) {
+                    $decoded = json_decode($row['raw_response_es'], true);
+                    if (is_array($decoded)) {
+                        $recipe['title'] = $row['title_es'] ?: $decoded['title'] ?? $recipe['title'];
+                        $recipe['summary'] = $decoded['summary'] ?? $recipe['summary'];
+                    }
+                }
+            }
+            unset($recipe);
         } catch (\RuntimeException $e) {
             $errorMessage = $e->getMessage();
             $this->log('error', 'Error en búsqueda de catálogo: ' . $e->getMessage());

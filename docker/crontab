@@ -1,0 +1,1 @@
+0 3 */2 * * php /var/www/app/bin/preload-recipes.php >> /var/www/app/log/preload-cron.log 2>&1

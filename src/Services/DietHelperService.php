@@ -4,9 +4,11 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Core\Log\LoggerInterface;
+use App\Services\Traits\NutritionNormalizer;
 
 class DietHelperService
 {
+    use NutritionNormalizer;
     private const DIET_MAP = [
         'sin-gluten'     => 'gluten free',
         'keto'           => 'ketogenic',
@@ -86,7 +88,7 @@ class DietHelperService
                 $filters['maxFat'] = (int) round(($targetFat * $ratio) * 1.3);
             }
 
-            $results = $this->spoonacular->searchRecipes($filters);
+            $results = $this->spoonacular->searchRecipes($filters, true);
 
             // Fallback 1: Si es muy restrictivo y no hay recetas, intentar solo con Calorías y Dieta con 50% de margen
             if (empty($results['results'])) {
@@ -104,7 +106,7 @@ class DietHelperService
                     $fallbackFilters['minCalories'] = max(0, (int) round(($targetCalories * $ratio) * 0.5));
                     $fallbackFilters['maxCalories'] = (int) round(($targetCalories * $ratio) * 1.5);
                 }
-                $results = $this->spoonacular->searchRecipes($fallbackFilters);
+                $results = $this->spoonacular->searchRecipes($fallbackFilters, true);
             }
 
             // Fallback 2: Si aun no hay, intentar sin restricciones de macros/calorías (solo dieta)
@@ -119,7 +121,7 @@ class DietHelperService
                 if ($spoonacularDiet !== '') {
                     $fallbackFilters2['diet'] = $spoonacularDiet;
                 }
-                $results = $this->spoonacular->searchRecipes($fallbackFilters2);
+                $results = $this->spoonacular->searchRecipes($fallbackFilters2, true);
             }
 
             $pool = $results['results'] ?? [];
@@ -258,18 +260,12 @@ class DietHelperService
 
     private function extractNutritionFromRecipe(array $recipe): array
     {
-        $nutrients = $recipe['nutrition']['nutrients'] ?? [];
-        $map       = [];
-
-        foreach ($nutrients as $n) {
-            $map[$n['name']] = (float) ($n['amount'] ?? 0);
-        }
-
+        $normalized = $this->normalizeRecipe($recipe);
         return [
-            'calories' => $map['Calories']      ?? 0.0,
-            'protein'  => $map['Protein']        ?? 0.0,
-            'carbs'    => $map['Carbohydrates']  ?? 0.0,
-            'fat'      => $map['Fat']            ?? 0.0,
+            'calories' => $normalized['nutrition']['calories'],
+            'protein'  => $normalized['nutrition']['protein'],
+            'carbs'    => $normalized['nutrition']['carbs'],
+            'fat'      => $normalized['nutrition']['fat'],
         ];
     }
 

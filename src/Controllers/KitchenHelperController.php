@@ -5,9 +5,13 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Session;
 use App\Core\Validator;
+use App\Models\RecipeTranslation;
+use App\Services\Traits\NutritionNormalizer;
+use App\Services\Translation\DeferredTranslator;
 
 class KitchenHelperController extends Controller
 {
+    use NutritionNormalizer;
     private const VALID_SORTS = ['healthiness', 'time'];
     private const MAX_INGREDIENTS = 20;
 
@@ -78,18 +82,7 @@ class KitchenHelperController extends Controller
                 }
 
                 foreach ($list as &$recipe) {
-                    if (isset($recipe['nutrition']['nutrients'])) {
-                        $map = [];
-                        foreach ($recipe['nutrition']['nutrients'] as $n) {
-                            $map[$n['name']] = (float) ($n['amount'] ?? 0);
-                        }
-                        $recipe['nutrition'] = [
-                            'calories' => $map['Calories']     ?? 0.0,
-                            'protein'  => $map['Protein']       ?? 0.0,
-                            'carbs'    => $map['Carbohydrates'] ?? 0.0,
-                            'fat'      => $map['Fat']           ?? 0.0,
-                        ];
-                    }
+                    $recipe = $this->normalizeRecipe($recipe);
                     if (!isset($recipe['usedIngredientCount']) && isset($recipe['usedIngredients'])) {
                         $recipe['usedIngredientCount'] = count($recipe['usedIngredients']);
                     }
@@ -211,16 +204,70 @@ class KitchenHelperController extends Controller
 
         $this->log('info', 'Solicitud de detalle', ['recipe_id' => $recipeId]);
 
-        try {
-            $service = new \App\Services\SpoonacularService($this->logger);
-            $result  = $service->getRecipeInfo($recipeId, true);
+        $result = $this->fromLocalDb($recipeId);
+        $needsTranslation = false;
 
-            $this->log('info', 'Detalle completado', ['recipe_id' => $recipeId]);
-            $this->json(['success' => true, 'data' => $result]);
-        } catch (\Throwable $e) {
-            $this->log('error', 'Error en detalle', ['recipe_id' => $recipeId, 'error' => $e->getMessage()]);
-            $this->json(['error' => 'Error al obtener la receta.'], 502);
+        if ($result === null) {
+            try {
+                $service = new \App\Services\SpoonacularService($this->logger);
+                $result = $service->getRecipeInfo($recipeId, true, false);
+                (new RecipeTranslation())->saveRaw($recipeId, $result);
+                $result = $this->normalizeRecipe($result);
+                $needsTranslation = true;
+            } catch (\Throwable $e) {
+                $this->log('error', 'Error en detalle', ['recipe_id' => $recipeId, 'error' => $e->getMessage()]);
+                $this->json(['error' => 'Error al obtener la receta.'], 502);
+                return;
+            }
         }
+
+        http_response_code(200);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'data' => $result]);
+
+        if ($needsTranslation) {
+            DeferredTranslator::afterResponse(fn() => DeferredTranslator::translate($recipeId));
+        }
+        exit;
+    }
+
+    /**
+     * Valida que los datos decodificados tengan la estructura completa de Spoonacular.
+     */
+    private function isCompleteRecipe(?array $data): bool
+    {
+        return $data !== null && isset($data['extendedIngredients']);
+    }
+
+    /**
+     * Busca una receta en la BD local.
+     * Devuelve raw_response_es, raw_response_en (fallback) o null.
+     */
+    private function fromLocalDb(int $spoonacularId): ?array
+    {
+        $enabled = ($_ENV['RECIPES_TABLE_ENABLED'] ?? 'true') === 'true';
+        if (!$enabled) return null;
+
+        try {
+            $row = (new RecipeTranslation())->findBySpoonacularId($spoonacularId);
+            if ($row) {
+                $originalEn = $row['raw_response_en'] ? json_decode($row['raw_response_en'], true) : null;
+
+                if (!empty($row['raw_response_es'])) {
+                    $decoded = json_decode($row['raw_response_es'], true);
+                    if (is_array($decoded) && $this->isCompleteRecipe($decoded)) {
+                        return $this->normalizeRecipe($decoded, $originalEn);
+                    }
+                }
+                if ($originalEn !== null && $this->isCompleteRecipe($originalEn)) {
+                    return $this->normalizeRecipe($originalEn);
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->log('error', 'Error consultando recipe_translations', ['error' => $e->getMessage()]);
+        }
+
+        return null;
     }
 
     private function enrichWithNutrition(array $recipes, \App\Services\SpoonacularService $service): array
@@ -249,21 +296,9 @@ class KitchenHelperController extends Controller
                 if (isset($info['extendedIngredients'])) {
                     $recipe['extendedIngredients'] = $info['extendedIngredients'];
                 }
-
-                $nutrients = $info['nutrition']['nutrients'] ?? [];
-                $map = [];
-                foreach ($nutrients as $n) {
-                    $map[$n['name']] = (float) ($n['amount'] ?? 0);
-                }
-
-                $recipe['nutrition'] = [
-                    'calories' => $map['Calories']     ?? 0.0,
-                    'protein'  => $map['Protein']       ?? 0.0,
-                    'carbs'    => $map['Carbohydrates'] ?? 0.0,
-                    'fat'      => $map['Fat']           ?? 0.0,
-                ];
+                $recipe = $this->normalizeRecipe($recipe, $info);
             } else {
-                $recipe['nutrition'] = ['calories' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0];
+                $recipe['nutrition'] = ['nutrients' => [], 'calories' => 0, 'protein' => 0, 'carbs' => 0, 'fat' => 0];
             }
         }
         unset($recipe);

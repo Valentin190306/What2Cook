@@ -5,10 +5,12 @@ namespace App\Services;
 
 use App\Core\FileCache;
 use App\Core\Log\LoggerInterface;
+use App\Services\Traits\NutritionNormalizer;
 use RuntimeException;
 
 class SpoonacularService
 {
+    use NutritionNormalizer;
     private const BASE_URL = 'https://api.spoonacular.com';
     private const CACHE_TTL = 604800; // 7 días
     private const API_TIMEOUT = 20;
@@ -17,13 +19,18 @@ class SpoonacularService
     private ?LoggerInterface $logger = null;
     private FileCache $cache;
 
-    public function __construct(?LoggerInterface $logger = null)
+    /**
+     * @param string|null $apiKey  Key opcional. Si no se pasa, usa SPOONACULAR_KEY del .env.
+     */
+    public function __construct(?LoggerInterface $logger = null, ?string $apiKey = null)
     {
         $this->logger = $logger;
 
-        $key = $_ENV['SPOONACULAR_KEY'] ?? '';
+        $key = $apiKey ?? ($_ENV['SPOONACULAR_KEY'] ?? '');
         if ($key === '') {
-            throw new RuntimeException('SPOONACULAR_KEY no está definida en las variables de entorno.');
+            throw new RuntimeException(
+                'SPOONACULAR_KEY no está definida. Pasa una key al constructor o define la env var.'
+            );
         }
         $this->apiKey = $key;
 
@@ -66,11 +73,13 @@ class SpoonacularService
         return $this->translateResults($data);
     }
 
-    public function getRecipeInfo(int $id, bool $includeNutrition = true): array
+    public function getRecipeInfo(int $id, bool $includeNutrition = true, bool $translate = true): array
     {
         $data = $this->get("/recipes/{$id}/information", [
             'includeNutrition' => $includeNutrition ? 'true' : 'false',
         ]);
+
+        if (!$translate) return $data;
 
         $translated = $this->translateResults([$data]);
         return $translated[0] ?? $data;
@@ -92,12 +101,34 @@ class SpoonacularService
         return $data;
     }
 
+    /**
+     * Obtiene datos de receta SIN traducir (para el job de precarga).
+     */
+    public function getRawRecipeInfo(int $id, bool $includeNutrition = true): array
+    {
+        return $this->get("/recipes/{$id}/information", [
+            'includeNutrition' => $includeNutrition ? 'true' : 'false',
+        ]);
+    }
+
+    /**
+     * Obtiene datos de varias recetas SIN traducir (para el job de precarga).
+     */
+    public function getRawRecipeInfoBulk(array $ids, bool $includeNutrition = true): array
+    {
+        if (empty($ids)) return [];
+        return $this->get("/recipes/informationBulk", [
+            'ids' => implode(',', $ids),
+            'includeNutrition' => $includeNutrition ? 'true' : 'false',
+        ]);
+    }
+
     public function getRecipeNutrition(int $id): array
     {
         return $this->get("/recipes/{$id}/nutritionWidget.json", []);
     }
 
-    public function searchRecipes(array $filters = []): array
+    public function searchRecipes(array $filters = [], bool $skipTranslation = false): array
     {
         $defaults = [
             'addRecipeNutrition' => 'true',
@@ -124,7 +155,7 @@ class SpoonacularService
 
         $data = $this->get('/recipes/complexSearch', $filters);
 
-        if (isset($data['results']) && is_array($data['results'])) {
+        if (!$skipTranslation && isset($data['results']) && is_array($data['results'])) {
             $data['results'] = $this->translateResults($data['results']);
         }
 
@@ -144,7 +175,9 @@ class SpoonacularService
             if (!is_array($item) || !isset($item['id'])) continue;
 
             try {
+                $original = $item;
                 $item = $translator->translateArray($item, 'es');
+                $item = $this->normalizeRecipe($item, $original);
             } catch (\Exception $e) {
                 $this->log('warning', "Error traduciendo receta {$item['id']}: " . $e->getMessage());
             }
