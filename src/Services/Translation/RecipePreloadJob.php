@@ -278,7 +278,12 @@ class RecipePreloadJob
         ) : '';
 
         // Traducir array completo (incluye instructions, ingredients, etc.)
+        // pero preservar nutrition con nombres en inglés
+        $nutrition = $recipeData['nutrition'] ?? null;
         $translatedData = $this->translator->translateArray($recipeData, 'es');
+        if ($nutrition !== null) {
+            $translatedData['nutrition'] = $nutrition;
+        }
         $rawEs = json_encode($translatedData, JSON_UNESCAPED_UNICODE);
 
         $this->model->upsert([

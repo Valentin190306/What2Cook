@@ -216,15 +216,14 @@ class FavoriteController extends Controller
                 try {
                     $row = $model->findBySpoonacularId($sid);
                     if ($row) {
-                        $originalEn = $row['raw_response_en'] ? json_decode($row['raw_response_en'], true) : null;
-
                         if (!empty($row['raw_response_es'])) {
                             $decoded = json_decode($row['raw_response_es'], true);
                             if (is_array($decoded) && $this->isCompleteRecipe($decoded)) {
-                                $result[] = $this->normalizeRecipe($decoded, $originalEn);
+                                $result[] = $this->normalizeRecipe($decoded);
                                 continue;
                             }
                         }
+                        $originalEn = $row['raw_response_en'] ? json_decode($row['raw_response_en'], true) : null;
                         if ($originalEn !== null && $this->isCompleteRecipe($originalEn)) {
                             $result[] = $this->normalizeRecipe($originalEn);
                             $needsTranslation[] = $sid;

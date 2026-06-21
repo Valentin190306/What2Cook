@@ -177,9 +177,12 @@ class SpoonacularService
             if (!is_array($item) || !isset($item['id'])) continue;
 
             try {
-                $original = $item;
+                $nutrition = $item['nutrition'] ?? null;
                 $item = $translator->translateArray($item, 'es');
-                $item = $this->normalizeRecipe($item, $original);
+                if ($nutrition !== null) {
+                    $item['nutrition'] = $nutrition;
+                }
+                $item = $this->normalizeRecipe($item);
             } catch (\Exception $e) {
                 $this->log('warning', "Error traduciendo receta {$item['id']}: " . $e->getMessage());
             }

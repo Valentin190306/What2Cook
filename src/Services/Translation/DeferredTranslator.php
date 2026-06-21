@@ -51,7 +51,11 @@ class DeferredTranslator
                 'es'
             ) : '';
 
+            $nutrition = $recipeData['nutrition'] ?? null;
             $translatedData = $translator->translateArray($recipeData, 'es');
+            if ($nutrition !== null) {
+                $translatedData['nutrition'] = $nutrition;
+            }
             $rawEs = json_encode($translatedData, JSON_UNESCAPED_UNICODE);
 
             $model->upsert([

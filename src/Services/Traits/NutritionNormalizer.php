@@ -5,28 +5,35 @@ namespace App\Services\Traits;
 
 trait NutritionNormalizer
 {
+    private const SPANISH_NUTRIENTS = [
+        'Calorías'      => 'Calories',
+        'Energía'       => 'Calories',
+        'Proteínas'     => 'Protein',
+        'Proteina'      => 'Protein',
+        'Carbohidratos' => 'Carbohydrates',
+        'Grasa'         => 'Fat',
+        'Grasas'        => 'Fat',
+        'Grasas Totales' => 'Fat',
+        'Azúcar'        => 'Sugar',
+        'Azúcares'      => 'Sugar',
+        'Fibra'         => 'Fiber',
+        'Fibra Alimentaria' => 'Fiber',
+        'Colesterol'    => 'Cholesterol',
+        'Sodio'         => 'Sodium',
+    ];
+
     /**
-     * Normaliza la sección nutrition de una receta:
-     *  1. Restaura nombres de nutrientes al inglés usando los datos originales
-     *  2. Calcula la estructura plana (calories, protein, carbs, fat)
-     *
-     * @param array      $recipe    Datos de la receta (posiblemente traducidos)
-     * @param array|null $original  Datos originales en inglés (para restaurar nombres)
-     * @return array
+     * Calcula la estructura plana de nutrición (calories, protein, carbs, fat)
+     * a partir de nutrition.nutrients. Normaliza nombres de nutrientes al inglés
+     * por si algún registro antiguo en DB aún los tiene traducidos.
      */
-    private function normalizeRecipe(array $recipe, ?array $original = null): array
+    private function normalizeRecipe(array $recipe): array
     {
         $nutrients = $recipe['nutrition']['nutrients'] ?? [];
 
-        if (empty($nutrients) && $original !== null && isset($original['nutrition']['nutrients'])) {
-            $nutrients = $original['nutrition']['nutrients'];
-        }
-
-        if ($original !== null && isset($original['nutrition']['nutrients'])) {
-            foreach ($original['nutrition']['nutrients'] as $i => $n) {
-                if (isset($nutrients[$i])) {
-                    $nutrients[$i]['name'] = $n['name'];
-                }
+        foreach ($nutrients as $i => $n) {
+            if (isset(self::SPANISH_NUTRIENTS[$n['name']])) {
+                $nutrients[$i]['name'] = self::SPANISH_NUTRIENTS[$n['name']];
             }
         }
 

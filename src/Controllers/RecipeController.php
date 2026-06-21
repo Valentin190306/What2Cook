@@ -73,14 +73,13 @@ class RecipeController extends Controller
         try {
             $row = (new RecipeTranslation())->findBySpoonacularId($spoonacularId);
             if ($row) {
-                $originalEn = $row['raw_response_en'] ? json_decode($row['raw_response_en'], true) : null;
-
                 if (!empty($row['raw_response_es'])) {
                     $decoded = json_decode($row['raw_response_es'], true);
                     if (is_array($decoded) && $this->isCompleteRecipe($decoded)) {
-                        return $this->normalizeRecipe($decoded, $originalEn);
+                        return $this->normalizeRecipe($decoded);
                     }
                 }
+                $originalEn = $row['raw_response_en'] ? json_decode($row['raw_response_en'], true) : null;
                 if ($originalEn !== null && $this->isCompleteRecipe($originalEn)) {
                     return $this->normalizeRecipe($originalEn);
                 }
