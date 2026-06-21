@@ -2,7 +2,7 @@
 
 $title = 'Mis Favoritos - What2Cook';
 $styles = ['catalogoRecetas', 'receta', 'perfil', 'favoritos'];
-$scripts = ['favorites'];
+$scripts = ['favorites', 'meal-prep-modal'];
 
 ?>
 
@@ -95,7 +95,7 @@ $scripts = ['favorites'];
                 $servings = json_decode($mp['servings'], true) ?? [];
                 $recipeCount = count($recipeIds);
             ?>
-            <article class="mealprep-card" onclick="if (!event.target.closest('button')) window.location='/asistente-cocina?meal_prep=<?= (int) $mp['id'] ?>'" role="link" tabindex="0">
+            <article class="mealprep-card" data-mp-id="<?= (int) $mp['id'] ?>" onclick="if (!event.target.closest('button')) openMealPrepModal(<?= (int) $mp['id'] ?>)" role="link" tabindex="0">
                 <div class="mealprep-card__header">
                     <span class="mealprep-card__badge">Meal Prep</span>
                     <button type="button" class="btn-favorito"
@@ -135,10 +135,24 @@ $scripts = ['favorites'];
                 </div>
                 
                 <div class="mealprep-card__footer">
-                    <span class="mealprep-card__link-text">Ver Meal Prep →</span>
+                    <span class="mealprep-card__link-text">Ver recetas →</span>
                 </div>
             </article>
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
 <?php endif; ?>
+
+<!-- Modal de detalle de Meal Prep -->
+<div class="modal-overlay" id="mp-modal" aria-hidden="true" role="dialog" aria-label="Detalle del Meal Prep">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-card__header">
+      <h2 id="mp-modal-title">Meal Prep</h2>
+      <button type="button" class="btn-close-modal" id="mp-modal-close" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="modal-card__body" id="mp-modal-body">
+      <div class="mp-ingredients" id="mp-ingredients"></div>
+      <div class="recipe-grid" id="mp-recipes"></div>
+    </div>
+  </div>
+</div>

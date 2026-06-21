@@ -106,6 +106,24 @@ class RecipeTranslation extends Model
         return $stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
 
+    public function updateTranslation(int $spoonacularId, string $titleEs, string $summaryEs, string $rawEs): void
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE {$this->table} SET
+                title_es = :title_es,
+                summary_es = :summary_es,
+                raw_response_es = :raw_response_es,
+                translated_at = NOW()
+             WHERE spoonacular_id = :spoonacular_id"
+        );
+        $stmt->execute([
+            'spoonacular_id' => $spoonacularId,
+            'title_es'       => $titleEs,
+            'summary_es'     => $summaryEs,
+            'raw_response_es' => $rawEs,
+        ]);
+    }
+
     public function findUntranslatedIds(): array
     {
         $stmt = $this->db->query(

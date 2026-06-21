@@ -58,12 +58,12 @@ class DeferredTranslator
             }
             $rawEs = json_encode($translatedData, JSON_UNESCAPED_UNICODE);
 
-            $model->upsert([
-                'spoonacular_id'  => $spoonacularId,
-                'title_es'        => $titleEs,
-                'summary_es'      => $summaryEs,
-                'raw_response_es' => $rawEs,
-            ]);
+            $model->updateTranslation(
+                $spoonacularId,
+                $titleEs,
+                $summaryEs,
+                $rawEs
+            );
         } catch (\Throwable $e) {
             error_log("[DeferredTranslator] Error traduciendo {$spoonacularId}: " . $e->getMessage());
         }
