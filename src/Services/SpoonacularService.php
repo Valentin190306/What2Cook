@@ -59,7 +59,7 @@ class SpoonacularService
 
     // ── Recetas ───────────────────────────────────────────────────────────────
 
-    public function searchByIngredients(array $ingredients, int $number = 10, bool $maximize = true): array
+    public function searchByIngredients(array $ingredients, int $number = 10, bool $maximize = true, bool $skipTranslation = false): array
     {
         $ingredients = $this->maybeTranslateInput($ingredients);
 
@@ -69,6 +69,8 @@ class SpoonacularService
             'ranking'              => $maximize ? 2 : 1,
             'ignorePantry'         => 'true',
         ]);
+
+        if ($skipTranslation) return $data;
 
         return $this->translateResults($data);
     }

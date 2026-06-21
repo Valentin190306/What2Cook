@@ -18,6 +18,10 @@ trait NutritionNormalizer
     {
         $nutrients = $recipe['nutrition']['nutrients'] ?? [];
 
+        if (empty($nutrients) && $original !== null && isset($original['nutrition']['nutrients'])) {
+            $nutrients = $original['nutrition']['nutrients'];
+        }
+
         if ($original !== null && isset($original['nutrition']['nutrients'])) {
             foreach ($original['nutrition']['nutrients'] as $i => $n) {
                 if (isset($nutrients[$i])) {

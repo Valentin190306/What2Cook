@@ -72,7 +72,7 @@ class KitchenHelperController extends Controller
                     $filters['intolerances'] = implode(',', $userIntolerances);
                 }
 
-                $results = $service->searchRecipes($filters);
+                $results = $service->searchRecipes($filters, true);
                 $list = $results['results'] ?? $results;
 
                 if (!is_array($list)) {
@@ -92,7 +92,7 @@ class KitchenHelperController extends Controller
                 }
                 unset($recipe);
             } else {
-                $list = $service->searchByIngredients($ingredients, 12, true);
+                $list = $service->searchByIngredients($ingredients, 12, true, true);
                 if (!is_array($list)) {
                     $this->log('error', 'Single search: respuesta inválida de searchByIngredients');
                     $this->json(['error' => 'Error al obtener recetas.'], 502);
@@ -159,7 +159,7 @@ class KitchenHelperController extends Controller
                 $filters['intolerances'] = implode(',', $userIntolerances);
             }
 
-            $results = $service->searchRecipes($filters);
+            $results = $service->searchRecipes($filters, true);
             $pool = $results['results'] ?? $results;
 
             if (!is_array($pool)) {
