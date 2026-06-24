@@ -10,7 +10,7 @@ $baseUrl = "{$scheme}://{$host}";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'What2Cook' ?></title>
+    <title><?= htmlspecialchars($title ?? 'What2Cook') ?></title>
 
     <!-- Schema: WebSite + SearchAction -->
     <script type="application/ld+json">

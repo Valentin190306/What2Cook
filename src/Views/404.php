@@ -5,7 +5,7 @@ $styles = [];
 <section class="error-page">
     <h1>Error 404</h1>
     <h2>Página no encontrada</h2>
-    <p><?= $message ?? 'Lo sentimos, la página que estás buscando no existe.' ?></p>
+    <p><?= htmlspecialchars($message ?? 'Lo sentimos, la página que estás buscando no existe.') ?></p>
     <a href="/" class="btn-primary">Volver al inicio</a>
 </section>
 
