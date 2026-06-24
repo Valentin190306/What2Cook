@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sin Conexión - What2Cook</title>
+    <style>
+        :root {
+            --color-carrot:      #e67e22;
+            --color-spinach:     #27ae60;
+            --color-black:       #1a1a1a;
+            --color-cream:       #f9f7f2;
+            --color-text:        #2c2c2c;
+            --color-text-muted:  #555555;
+            --color-border:      #333333;
+            --font-title:        'Playfair Display', Georgia, serif;
+            --font-body:         'Lora', Times, serif;
+        }
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-cream);
+            color: var(--color-text);
+            margin: 0;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 2px solid var(--color-border);
+            padding: 2rem;
+            background: #fff;
+            box-shadow: 4px 4px 0px var(--color-border);
+        }
+        header {
+            border-bottom: 2px solid var(--color-border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .logo {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.05em;
+            color: var(--color-black);
+            margin: 0;
+        }
+        .logo span {
+            color: var(--color-carrot);
+        }
+        h1 {
+            font-family: var(--font-title);
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            color: var(--color-black);
+        }
+        p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--color-text-muted);
+            margin-bottom: 2rem;
+        }
+        .grid-title {
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            border-top: 2px solid var(--color-border);
+            border-bottom: 2px solid var(--color-border);
+            padding: 0.5rem 0;
+            margin-top: 2rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            text-align: left;
+        }
+        @media(min-width: 600px) {
+            .recipe-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .recipe-card {
+            border: 1px solid var(--color-border);
+            background: var(--color-cream);
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .recipe-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 3px 3px 0px var(--color-border);
+        }
+        .recipe-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--color-border);
+            background-color: #ddd;
+        }
+        .recipe-info {
+            padding: 1rem;
+        }
+        .recipe-name {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+            color: var(--color-black);
+            line-height: 1.2;
+        }
+        .btn-retry {
+            display: inline-block;
+            background-color: var(--color-carrot);
+            color: white;
+            font-weight: bold;
+            padding: 0.8rem 1.5rem;
+            border: 2px solid var(--color-border);
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 2px 2px 0px var(--color-border);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn-retry:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px var(--color-border);
+        }
+        .no-recipes {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 2rem;
+            font-style: italic;
+            color: var(--color-text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">What<span>2</span>Cook</div>
+        </header>
+        
+        <h1>Sin conexión a Internet</h1>
+        <p>Parece que estás offline. Pero podés seguir consultando tus recetas favoritas guardadas abajo.</p>
+        
+        <button class="btn-retry" onclick="window.location.reload()">Reintentar conexión</button>
+
+        <h2 class="grid-title">Tus favoritos disponibles offline</h2>
+        <div class="recipe-grid" id="offline-recipes">
+            <p style="grid-column: 1 / -1; text-align: center;">Cargando recetas guardadas...</p>
+        </div>
+    </div>
+
+    <script>
+        async function loadOfflineRecipes() {
+            const container = document.getElementById('offline-recipes');
+            try {
+                const response = await fetch('/offline-favorites.json');
+                if (!response.ok) {
+                    container.innerHTML = '<p class="no-recipes">No tenés recetas guardadas para ver offline todavía.</p>';
+                    return;
+                }
+
+                const favorites = await response.json();
+                
+                if (favorites.length === 0) {
+                    container.innerHTML = '<p class="no-recipes">No tenés recetas guardadas para ver offline todavía.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                favorites.forEach((fav) => {
+                    const sid = fav.spoonacular_id;
+                    const title = fav.title || 'Receta sin título';
+                    const imgSrc = fav.image || '/assets/img/placeholder_RecetaSinFoto.png';
+                    const path = `/receta/${sid}`;
+
+                    const card = document.createElement('a');
+                    card.className = 'recipe-card';
+                    card.href = path;
+                    card.innerHTML = `
+                        <img class="recipe-img" src="${imgSrc}" alt="${title}" onerror="this.onerror=null; this.src='/assets/img/placeholder_RecetaSinFoto.png';">
+                        <div class="recipe-info">
+                            <h3 class="recipe-name">${title}</h3>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error('Error loading offline recipes:', err);
+                container.innerHTML = '<p class="no-recipes">Error al cargar las recetas guardadas offline.</p>';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadOfflineRecipes);
+    </script>
+</body>
+</html>

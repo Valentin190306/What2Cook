@@ -148,5 +148,6 @@ $baseUrl = "{$scheme}://{$host}";
             <script src="/assets/js/<?= $script ?>.js?v=<?= time() ?>" defer></script>
         <?php endforeach; ?>
     <?php endif; ?>
+    <script src="/assets/js/sw-register.js" defer></script>
 </body>
 </html>

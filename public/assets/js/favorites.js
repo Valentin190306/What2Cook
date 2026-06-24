@@ -68,6 +68,24 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 btn.classList.remove('favorited');
             }
+
+            // Notificar al Service Worker
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                if (favorited) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'CACHE_RECIPE',
+                        spoonacularId: spoonacularId,
+                        title: title,
+                        imageUrl: image
+                    });
+                } else {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'UNCACHE_RECIPE',
+                        spoonacularId: spoonacularId,
+                        imageUrl: image
+                    });
+                }
+            }
             
             // Si estamos en la página de favoritos y desmarcar, removemos la tarjeta
             if (btn.hasAttribute('data-fav-remove-card') && !favorited) {
