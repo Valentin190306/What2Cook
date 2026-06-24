@@ -93,9 +93,20 @@ class ProfileController extends Controller
             'wheat' => 'Trigo'
         ];
 
+        $avatarUrl = '/assets/img/avatar_placeholder.jpg';
+        $extensions = ['jpg', 'jpeg', 'png', 'webp'];
+        foreach ($extensions as $ext) {
+            $path = __DIR__ . '/../../public/uploads/avatars/user_' . $userId . '.' . $ext;
+            if (file_exists($path)) {
+                $avatarUrl = '/uploads/avatars/user_' . $userId . '.' . $ext . '?t=' . filemtime($path);
+                break;
+            }
+        }
+
         View::render('Profile', [
             'userName' => $user ? $user['name'] : 'Usuario',
             'userEmail' => $user ? $user['email'] : '',
+            'avatarUrl' => $avatarUrl,
             'userDiet' => $userDiet,
             'userDietLabel' => $dietLabels[$userDiet] ?? 'Sin dieta',
             'userAllergies' => $userAllergies,
@@ -109,6 +120,52 @@ class ProfileController extends Controller
             'recentDietPlans' => $recentDietPlans,
             'success' => Session::getFlash('success'),
         ]);
+    }
+
+    public function uploadAvatar(): void
+    {
+        $userId = $this->requireAuthWeb();
+        
+        if (!isset($_FILES['avatar']) || $_FILES['avatar']['error'] !== UPLOAD_ERR_OK) {
+            $this->json(['error' => 'No se subió ningún archivo o hubo un error.'], 400);
+            return;
+        }
+        
+        $file = $_FILES['avatar'];
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
+        
+        if (!in_array($ext, $allowed, true)) {
+            $this->json(['error' => 'Formato no permitido (solo JPG, PNG y WEBP).'], 400);
+            return;
+        }
+        
+        if ($file['size'] > 5 * 1024 * 1024) {
+            $this->json(['error' => 'La imagen no debe superar los 5MB.'], 400);
+            return;
+        }
+        
+        $uploadDir = __DIR__ . '/../../public/uploads/avatars';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        foreach ($allowed as $allowedExt) {
+            $oldFile = $uploadDir . '/user_' . $userId . '.' . $allowedExt;
+            if (file_exists($oldFile)) {
+                @unlink($oldFile);
+            }
+        }
+        
+        $destPath = $uploadDir . '/user_' . $userId . '.' . $ext;
+        if (move_uploaded_file($file['tmp_name'], $destPath)) {
+            $this->json([
+                'success' => true,
+                'avatar_url' => '/uploads/avatars/user_' . $userId . '.' . $ext . '?t=' . time()
+            ]);
+        } else {
+            $this->json(['error' => 'No se pudo guardar el archivo.'], 500);
+        }
     }
 
     public function editForm(): void

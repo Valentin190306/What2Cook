@@ -23,6 +23,7 @@ $router->add('GET', '/mis-planes', 'PlanController@myPlans');
 $router->add('GET', '/lista-compras', 'ShoppingListController@index');
 $router->add('GET', '/perfil/editar', 'ProfileController@editForm');
 $router->add('POST', '/perfil/editar', 'ProfileController@update');
+$router->add('POST', '/api/profile/avatar', 'ProfileController@uploadAvatar');
 $router->add('GET', '/login', 'AuthController@loginForm');
 $router->add('GET', '/register', 'AuthController@registerForm');
 

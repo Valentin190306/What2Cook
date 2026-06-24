@@ -11,7 +11,17 @@ $scripts = ['api', 'perfil', 'carousel'];
 
 <section class="profile-hero">
     <div class="profile-hero-content">
-        <img src="/assets/img/avatar_placeholder.jpg" alt="Avatar de Usuario" class="avatar">
+        <div class="avatar-container">
+            <img src="<?= htmlspecialchars($avatarUrl ?? '/assets/img/avatar_placeholder.jpg') ?>" alt="Avatar de Usuario" class="avatar" id="profile-avatar">
+            <div class="avatar-overlay" onclick="triggerAvatarUpload()">
+                <svg class="camera-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                <span>Editar</span>
+            </div>
+            <input type="file" id="avatar-file-input" accept="image/*" style="display: none;" onchange="handleAvatarUpload(this)">
+        </div>
         <div class="profile-hero-text">
             <p>Bienvenido</p>
             <h1><?= htmlspecialchars($userName ?? 'Usuario') ?></h1>
