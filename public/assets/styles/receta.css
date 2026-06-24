@@ -96,6 +96,10 @@ main>article.receta-detalle {
   100% { transform: scale(1); }
 }
 
+/* Indicador de Me gusta (Likes Badge) */
+.likes-meta-dt {
+  margin-left: auto;
+}
 
 /* --- Content Wrapper --- */
 .receta-content {

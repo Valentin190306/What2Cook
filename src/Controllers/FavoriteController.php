@@ -41,13 +41,19 @@ class FavoriteController extends Controller
             'image' => $image,
         ]);
 
+        $likesCount = (new Favorite())->countByRecipe($spoonacularId);
+
         $this->log('info', 'Toggle favorito', [
             'user_id' => $userId,
             'spoonacular_id' => $spoonacularId,
             'favorited' => $favorited,
+            'likes_count' => $likesCount,
         ]);
 
-        $this->json(['favorited' => $favorited]);
+        $this->json([
+            'favorited' => $favorited,
+            'likesCount' => $likesCount,
+        ]);
     }
 
     public function index(): void

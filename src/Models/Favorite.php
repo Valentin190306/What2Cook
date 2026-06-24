@@ -44,6 +44,13 @@ class Favorite extends Model
         return $stmt->rowCount() > 0;
     }
 
+    public function countByRecipe(int $spoonacularId): int
+    {
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM favorites WHERE spoonacular_id = :sid");
+        $stmt->execute(['sid' => $spoonacularId]);
+        return (int) $stmt->fetchColumn();
+    }
+
     public function toggle(int $userId, array $recipe): bool
     {
         $spoonacularId = (int) $recipe['spoonacular_id'];

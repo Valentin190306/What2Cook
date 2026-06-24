@@ -41,10 +41,16 @@ class RecipeController extends Controller
             $isFavorite = (new Favorite())->existsForUser($uid, $recipeId);
         }
 
+        $likesCount = 0;
+        if ($recipe !== null) {
+            $likesCount = (new Favorite())->countByRecipe($recipeId);
+        }
+
         \App\Core\View::render('Recipe', [
             'id'         => (string) $recipeId,
             'recipe'     => $recipe,
             'isFavorite' => $isFavorite,
+            'likesCount' => $likesCount,
         ]);
 
         if ($needsTranslation) {

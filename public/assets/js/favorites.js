@@ -54,6 +54,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             const favorited = !!data.favorited;
             
+            // Actualizar contador si viene en la respuesta
+            if (typeof data.likesCount !== 'undefined') {
+                const likesVal = document.getElementById('likes-count-val');
+                if (likesVal) {
+                    likesVal.textContent = data.likesCount;
+                }
+            }
+
             // Actualizar el estado del botón
             btn.dataset.favorited = favorited ? 'true' : 'false';
             // Only set textContent if the button doesn't use background image (like recipe page)
