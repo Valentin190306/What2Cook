@@ -1,0 +1,6 @@
+controller:
+  service:
+    loadBalancerIP: __STATIC_IP__
+    type: LoadBalancer
+  publishService:
+    enabled: true

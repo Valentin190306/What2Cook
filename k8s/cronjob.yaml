@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: preload-recipes
+  namespace: what2cook
+spec:
+  schedule: "0 3 */2 * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: preload
+            image: __IMAGE__:__TAG__
+            command: ["php", "bin/preload-recipes.php"]
+            envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets

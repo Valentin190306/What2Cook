@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: what2cook
+data:
+  DB_HOST: "postgres.what2cook.svc.cluster.local"
+  DB_PORT: "5432"
+  DB_NAME: "what2cook"
+  LIBRETRANSLATE_URL: "http://libretranslate.what2cook.svc.cluster.local:5000"
+  TRANSLATION_PROVIDER: "libretranslate"
+  ENABLE_INPUT_TRANSLATION: "true"
+  ENABLE_OUTPUT_TRANSLATION: "true"
+  RECIPES_TABLE_ENABLED: "true"
+  TRANSLATION_DAILY_LIMIT: "150"
+  TRANSLATION_SEARCH_TERMS: "5"
