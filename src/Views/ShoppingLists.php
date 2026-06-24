@@ -2,6 +2,7 @@
 $title = 'Mis Listas de Compra - What2Cook';
 $styles = ['lista-compras'];
 $scripts = ['shopping-lists', 'print'];
+$noindex = true;
 ?>
 <section class="lista-compras-hero">
     <h1>Mis Listas de Compra</h1>

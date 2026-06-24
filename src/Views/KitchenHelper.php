@@ -2,7 +2,23 @@
 $title  = 'Asistente de Cocina - What2Cook';
 $styles = ['asistenteCocina'];
 $scripts = ['utils', 'api', 'ingredient-translations', 'cooking-assistant', 'favorites', 'shopping-lists'];
+$metaDescription = 'Buscá recetas saludables ingresando los ingredientes que tenés a mano. Nuestro asistente de cocina te sugerirá qué preparar en minutos.';
+
+$scheme = (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '8080') ? 'http' : ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
+$host   = $_SERVER['HTTP_HOST'] ?? 'what2cook.app';
+$baseUrl = "{$scheme}://{$host}";
 ?>
+<!-- Schema: BreadcrumbList -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"},
+        {"@type": "ListItem", "position": 2, "name": "Asistente de Cocina", "item": "<?= $baseUrl ?>/asistente-cocina"}
+    ]
+}
+</script>
 
 <!-- ── HERO ─────────────────────────────────────────────────────────────── -->
 <section class="asistente-hero">

@@ -1,6 +1,7 @@
 <?php
 $title = 'Iniciar Sesión - What2Cook';
 $styles = ['components'];
+$noindex = true;
 ?>
 <section class="form-panel">
     <h1>Iniciar sesión</h1>

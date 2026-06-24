@@ -1,6 +1,7 @@
 <?php
 $title = 'Editar Perfil - What2Cook';
 $styles = ['perfilEdit'];
+$noindex = true;
 
 $diets = [
     '' => 'Sin dieta',

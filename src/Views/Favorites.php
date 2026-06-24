@@ -3,6 +3,7 @@
 $title = 'Mis Favoritos - What2Cook';
 $styles = ['catalogoRecetas', 'receta', 'perfil', 'favoritos'];
 $scripts = ['favorites', 'meal-prep-modal'];
+$noindex = true;
 
 ?>
 

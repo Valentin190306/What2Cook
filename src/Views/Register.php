@@ -2,6 +2,7 @@
 $title = 'Registrarse - What2Cook';
 $styles = ['components'];
 $scripts = ['auth'];
+$noindex = true;
 ?>
 <section class="form-panel">
     <h1>Registrarse</h1>

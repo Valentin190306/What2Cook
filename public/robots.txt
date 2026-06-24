@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /diets
+Allow: /asistente-cocina
+Allow: /asistente-dieta
+Allow: /recetas
+Allow: /receta/
+Disallow: /perfil
+Disallow: /perfil/
+Disallow: /favoritos
+Disallow: /mis-planes
+Disallow: /lista-compras
+Disallow: /login
+Disallow: /register
+Disallow: /api/
+
+Sitemap: http://localhost:8080/sitemap.xml

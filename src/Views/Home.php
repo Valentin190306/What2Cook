@@ -1,7 +1,22 @@
 <?php
 $title = 'Inicio - What2Cook';
 $styles = ['index'];
+$metaDescription = 'Descubrí más de 5,000 recetas, planificá tus comidas según tus objetivos nutricionales y encontrá qué cocinar con los ingredientes que tenés en What2Cook.';
+
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host   = $_SERVER['HTTP_HOST'] ?? 'what2cook.app';
+$baseUrl = "{$scheme}://{$host}";
 ?>
+<!-- Schema: BreadcrumbList -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"}
+    ]
+}
+</script>
 <section class="hero">
     <h1>Descubre tu próxima receta favorita</h1>
     <p>

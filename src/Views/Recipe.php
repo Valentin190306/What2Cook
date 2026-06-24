@@ -26,6 +26,15 @@ $nutriMap     = [];
 foreach ($nutrients as $n) {
     $nutriMap[$n['name']] = $n;
 }
+
+if (!empty($recipe)) {
+    $metaDescription = mb_substr($summary, 0, 155) . '...';
+    $ogImage = $image;
+}
+
+$scheme = (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '8080') ? 'http' : ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
+$host   = $_SERVER['HTTP_HOST'] ?? 'what2cook.app';
+$baseUrl = "{$scheme}://{$host}";
 ?>
 
 <?php if ($recipe === null): ?>
@@ -37,6 +46,19 @@ foreach ($nutrients as $n) {
 <?php else: ?>
 
 <article class="receta-detalle">
+
+    <!-- Schema: BreadcrumbList -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"},
+            {"@type": "ListItem", "position": 2, "name": "Catálogo", "item": "<?= $baseUrl ?>/recetas"},
+            {"@type": "ListItem", "position": 3, "name": <?= json_encode($recipe['title'] ?? 'Receta', JSON_UNESCAPED_UNICODE) ?>, "item": "<?= $baseUrl ?>/receta/<?= (int) ($recipe['id'] ?? 0) ?>"}
+        ]
+    }
+    </script>
 
     <!-- Schema: Recipe -->
     <script type="application/ld+json">

@@ -2,7 +2,23 @@
 $title = 'Asistente de Dietas - What2Cook';
 $styles = ['asistenteDieta'];
 $scripts = ['utils', 'api', 'diet-helper', 'shopping-lists'];
+$metaDescription = 'Creá planes de alimentación personalizados indicando tu objetivo de calorías diarias y preferencias de dieta. Obtené planes semanales o mensuales.';
+
+$scheme = (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '8080') ? 'http' : ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
+$host   = $_SERVER['HTTP_HOST'] ?? 'what2cook.app';
+$baseUrl = "{$scheme}://{$host}";
 ?>
+<!-- Schema: BreadcrumbList -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"},
+        {"@type": "ListItem", "position": 2, "name": "Asistente de Dietas", "item": "<?= $baseUrl ?>/asistente-dieta"}
+    ]
+}
+</script>
 <style>
 .ca-loading-newspaper {
   display: flex;

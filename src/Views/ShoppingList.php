@@ -2,6 +2,7 @@
 $title = 'Lista de Compras - What2Cook';
 $styles = ['perfil'];
 $scripts = ['shopping-list'];
+$noindex = true;
 ?>
 
 <section class="profile-section">

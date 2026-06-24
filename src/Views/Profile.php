@@ -2,6 +2,7 @@
 $title = 'Mi Perfil - What2Cook';
 $styles = ['perfil','carousel'];
 $scripts = ['api', 'perfil', 'carousel'];
+$noindex = true;
 ?>
 <?php /* Hidden success message for now
 <?php if (!empty($success)): ?>

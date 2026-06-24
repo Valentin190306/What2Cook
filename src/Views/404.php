@@ -1,6 +1,7 @@
 <?php
 $title = '404 - No encontrado';
 $styles = [];
+$noindex = true;
 ?>
 <section class="error-page">
     <h1>Error 404</h1>

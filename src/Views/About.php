@@ -1,7 +1,38 @@
 <?php
 $title = 'Sobre Nosotros - What2Cook';
 $styles = ['nosotros'];
+$metaDescription = 'Conocé la historia, misión y visión detrás de What2Cook. Simplificamos la planificación de tus comidas y el descubrimiento de recetas saludables.';
+
+$scheme = (!empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '8080') ? 'http' : ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
+$host   = $_SERVER['HTTP_HOST'] ?? 'what2cook.app';
+$baseUrl = "{$scheme}://{$host}";
 ?>
+<!-- Schema: BreadcrumbList -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"},
+        {"@type": "ListItem", "position": 2, "name": "Sobre nosotros", "item": "<?= $baseUrl ?>/about"}
+    ]
+}
+</script>
+
+<!-- Schema: AboutPage -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "Sobre Nosotros - What2Cook",
+    "description": "Nuestra historia, misión y visión en What2Cook.",
+    "mainEntity": {
+        "@type": "Organization",
+        "name": "What2Cook",
+        "url": "<?= $baseUrl ?>/"
+    }
+}
+</script>
 <h1>Sobre nosotros</h1>
 
 <section>

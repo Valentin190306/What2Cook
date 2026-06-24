@@ -2,6 +2,7 @@
 $title = 'Catálogo de Recetas - What2Cook';
 $styles = ['catalogoRecetas'];
 $scripts = ['favorites', 'catalogue'];
+$metaDescription = 'Explorá nuestro catálogo de recetas saludables y deliciosas. Filtra por tipo de plato, dieta, intolerancias y tiempo de preparación.';
 
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
 $host   = $_SERVER['HTTP_HOST'] ?? 'what2cook.app';

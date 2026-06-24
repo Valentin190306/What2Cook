@@ -2,6 +2,7 @@
 $title = 'Mis Planes - What2Cook';
 $styles = ['perfil','carousel','receta'];
 $scripts = ['api','plans','carousel','print'];
+$noindex = true;
 
 // Auxiliar para recuperar detalles de recetas para la impresión (con fallback y caché)
 if (!function_exists('getRecipeDetailsForPrint')) {

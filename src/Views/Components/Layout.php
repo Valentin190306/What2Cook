@@ -11,6 +11,23 @@ $baseUrl = "{$scheme}://{$host}";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($title ?? 'What2Cook') ?></title>
+    <meta name="description" content="<?= htmlspecialchars($metaDescription ?? 'Planificá tus comidas semanales, buscá recetas por ingredientes con nuestro asistente inteligente y gestioná tus listas de compras en What2Cook.') ?>">
+
+    <?php
+    $canonicalUrl = $canonicalUrl ?? ($baseUrl . explode('?', $_SERVER['REQUEST_URI'] ?? '')[0]);
+    if (!empty($noindex)): ?>
+    <meta name="robots" content="noindex, nofollow">
+    <?php else: ?>
+    <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl) ?>">
+    <?php endif; ?>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="<?= htmlspecialchars($ogTitle ?? $title ?? 'What2Cook') ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($ogDescription ?? $metaDescription ?? 'Planificá tus comidas semanales, buscá recetas por ingredientes con nuestro asistente inteligente y gestioná tus listas de compras en What2Cook.') ?>">
+    <meta property="og:type" content="<?= htmlspecialchars($ogType ?? 'website') ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl) ?>">
+    <meta property="og:image" content="<?= htmlspecialchars($ogImage ?? $baseUrl . '/assets/img/LogoW2C_1.png') ?>">
+    <meta property="og:site_name" content="What2Cook">
 
     <!-- Schema: WebSite + SearchAction -->
     <script type="application/ld+json">
