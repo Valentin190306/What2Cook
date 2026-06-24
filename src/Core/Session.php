@@ -35,13 +35,21 @@ class Session
         }
     }
 
-    /**
-     * Obtiene el ID del usuario autenticado si existe.
-     */
     public static function userId(): ?int
     {
         self::start();
-        return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+        if (isset($_SESSION['user_id'])) {
+            return (int) $_SESSION['user_id'];
+        }
+
+        // Intentar autologueo con cookie Remember Me
+        $userId = self::attemptRememberMeLogin();
+        if ($userId !== null) {
+            $_SESSION['user_id'] = $userId;
+            return $userId;
+        }
+
+        return null;
     }
 
     /**
@@ -68,11 +76,72 @@ class Session
     public static function logout(): void
     {
         self::start();
+
+        // Eliminar token de "Remember Me" en base de datos y borrar cookie
+        if (!empty($_COOKIE['remember_me'])) {
+            $parts = explode(':', $_COOKIE['remember_me']);
+            if (count($parts) === 2) {
+                try {
+                    $db = \App\Core\Database::getInstance();
+                    $stmt = $db->prepare("DELETE FROM user_remember_tokens WHERE selector = :selector");
+                    $stmt->execute(['selector' => $parts[0]]);
+                } catch (\Throwable $e) {
+                    error_log("Error deleting remember token on logout: " . $e->getMessage());
+                }
+            }
+            $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+            setcookie('remember_me', '', [
+                'expires' => time() - 42000,
+                'path' => '/',
+                'domain' => '',
+                'secure' => $secure,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+        }
+
         $_SESSION = [];
         if (isset($_COOKIE[session_name()])) {
             setcookie(session_name(), '', time() - 42000, '/');
         }
         session_destroy();
+    }
+
+    /**
+     * Intenta iniciar sesión usando la cookie remember_me (split token).
+     */
+    private static function attemptRememberMeLogin(): ?int
+    {
+        if (empty($_COOKIE['remember_me'])) {
+            return null;
+        }
+
+        $parts = explode(':', $_COOKIE['remember_me']);
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+        [$selector, $validator] = $parts;
+
+        try {
+            $db = \App\Core\Database::getInstance();
+            $stmt = $db->prepare("
+                SELECT * FROM user_remember_tokens 
+                WHERE selector = :selector 
+                  AND expires_at > NOW() 
+                LIMIT 1
+            ");
+            $stmt->execute(['selector' => $selector]);
+            $token = $stmt->fetch();
+
+            if ($token && hash_equals($token['hashed_validator'], hash('sha256', $validator))) {
+                return (int) $token['user_id'];
+            }
+        } catch (\Throwable $e) {
+            error_log("Error in remember me login: " . $e->getMessage());
+        }
+
+        return null;
     }
 
     /**

@@ -42,10 +42,38 @@ class AuthController extends Controller
             $this->redirect('/login');
         }
 
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '';
+        $db = \App\Core\Database::getInstance();
+
+        // 1. Rate Limiting Check (max 5 intentos en 15 minutos)
+        try {
+            $stmt = $db->prepare("
+                SELECT COUNT(*) FROM login_attempts 
+                WHERE ip_address = :ip 
+                  AND attempted_at > NOW() - INTERVAL '15 minutes'
+            ");
+            $stmt->execute(['ip' => $ip]);
+            $attempts = (int) $stmt->fetchColumn();
+
+            if ($attempts >= 5) {
+                $this->log('warning', 'Login bloqueado por exceso de intentos', ['ip' => $ip]);
+                Session::flash('error', 'Demasiados intentos fallidos. Tu IP ha sido bloqueada temporalmente por 15 minutos.');
+                $this->redirect('/login');
+            }
+        } catch (\Throwable $e) {
+            $this->log('error', 'Error al verificar rate limiting', ['error' => $e->getMessage()]);
+        }
+
         $email = Validator::email($_POST['email'] ?? null);
         $password = Validator::password($_POST['password'] ?? null, 1, 255);
 
         if ($email === null || $password === null) {
+            // Registrar intento fallido
+            try {
+                $stmt = $db->prepare("INSERT INTO login_attempts (ip_address) VALUES (:ip)");
+                $stmt->execute(['ip' => $ip]);
+            } catch (\Throwable $e) {}
+
             $this->log('warning', 'Login: credenciales inválidas');
             Session::flash('error', 'Credenciales inválidas.');
             $this->redirect('/login');
@@ -54,13 +82,61 @@ class AuthController extends Controller
         $user = (new User())->findByEmail($email);
 
         if ($user === null || !password_verify($password, $user['password'])) {
+            // Registrar intento fallido
+            try {
+                $stmt = $db->prepare("INSERT INTO login_attempts (ip_address) VALUES (:ip)");
+                $stmt->execute(['ip' => $ip]);
+            } catch (\Throwable $e) {}
+
             $this->log('warning', 'Login: credenciales incorrectas', ['email' => $email]);
             Session::flash('error', 'Credenciales inválidas.');
             $this->redirect('/login');
         }
 
+        // Limpiar intentos fallidos al iniciar sesión con éxito
+        try {
+            $stmt = $db->prepare("DELETE FROM login_attempts WHERE ip_address = :ip");
+            $stmt->execute(['ip' => $ip]);
+        } catch (\Throwable $e) {}
+
+        // Iniciar sesión en session php
         Session::login((int) $user['id']);
         $this->log('info', 'Login exitoso', ['user_id' => (int) $user['id'], 'email' => $email]);
+
+        // Manejar "Recordarme" (Remember Me)
+        $remember = !empty($_POST['remember_me']);
+        if ($remember) {
+            try {
+                $selector = bin2hex(random_bytes(12));
+                $validator = bin2hex(random_bytes(32));
+                $hashedValidator = hash('sha256', $validator);
+                $expiresAt = (new \DateTime())->modify('+30 days')->format('Y-m-d H:i:s');
+
+                $stmt = $db->prepare("
+                    INSERT INTO user_remember_tokens (user_id, selector, hashed_validator, expires_at)
+                    VALUES (:user_id, :selector, :hashed, :expires)
+                ");
+                $stmt->execute([
+                    'user_id' => $user['id'],
+                    'selector' => $selector,
+                    'hashed' => $hashedValidator,
+                    'expires' => $expiresAt
+                ]);
+
+                $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+                setcookie('remember_me', "{$selector}:{$validator}", [
+                    'expires' => time() + (30 * 24 * 60 * 60),
+                    'path' => '/',
+                    'domain' => '',
+                    'secure' => $secure,
+                    'httponly' => true,
+                    'samesite' => 'Lax'
+                ]);
+            } catch (\Throwable $e) {
+                $this->log('error', 'Error creando token Remember Me', ['error' => $e->getMessage()]);
+            }
+        }
+
         $this->redirect('/perfil');
     }
 
@@ -143,5 +219,21 @@ class AuthController extends Controller
         Session::logout();
         $this->log('info', 'Logout', ['user_id' => $userId]);
         $this->redirect('/');
+    }
+
+    public function checkEmail(): void
+    {
+        $this->requireJson();
+        $body = $this->parseBody();
+        
+        $email = \App\Core\Validator::email($body['email'] ?? null);
+
+        if ($email === null) {
+            $this->json(['error' => 'Email inválido.'], 422);
+            return;
+        }
+
+        $user = (new User())->findByEmail($email);
+        $this->json(['exists' => $user !== null]);
     }
 }

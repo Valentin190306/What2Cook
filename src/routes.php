@@ -30,6 +30,7 @@ $router->add('GET', '/register', 'AuthController@registerForm');
 $router->add('POST', '/login', 'AuthController@login');
 $router->add('POST', '/register', 'AuthController@register');
 $router->add('POST', '/logout', 'AuthController@logout');
+$router->add('POST', '/api/check-email', 'AuthController@checkEmail');
 
 // Rutas de API — Dishes
 $router->add('GET', '/api/dishes', 'DishController@all');
