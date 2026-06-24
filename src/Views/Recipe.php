@@ -71,7 +71,7 @@ foreach ($nutrients as $n) {
         <?php if ($image): ?>
             <img class="receta-img" src="<?= htmlspecialchars($image) ?>" alt="<?= htmlspecialchars($recipe['title']) ?>">
         <?php else: ?>
-            <img class="receta-img" src="/assets/img/placeholder.jpg" alt="Sin imagen">
+            <img class="receta-img" src="/assets/img/placeholder_RecetaSinFoto.png" alt="Sin imagen">
         <?php endif; ?>
 
         <button type="button" class="btn-favorito"
@@ -86,7 +86,12 @@ foreach ($nutrients as $n) {
     </div>
 
     <div class="receta-content">
-        <h1><?= htmlspecialchars($recipe['title']) ?></h1>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+            <h1 style="margin: 0;"><?= htmlspecialchars($recipe['title']) ?></h1>
+            <button type="button" class="btn-save-list no-print" onclick="window.print()" style="margin: 0;">
+                Imprimir receta
+            </button>
+        </div>
 
         <!-- ── Meta ── -->
         <dl class="receta-meta">

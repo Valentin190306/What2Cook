@@ -56,7 +56,7 @@ async function openMealPrepModal(mpId) {
         if (data.recipes && data.recipes.length > 0) {
             recipesEl.innerHTML = data.recipes.map(recipe => {
                 const id = recipe.id || 0;
-                const image = recipe.image || '/assets/img/placeholder.jpg';
+                const image = recipe.image || '/assets/img/placeholder_RecetaSinFoto.png';
                 const title = recipe.title || 'Sin título';
                 const readyIn = recipe.readyInMinutes || null;
                 const servings = recipe.servings || null;

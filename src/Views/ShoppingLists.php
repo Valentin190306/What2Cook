@@ -1,11 +1,14 @@
 <?php
 $title = 'Mis Listas de Compra - What2Cook';
 $styles = ['lista-compras'];
-$scripts = ['shopping-lists'];
+$scripts = ['shopping-lists', 'print'];
 ?>
 <section class="lista-compras-hero">
     <h1>Mis Listas de Compra</h1>
     <p>Tus listas de compras guardadas</p>
+    <button type="button" class="btn-rename no-print" onclick="window.print()" style="margin: 1rem auto 0; display: inline-block;">
+        Imprimir listas
+    </button>
 </section>
 
 <section class="lista-compras-container">
@@ -31,13 +34,17 @@ $scripts = ['shopping-lists'];
                 <ul>
                     <?php foreach ($list['items'] as $item): ?>
                     <li>
-                        <span class="item-name"><?= htmlspecialchars($item['ingredient_name']) ?></span>
+                        <div class="item-left-group">
+                            <span class="checkbox-square"></span>
+                            <span class="item-name"><?= htmlspecialchars($item['ingredient_name']) ?></span>
+                        </div>
                         <span class="item-amount"><?= round($item['amount'], 2) ?> <?= htmlspecialchars($item['unit'] ?? '') ?></span>
                     </li>
                     <?php endforeach; ?>
                 </ul>
             </div>
             <div class="shopping-list-card__actions">
+                <button type="button" class="btn-print no-print" onclick="printList(this.closest('.shopping-list-card'))">Imprimir</button>
                 <button type="button" class="btn-rename" data-rename-list="<?= (int) $list['id'] ?>">Renombrar</button>
                 <button type="button" class="btn-delete" data-delete-list="<?= (int) $list['id'] ?>">Eliminar</button>
             </div>

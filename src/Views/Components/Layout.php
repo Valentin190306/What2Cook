@@ -58,6 +58,9 @@ $baseUrl = "{$scheme}://{$host}";
             <link rel="stylesheet" href="/assets/styles/<?= $style ?>.css?v=<?= time() ?>">
         <?php endforeach; ?>
     <?php endif; ?>
+
+    <!-- Estilos de impresión -->
+    <link rel="stylesheet" href="/assets/styles/print.css?v=<?= time() ?>" media="print">
 </head>
 <body>
     <header>

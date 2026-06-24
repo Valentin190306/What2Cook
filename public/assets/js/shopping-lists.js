@@ -401,13 +401,21 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.addEventListener('click', handleOverlayClick);
     });
 
+    // Toggle check item on click
+    document.addEventListener('click', (event) => {
+        const li = event.target.closest('.shopping-list-card__items li');
+        if (li) {
+            li.classList.toggle('is-checked');
+        }
+    });
+
     // Toggle card expansion in /lista-compras
     document.addEventListener('click', (event) => {
         const card = event.target.closest('.shopping-list-card');
         if (!card) return;
 
-        // If the click is on interactive components, do nothing
-        if (event.target.closest('button, input, select, textarea, a, .modal-card, .modal-overlay')) {
+        // If the click is on interactive components or checklist items, do nothing
+        if (event.target.closest('button, input, select, textarea, a, .modal-card, .modal-overlay, .shopping-list-card__items li')) {
             return;
         }
 

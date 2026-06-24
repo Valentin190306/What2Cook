@@ -22,7 +22,7 @@ $scripts = ['favorites', 'meal-prep-modal'];
     <div class="recipe-grid">
         <?php foreach ($favorites as $recipe): 
             $id = (int) ($recipe['id'] ?? 0);
-            $image = $recipe['image'] ?? '/assets/img/placeholder.jpg';
+            $image = $recipe['image'] ?? '/assets/img/placeholder_RecetaSinFoto.png';
             $readyIn = $recipe['readyInMinutes'] ?? null;
             $servings = $recipe['servings'] ?? null;
             $diets = $recipe['diets'] ?? [];

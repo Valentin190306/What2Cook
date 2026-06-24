@@ -1,0 +1,289 @@
+@media print {
+
+    /* ---- Comunes ---- */
+    nav,
+    header,
+    footer,
+    .no-print,
+    button.no-print,
+    .social,
+    .btn-link,
+    .empty-state a {
+        display: none !important;
+    }
+
+    body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 12pt !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Forzar fondo blanco y texto oscuro en navegadores */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    /* Evitar cortes feos entre páginas */
+    .meal-thumb,
+    .shopping-list-card,
+    section,
+    article,
+    li,
+    tr {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+
+    /* ---- Receta (/receta/{id}) ---- */
+    .btn-favorito,
+    #btn-save-list,
+    .btn-save-list,
+    #btn-menos,
+    #btn-mas,
+    .porciones {
+        display: none !important;
+    }
+
+    /* Desarmar la grilla de dos columnas desktop para optimizar espacio */
+    .receta-detalle {
+        display: block !important;
+    }
+
+    .receta-hero,
+    .receta-content,
+    section.ingredientes,
+    section.preparacion {
+        width: 100% !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .receta-hero img.receta-img {
+        max-height: 250px !important;
+        width: auto !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        display: block !important;
+        float: none !important;
+    }
+
+    /* ---- Planes (/mis-planes) ---- */
+    /* Ocultar títulos de sección cuando se imprime un plan */
+    body.printing-plan .profile-section > h2,
+    body.printing-plan .profile-section > p {
+        display: none !important;
+    }
+
+    /* Resetear contenedores para habilitar saltos de página (evitando flexbox/grid en el flujo principal) */
+    body, main,
+    .profile-section,
+    .flex-column,
+    .plan-card,
+    .plan-card-inner {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Imprimir únicamente el plan seleccionado */
+    body.printing-plan .plan-card:not(.printing) {
+        display: none !important;
+    }
+
+    /* Portada / Carátula Brutalista Premium */
+    .print-cover {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        min-height: 80vh !important;
+        max-height: 85vh !important;
+        box-sizing: border-box !important;
+        padding: 2.5rem !important;
+        border: 6px double #000000 !important;
+        margin: 0 !important;
+        position: relative !important;
+        break-before: avoid !important;
+        page-break-before: avoid !important;
+        break-after: page !important;
+        page-break-after: always !important;
+    }
+
+    .print-cover-logo {
+        width: 150px !important;
+        height: auto !important;
+        margin-bottom: 1.5rem !important;
+        filter: grayscale(100%) !important;
+    }
+
+    .print-cover-title {
+        font-family: var(--font-title), sans-serif !important;
+        font-size: 2.5rem !important;
+        font-weight: 900 !important;
+        text-transform: uppercase !important;
+        margin: 0.5rem 0 !important;
+        line-height: 1.1 !important;
+        letter-spacing: 0.02em !important;
+    }
+
+    .print-cover-subtitle {
+        font-family: var(--font-title), sans-serif !important;
+        font-size: 1.3rem !important;
+        font-weight: 700 !important;
+        color: #333333 !important;
+        margin-bottom: 1.5rem !important;
+        text-transform: uppercase !important;
+    }
+
+    .print-cover-divider {
+        width: 100px !important;
+        height: 4px !important;
+        background-color: #000000 !important;
+        margin: 1rem 0 !important;
+    }
+
+    .print-cover-meta {
+        font-size: 1.05rem !important;
+        line-height: 1.5 !important;
+        text-align: left !important;
+        margin-top: 0.5rem !important;
+        border: 2px solid #000000 !important;
+        padding: 1.2rem !important;
+        width: 100% !important;
+        max-width: 440px !important;
+        background-color: #fbfbfb !important;
+    }
+
+    .print-cover-meta p {
+        margin: 0.3rem 0 !important;
+    }
+
+    .plan-card {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        display: block !important;
+    }
+
+    .plan-card-inner {
+        display: block !important;
+    }
+
+    /* Ocultar el info lateral en impresión ya que la carátula lo reemplaza */
+    .plan-card-info {
+        display: none !important;
+    }
+
+    .receta-detalle {
+        display: block !important;
+    }
+
+    .plan-carousel-panel {
+        display: none !important;
+    }
+
+    .print-only-recipes {
+        display: block !important;
+    }
+
+    .print-recipe-block {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 2.5rem !important;
+        box-sizing: border-box !important;
+        background: #ffffff !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    .print-meal-header {
+        font-family: var(--font-title), sans-serif !important;
+        font-size: 1.5rem !important;
+        font-weight: 800 !important;
+        border-bottom: 2px solid #000000 !important;
+        background: #f0f0f0 !important;
+        margin-bottom: 1.5rem !important;
+        padding: 0.75rem 1.5rem !important;
+        color: #000000 !important;
+        text-align: left !important;
+        width: 100% !important;
+        text-transform: uppercase !important;
+        break-before: page !important;
+        page-break-before: always !important;
+        break-after: avoid !important;
+        page-break-after: avoid !important;
+    }
+
+    /* Evitar que la primera receta genere una página en blanco inicial después de la carátula */
+    .print-recipe-block:first-of-type .print-meal-header {
+        break-before: avoid !important;
+        page-break-before: avoid !important;
+    }
+
+
+
+    /* ---- Listas de compras (/lista-compras) ---- */
+    body.printing-list .lista-compras-hero {
+        display: none !important;
+    }
+
+    body.printing-list .shopping-list-card:not(.printing) {
+        display: none !important;
+    }
+
+    .shopping-list-card {
+        height: auto !important;
+        max-height: none !important;
+        box-shadow: none !important;
+        border: 1px solid #000000 !important;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .shopping-list-card__header {
+        background-color: #f0f0f0 !important;
+        color: #000000 !important;
+        border-bottom: 1px solid #000000 !important;
+    }
+
+    .shopping-list-card__header h3 {
+        color: #000000 !important;
+    }
+
+    .expand-icon {
+        display: none !important;
+    }
+
+    .shopping-list-card__items {
+        max-height: none !important;
+        overflow: visible !important;
+        padding: 0.5rem 1rem !important;
+    }
+
+    /* Eliminar el gradiente que oculta los items */
+    .shopping-list-card__items::after {
+        display: none !important;
+        opacity: 0 !important;
+    }
+
+    .shopping-list-card__actions {
+        display: none !important;
+    }
+}

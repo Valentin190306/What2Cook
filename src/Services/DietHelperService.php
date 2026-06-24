@@ -195,6 +195,11 @@ class DietHelperService
                 }
 
                 if ($recipe !== null) {
+                    try {
+                        (new \App\Models\RecipeTranslation())->saveRaw((int)$recipe['id'], $recipe);
+                    } catch (\Throwable $e) {
+                        // ignore database caching issues
+                    }
                     $dailyIds[] = (int) $recipe['id'];
                     $nutrition = $this->extractNutritionFromRecipe($recipe);
 
@@ -289,7 +294,7 @@ class DietHelperService
             'meal_type'        => $mealType,
             'spoonacular_id'   => 0,
             'title'            => 'Receta no encontrada (Ajuste muy restrictivo)',
-            'image'            => '/assets/img/placeholder.jpg',
+            'image'            => '/assets/img/placeholder_RecetaSinFoto.png',
             'ready_in_minutes' => 0,
             'servings'         => 0,
             'calories'         => 0.0,
