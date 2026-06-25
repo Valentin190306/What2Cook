@@ -6,6 +6,8 @@ use App\Core\Controller;
 use App\Core\Session;
 use App\Core\Validator;
 use App\Models\RecipeTranslation;
+use App\Services\RecipeStorageService;
+use App\Services\UserPreferenceService;
 use App\Services\Traits\NutritionNormalizer;
 use App\Services\Translation\DeferredTranslator;
 
@@ -38,16 +40,9 @@ class KitchenHelperController extends Controller
         $userDiet = '';
         $userIntolerances = [];
         if ($userId !== null) {
-            $user = (new \App\Models\User())->find($userId);
-            if ($user) {
-                $userDiet = $user['preferences'] ?? '';
-                if (!empty($user['allergies'])) {
-                    $decoded = json_decode($user['allergies'], true);
-                    if (is_array($decoded)) {
-                        $userIntolerances = $decoded;
-                    }
-                }
-            }
+            $prefs = (new UserPreferenceService())->getPreferences($userId);
+            $userDiet = $prefs['diet'];
+            $userIntolerances = $prefs['intolerances'];
         }
 
         $this->log('info', 'Búsqueda single', ['ingredients' => $ingredients, 'sort' => $sort, 'diet' => $userDiet, 'intolerances' => $userIntolerances]);
@@ -128,16 +123,9 @@ class KitchenHelperController extends Controller
         $userDiet = '';
         $userIntolerances = [];
         if ($userId !== null) {
-            $user = (new \App\Models\User())->find($userId);
-            if ($user) {
-                $userDiet = $user['preferences'] ?? '';
-                if (!empty($user['allergies'])) {
-                    $decoded = json_decode($user['allergies'], true);
-                    if (is_array($decoded)) {
-                        $userIntolerances = $decoded;
-                    }
-                }
-            }
+            $prefs = (new UserPreferenceService())->getPreferences($userId);
+            $userDiet = $prefs['diet'];
+            $userIntolerances = $prefs['intolerances'];
         }
 
         $this->log('info', 'Búsqueda Meal Prep', ['ingredients' => $ingredients, 'count' => $count, 'sort' => $sort, 'diet' => $userDiet, 'intolerances' => $userIntolerances]);
@@ -204,7 +192,8 @@ class KitchenHelperController extends Controller
 
         $this->log('info', 'Solicitud de detalle', ['recipe_id' => $recipeId]);
 
-        $result = $this->fromLocalDb($recipeId);
+        $storage = new RecipeStorageService($this->logger);
+        $result = $storage->findLocal($recipeId);
         $needsTranslation = false;
 
         if ($result === null) {
@@ -229,44 +218,6 @@ class KitchenHelperController extends Controller
             DeferredTranslator::afterResponse(fn() => DeferredTranslator::translate($recipeId));
         }
         exit;
-    }
-
-    /**
-     * Valida que los datos decodificados tengan la estructura completa de Spoonacular.
-     */
-    private function isCompleteRecipe(?array $data): bool
-    {
-        return $data !== null && isset($data['extendedIngredients']);
-    }
-
-    /**
-     * Busca una receta en la BD local.
-     * Devuelve raw_response_es, raw_response_en (fallback) o null.
-     */
-    private function fromLocalDb(int $spoonacularId): ?array
-    {
-        $enabled = ($_ENV['RECIPES_TABLE_ENABLED'] ?? 'true') === 'true';
-        if (!$enabled) return null;
-
-        try {
-            $row = (new RecipeTranslation())->findBySpoonacularId($spoonacularId);
-            if ($row) {
-                if (!empty($row['raw_response_es'])) {
-                    $decoded = json_decode($row['raw_response_es'], true);
-                    if (is_array($decoded) && $this->isCompleteRecipe($decoded)) {
-                        return $this->normalizeRecipe($decoded);
-                    }
-                }
-                $originalEn = $row['raw_response_en'] ? json_decode($row['raw_response_en'], true) : null;
-                if ($originalEn !== null && $this->isCompleteRecipe($originalEn)) {
-                    return $this->normalizeRecipe($originalEn);
-                }
-            }
-        } catch (\Throwable $e) {
-            $this->log('error', 'Error consultando recipe_translations', ['error' => $e->getMessage()]);
-        }
-
-        return null;
     }
 
     private function enrichWithNutrition(array $recipes, \App\Services\SpoonacularService $service): array

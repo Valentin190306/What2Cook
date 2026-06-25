@@ -99,9 +99,9 @@ Abre el archivo `.env` y configura tus valores locales:
 # Conexión a Base de Datos
 DB_HOST=database
 DB_PORT=5432
-DB_NAME=what2cook
-DB_USER=what2cook
-DB_PASSWORD=what2cook
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
 
 # Claves Spoonacular (rotación automática si una alcanza el límite diario)
 SPOONACULAR_KEY=tu_api_key_1
@@ -181,11 +181,6 @@ Cualquier motor de traducción es envuelto dinámicamente por la clase `CachedTr
 
 ### Traducción Diferida (Deferred Translation)
 Cuando un usuario consulta el detalle de una receta no indexada localmente, el controlador `RecipeController` realiza la consulta original a Spoonacular, renderiza la vista inmediatamente al cliente para evitar retrasos, y delega de manera diferida la traducción al español mediante `DeferredTranslator::afterResponse()`. Esto aprovecha la llamada `fastcgi_finish_request` para continuar el procesamiento en segundo plano después de desconectar el socket del navegador.
-
-### Job CLI de Precarga (`RecipePreloadJob`)
-El script ejecutable de consola `bin/preload-recipes.php` realiza tareas periódicas de indexación y traducción masiva de recetas.
-- **Rotación de Consultas:** Lee y rota de forma secuencial un pool de palabras clave (dietas, cocinas, tipos de platos) almacenado en `log/.search_index.txt`.
-- **Protección de Cuota:** Registra el consumo de puntos de API consumidos hoy en `log/.spoonacular_points.json` y se detiene automáticamente antes de sobrepasar el límite configurado (`TRANSLATION_DAILY_LIMIT`).
 
 ---
 

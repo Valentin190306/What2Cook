@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Services\SpoonacularService;
+use App\Services\RecipeStorageService;
 use App\Services\Traits\NutritionNormalizer;
 use App\Services\Translation\DeferredTranslator;
 use App\Core\Session;
@@ -19,7 +20,8 @@ class RecipeController extends Controller
         $this->log('info', 'Viendo receta', ['recipe_id' => $id]);
 
         $recipeId = (int) $id;
-        $recipe = $this->fromLocalDb($recipeId);
+        $storage = new RecipeStorageService($this->logger);
+        $recipe = $storage->findLocal($recipeId);
         $needsTranslation = false;
 
         if ($recipe !== null) {
@@ -61,44 +63,5 @@ class RecipeController extends Controller
         if ($needsTranslation) {
             DeferredTranslator::afterResponse(fn() => DeferredTranslator::translate($recipeId));
         }
-    }
-
-    /**
-     * Busca una receta en la BD local.
-     * Devuelve raw_response_es (traducido), raw_response_en (inglés fallback) o null.
-     */
-    /**
-     * Valida que los datos decodificados tengan la estructura completa de Spoonacular.
-     * Los resultados de complexSearch (catálogo) NO incluyen extendedIngredients.
-     */
-    private function isCompleteRecipe(?array $data): bool
-    {
-        return $data !== null && isset($data['extendedIngredients']);
-    }
-
-    public function fromLocalDb(int $spoonacularId): ?array
-    {
-        $enabled = ($_ENV['RECIPES_TABLE_ENABLED'] ?? 'true') === 'true';
-        if (!$enabled) return null;
-
-        try {
-            $row = (new RecipeTranslation())->findBySpoonacularId($spoonacularId);
-            if ($row) {
-                if (!empty($row['raw_response_es'])) {
-                    $decoded = json_decode($row['raw_response_es'], true);
-                    if (is_array($decoded) && $this->isCompleteRecipe($decoded)) {
-                        return $this->normalizeRecipe($decoded);
-                    }
-                }
-                $originalEn = $row['raw_response_en'] ? json_decode($row['raw_response_en'], true) : null;
-                if ($originalEn !== null && $this->isCompleteRecipe($originalEn)) {
-                    return $this->normalizeRecipe($originalEn);
-                }
-            }
-        } catch (\Throwable $e) {
-            $this->log('error', 'Error consultando recipe_translations', ['error' => $e->getMessage()]);
-        }
-
-        return null;
     }
 }

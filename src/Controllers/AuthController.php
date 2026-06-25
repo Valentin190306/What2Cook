@@ -226,7 +226,7 @@ class AuthController extends Controller
         $this->requireJson();
         $body = $this->parseBody();
         
-        $email = \App\Core\Validator::email($body['email'] ?? null);
+        $email = Validator::email($body['email'] ?? null);
 
         if ($email === null) {
             $this->json(['error' => 'Email inválido.'], 422);

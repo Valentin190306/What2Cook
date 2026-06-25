@@ -7,6 +7,8 @@ use App\Core\Controller;
 use App\Models\Plan;
 use App\Models\ShoppingList;
 use App\Services\DietHelperService;
+use App\Services\UserPreferenceService;
+use App\Services\AuthorizationService;
 use RuntimeException;
 
 class DietHelperController extends Controller
@@ -15,14 +17,11 @@ class DietHelperController extends Controller
 
     public function index(): void
     {
-        // Get user's dietary preference to use as default in the form
         $userId = \App\Core\Session::userId();
         $userDiet = '';
         if ($userId !== null) {
-            $user = (new \App\Models\User())->find($userId);
-            if ($user) {
-                $userDiet = $user['preferences'] ?? '';
-            }
+            $prefs = (new UserPreferenceService())->getPreferences($userId);
+            $userDiet = $prefs['diet'];
         }
         
         \App\Core\View::render('DietHelper', ['userDiet' => $userDiet]);
@@ -143,7 +142,7 @@ class DietHelperController extends Controller
             return;
         }
 
-        if ((int) $plan['user_id'] !== $userId) {
+        if (!(new AuthorizationService())->ownsPlan($userId, $planId)) {
             $this->log('warning', 'Acceso denegado a plan', ['plan_id' => $planId, 'user_id' => $userId]);
             $this->json(['error' => 'Acceso denegado.'], 403);
             return;
@@ -184,15 +183,7 @@ class DietHelperController extends Controller
         $userId = $this->requireAuthApi();
         $planId = (int) $id;
 
-        $planModel = new Plan();
-        $plan      = $planModel->find($planId);
-
-        if ($plan === null) {
-            $this->json(['error' => 'Plan no encontrado.'], 404);
-            return;
-        }
-
-        if ((int) $plan['user_id'] !== $userId) {
+        if (!(new AuthorizationService())->ownsPlan($userId, $planId)) {
             $this->json(['error' => 'Acceso denegado.'], 403);
             return;
         }
@@ -216,17 +207,12 @@ class DietHelperController extends Controller
         $this->requireJson();
 
         $itemId = (int) $id;
-        $shoppingList = new ShoppingList();
 
-        // Verificar que el item existe y pertenece al usuario
-        $item = $shoppingList->findById($itemId);
-        if ($item === null) {
-            $this->json(['error' => 'Item no encontrado.'], 404);
-        }
-        if ((int) $item['user_id'] !== $userId) {
+        if (!(new AuthorizationService())->ownsShoppingItem($userId, $itemId)) {
             $this->json(['error' => 'Acceso denegado.'], 403);
         }
 
+        $shoppingList = new ShoppingList();
         $body      = $this->parseBody();
         $purchased = (bool) ($body['purchased'] ?? false);
         $updated   = $shoppingList->togglePurchased($itemId, $purchased);

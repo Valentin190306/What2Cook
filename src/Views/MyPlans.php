@@ -7,14 +7,14 @@ $noindex = true;
 // Auxiliar para recuperar detalles de recetas para la impresión (con fallback y caché)
 if (!function_exists('getRecipeDetailsForPrint')) {
     function getRecipeDetailsForPrint(int $recipeId): ?array {
-        $recipeController = new \App\Controllers\RecipeController();
-        $recipe = $recipeController->fromLocalDb($recipeId);
+        $storage = new \App\Services\RecipeStorageService();
+        $recipe = $storage->findLocal($recipeId);
         if ($recipe === null) {
             try {
                 $service = new \App\Services\SpoonacularService(null);
                 $recipeData  = $service->getRecipeInfo($recipeId, true, false);
                 (new \App\Models\RecipeTranslation())->saveRaw($recipeId, $recipeData);
-                $recipe = $recipeController->fromLocalDb($recipeId);
+                $recipe = $storage->findLocal($recipeId);
             } catch (\Throwable $e) {
                 $recipe = null;
             }

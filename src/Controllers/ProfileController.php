@@ -13,6 +13,7 @@ use App\Models\ShoppingList;
 use App\Models\Favorite;
 use App\Models\MealPrepFavorite;
 use App\Models\SavedShoppingList;
+use App\Services\UserPreferenceService;
 use App\Core\View;
 
 class ProfileController extends Controller
@@ -54,15 +55,9 @@ class ProfileController extends Controller
             }
         }
 
-        // Decode dietary preferences
-        $userDiet = $user['preferences'] ?? '';
-        $userAllergies = [];
-        if (!empty($user['allergies'])) {
-            $decoded = json_decode($user['allergies'], true);
-            if (is_array($decoded)) {
-                $userAllergies = $decoded;
-            }
-        }
+        $prefs = (new UserPreferenceService())->getPreferences($userId);
+        $userDiet = $prefs['diet'];
+        $userAllergies = $prefs['intolerances'];
 
         $dietLabels = [
             '' => 'Sin dieta',
