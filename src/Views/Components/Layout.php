@@ -93,7 +93,6 @@ $baseUrl = "{$scheme}://{$host}";
                 <li><a href="/about">Nosotros</a></li>
                 <?php if ($uid === null): ?>
                     <li><a href="/login">Accedé</a></li>
-                    <li><a href="/register">Registrate</a></li>
                 <?php else: ?>
                     <li><a href="/favoritos">Favoritos</a></li>
                     <li><a href="/mis-planes">Mis Planes</a></li>
