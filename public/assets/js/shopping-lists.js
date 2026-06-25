@@ -5,12 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!errEl) {
             errEl = document.createElement('p');
             errEl.className = 'save-error-msg';
-            errEl.style.color = '#e53e3e';
-            errEl.style.fontSize = '0.9rem';
-            errEl.style.marginTop = '0.5rem';
-            errEl.style.width = '100%';
-            errEl.style.flexBasis = '100%';
-            errEl.style.textAlign = 'center';
             btn.parentNode.appendChild(errEl);
         }
         errEl.textContent = message;

@@ -629,6 +629,16 @@
     z-index: 1;
     display: block;
   }
+
+  .mp-summary {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mp-summary__buttons {
+    flex-wrap: wrap;
+    width: 100%;
+  }
 }
 
 /* ============================================================

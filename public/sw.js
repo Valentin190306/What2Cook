@@ -8,7 +8,7 @@
  * 3. ?v=time() en Layout.php fuerza la re-descarga de assets en cada navegación (mitigado por ignoreSearch).
  */
 
-const STATIC_CACHE = 'static-v1';
+const STATIC_CACHE = 'static-v2';
 const RECIPES_CACHE = 'recipes-v1';
 const IMAGES_CACHE = 'images-v1';
 

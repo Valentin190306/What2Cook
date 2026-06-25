@@ -209,6 +209,23 @@ textarea:focus {
   font-size: 0.8rem;
 }
 
+.save-error-msg {
+  background: #fdf2f2;
+  border: 1.5px solid var(--color-carrot);
+  color: var(--color-carrot);
+  padding: 0.6rem 1rem;
+  font-family: var(--font-title);
+  font-weight: 700;
+  text-align: center;
+  margin-top: 0.75rem;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  width: 100%;
+  flex-basis: 100%;
+  box-sizing: border-box;
+  order: 10;
+}
+
 .form-panel form {
   display: flex;
   flex-direction: column;
