@@ -374,21 +374,17 @@ textarea:focus {
 
 /* Alternador de Visibilidad de Contraseñas */
 .input-toggle-wrapper {
-  position: relative;
+  display: flex;
+  flex-direction: row;
   width: 100%;
-  margin-bottom: 1.5rem;
 }
 
 .input-toggle-wrapper input {
-  padding-right: 3rem !important;
+  flex: 1;
   margin-bottom: 0 !important;
 }
 
 .input-toggle-wrapper .btn-toggle-password {
-  position: absolute !important;
-  top: 50% !important;
-  right: 0.8rem !important;
-  transform: translateY(-50%) !important;
   background: transparent !important;
   border: none !important;
   color: var(--color-black) !important;
@@ -397,15 +393,16 @@ textarea:focus {
   font-size: 1.2rem !important;
   line-height: 1 !important;
   transition: transform 0.1s ease !important;
-  z-index: 10 !important;
   box-shadow: none !important;
   display: inline-block !important;
   width: auto !important;
   height: auto !important;
+  align-self: center;
+  margin-left: 0.5rem;
 }
 
 .input-toggle-wrapper .btn-toggle-password:hover {
-  transform: translateY(-50%) scale(1.1) !important;
+  transform: scale(1.1) !important;
   color: var(--color-carrot) !important;
 }
 
