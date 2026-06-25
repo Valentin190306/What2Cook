@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     strengthMsg.style.fontFamily = 'var(--font-title, sans-serif)';
     strengthMsg.style.textTransform = 'uppercase';
     strengthMsg.style.display = 'none';
-    passwordInput.parentNode.appendChild(strengthMsg);
+    passwordInput.parentNode.parentNode.appendChild(strengthMsg);
 
     // C. Password match warning element
     const matchMsg = document.createElement('div');
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
     matchMsg.style.textTransform = 'uppercase';
     matchMsg.style.display = 'none';
     matchMsg.textContent = 'Las contraseñas no coinciden';
-    confirmInput.parentNode.appendChild(matchMsg);
+    confirmInput.parentNode.parentNode.appendChild(matchMsg);
 
     const updateSubmitState = () => {
         if (submitBtn) {
