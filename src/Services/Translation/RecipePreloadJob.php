@@ -144,7 +144,7 @@ class RecipePreloadJob
                     'number' => 100,
                     'addRecipeInformation' => 'true',
                     'addRecipeNutrition' => 'true',
-                ]);
+                ], true);
                 $this->pointsUsed++;
             } catch (RuntimeException $e) {
                 if (str_contains($e->getMessage(), '402')) {
@@ -270,30 +270,16 @@ class RecipePreloadJob
 
         $rawEn = json_encode($recipeData, JSON_UNESCAPED_UNICODE);
 
-        // Traducir campos principales
-        $titleEs = $title !== '' ? $this->translator->translate($title, 'es') : '';
-        $summaryEs = $summary !== '' ? $this->translator->translate(
-            html_entity_decode(strip_tags($summary), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            'es'
-        ) : '';
-
-        // Traducir array completo (incluye instructions, ingredients, etc.)
-        // pero preservar nutrition con nombres en inglés
-        $nutrition = $recipeData['nutrition'] ?? null;
-        $translatedData = $this->translator->translateArray($recipeData, 'es');
-        if ($nutrition !== null) {
-            $translatedData['nutrition'] = $nutrition;
-        }
-        $rawEs = json_encode($translatedData, JSON_UNESCAPED_UNICODE);
-
+        // Guardar solo en inglés; la traducción se hace on-demand vía
+        // DeferredTranslator cuando un usuario visita la receta.
         $this->model->upsert([
             'spoonacular_id'   => $sid,
             'title_en'         => $title,
-            'title_es'         => $titleEs,
+            'title_es'         => null,
             'summary_en'       => $summary,
-            'summary_es'       => $summaryEs,
+            'summary_es'       => null,
             'raw_response_en'  => $rawEn,
-            'raw_response_es'  => $rawEs,
+            'raw_response_es'  => null,
             'image'            => $image,
             'ready_in_minutes' => $recipeData['readyInMinutes'] ?? null,
             'servings'         => $recipeData['servings'] ?? null,

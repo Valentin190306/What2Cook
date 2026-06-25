@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: preload-recipes-manual
+  namespace: what2cook
+spec:
+  ttlSecondsAfterFinished: 86400
+  activeDeadlineSeconds: 600
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: preload
+        image: us-central1-docker.pkg.dev/gen-lang-client-0122059896/what2cook/app:latest
+        imagePullPolicy: Always
+        command: ["php", "bin/preload-recipes.php"]
+        envFrom:
+        - configMapRef:
+            name: app-config
+        - secretRef:
+            name: app-secrets

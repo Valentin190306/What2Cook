@@ -18,6 +18,7 @@ class LibreTranslateTranslator implements TranslatorInterface
 
     private const int BATCH_SIZE = 25;
     private const int TIMEOUT = 60;
+    private const int CONNECT_TIMEOUT = 10;
 
     public function __construct(?LoggerInterface $logger = null)
     {
@@ -73,6 +74,7 @@ class LibreTranslateTranslator implements TranslatorInterface
                 CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
                 CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 CURLOPT_TIMEOUT => self::TIMEOUT,
+                CURLOPT_CONNECTTIMEOUT => self::CONNECT_TIMEOUT,
             ]);
 
             $body = curl_exec($ch);

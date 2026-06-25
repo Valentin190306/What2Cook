@@ -103,8 +103,9 @@ DB_NAME=what2cook
 DB_USER=what2cook
 DB_PASSWORD=what2cook
 
-# Claves Spoonacular (Frontend y CLI Background Job)
-SPOONACULAR_KEY=tu_api_key_frontend
+# Claves Spoonacular (rotación automática si una alcanza el límite diario)
+SPOONACULAR_KEY=tu_api_key_1
+SPOONACULAR_KEY_2=tu_api_key_2
 SPOONACULAR_KEY_BACKGROUND=tu_api_key_background
 
 # Proveedores de Traducción (opciones: 'openai', 'gemini', 'libretranslate')

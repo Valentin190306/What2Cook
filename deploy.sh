@@ -119,6 +119,7 @@ done
 sed \
   -e "s/DB_PASSWORD: \"\"/DB_PASSWORD: \"${DB_PASSWORD}\"/g" \
   -e "s/SPOONACULAR_KEY: \"\"/SPOONACULAR_KEY: \"${SPOONACULAR_KEY:-}\"/g" \
+  -e "s/SPOONACULAR_KEY_2: \"\"/SPOONACULAR_KEY_2: \"${SPOONACULAR_KEY_2:-}\"/g" \
   -e "s/SPOONACULAR_KEY_BACKGROUND: \"\"/SPOONACULAR_KEY_BACKGROUND: \"${SPOONACULAR_KEY_BACKGROUND:-}\"/g" \
   -e "s/OPENAI_API_KEY: \"\"/OPENAI_API_KEY: \"${OPENAI_API_KEY:-}\"/g" \
   -e "s/GEMINI_API_KEY: \"\"/GEMINI_API_KEY: \"${GEMINI_API_KEY:-}\"/g" \
@@ -127,6 +128,7 @@ sed \
 echo ""
 echo "  Verify secrets before continuing:"
 echo "    SPOONACULAR_KEY:        ${SPOONACULAR_KEY:+✅ set}${SPOONACULAR_KEY:-⚠️  EMPTY}"
+echo "    SPOONACULAR_KEY_2:      ${SPOONACULAR_KEY_2:+✅ set}${SPOONACULAR_KEY_2:-⚠️  EMPTY}"
 echo "    SPOONACULAR_KEY_BG:     ${SPOONACULAR_KEY_BACKGROUND:+✅ set}${SPOONACULAR_KEY_BACKGROUND:-⚠️  EMPTY}"
 echo "    OPENAI_API_KEY:         ${OPENAI_API_KEY:+✅ set}${OPENAI_API_KEY:-⚪ optional}"
 echo "    GEMINI_API_KEY:         ${GEMINI_API_KEY:+✅ set}${GEMINI_API_KEY:-⚪ optional}"

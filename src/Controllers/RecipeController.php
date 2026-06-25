@@ -22,7 +22,12 @@ class RecipeController extends Controller
         $recipe = $this->fromLocalDb($recipeId);
         $needsTranslation = false;
 
-        if ($recipe === null) {
+        if ($recipe !== null) {
+            $row = (new RecipeTranslation())->findBySpoonacularId($recipeId);
+            if ($row && empty($row['raw_response_es'])) {
+                $needsTranslation = true;
+            }
+        } else {
             try {
                 $service = new SpoonacularService($this->logger);
                 $recipe  = $service->getRecipeInfo($recipeId, true, false);

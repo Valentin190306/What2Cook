@@ -13,6 +13,7 @@ spec:
           containers:
           - name: preload
             image: __IMAGE__:__TAG__
+            imagePullPolicy: Always
             command: ["php", "bin/preload-recipes.php"]
             envFrom:
             - configMapRef:

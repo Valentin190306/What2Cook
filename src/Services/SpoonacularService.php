@@ -14,25 +14,37 @@ class SpoonacularService
     private const BASE_URL = 'https://api.spoonacular.com';
     private const CACHE_TTL = 604800; // 7 días
     private const API_TIMEOUT = 20;
+    private const API_CONNECT_TIMEOUT = 10;
 
-    private string $apiKey;
+    /** @var string[] */
+    private array $apiKeys;
     private ?LoggerInterface $logger = null;
     private FileCache $cache;
 
     /**
-     * @param string|null $apiKey  Key opcional. Si no se pasa, usa SPOONACULAR_KEY del .env.
+     * @param string|null $apiKey  Key opcional. Si no se pasa, usa SPOONACULAR_KEY y SPOONACULAR_KEY_2 del .env.
      */
     public function __construct(?LoggerInterface $logger = null, ?string $apiKey = null)
     {
         $this->logger = $logger;
 
-        $key = $apiKey ?? ($_ENV['SPOONACULAR_KEY'] ?? '');
-        if ($key === '') {
-            throw new RuntimeException(
-                'SPOONACULAR_KEY no está definida. Pasa una key al constructor o define la env var.'
-            );
+        if ($apiKey !== null) {
+            $this->apiKeys = [$apiKey];
+        } else {
+            $keys = [];
+            if (!empty($_ENV['SPOONACULAR_KEY'])) {
+                $keys[] = $_ENV['SPOONACULAR_KEY'];
+            }
+            if (!empty($_ENV['SPOONACULAR_KEY_2'])) {
+                $keys[] = $_ENV['SPOONACULAR_KEY_2'];
+            }
+            if (empty($keys)) {
+                throw new RuntimeException(
+                    'No hay claves Spoonacular definidas. Define SPOONACULAR_KEY o SPOONACULAR_KEY_2 en .env.'
+                );
+            }
+            $this->apiKeys = $keys;
         }
-        $this->apiKey = $key;
 
         $this->cache = new FileCache(
             __DIR__ . '/../../log/cache',
@@ -195,57 +207,59 @@ class SpoonacularService
 
     private function get(string $endpoint, array $params): array
     {
-        $cacheKey = $this->buildCacheKey($endpoint, $params);
+        $cacheKey = $endpoint . '?' . http_build_query($params);
 
         $cached = $this->cache->get($cacheKey);
         if ($cached !== null) {
             return $cached;
         }
 
-        $params['apiKey'] = $this->apiKey;
+        $lastException = null;
 
-        $url = self::BASE_URL . $endpoint . '?' . http_build_query($params);
+        foreach ($this->apiKeys as $apiKey) {
+            $params['apiKey'] = $apiKey;
+            $url = self::BASE_URL . $endpoint . '?' . http_build_query($params);
 
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL            => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => self::API_TIMEOUT,
-            CURLOPT_HTTPHEADER     => ['Accept: application/json'],
-        ]);
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL             => $url,
+                CURLOPT_RETURNTRANSFER  => true,
+                CURLOPT_TIMEOUT         => self::API_TIMEOUT,
+                CURLOPT_CONNECTTIMEOUT  => self::API_CONNECT_TIMEOUT,
+                CURLOPT_HTTPHEADER      => ['Accept: application/json'],
+            ]);
 
-        $body  = curl_exec($ch);
-        $errno = curl_errno($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+            $body  = curl_exec($ch);
+            $errno = curl_errno($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
 
-        if ($errno !== 0 || $body === false) {
-            throw new RuntimeException("Error de red al llamar a Spoonacular: cURL errno {$errno}");
+            if ($errno !== 0 || $body === false) {
+                throw new RuntimeException("Error de red al llamar a Spoonacular: cURL errno {$errno}");
+            }
+
+            $data = json_decode($body, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new RuntimeException('Respuesta inválida de Spoonacular: no es JSON.');
+            }
+
+            if ($httpCode === 402) {
+                $this->log('warning', "Límite diario alcanzado con clave (...{$apiKey}), probando siguiente...");
+                continue;
+            }
+
+            if ($httpCode >= 400) {
+                $message = $data['message'] ?? 'Error desconocido';
+                throw new RuntimeException("Spoonacular respondió {$httpCode}: {$message}");
+            }
+
+            $this->cache->set($cacheKey, $data);
+
+            return $data;
         }
 
-        $data = json_decode($body, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new RuntimeException('Respuesta inválida de Spoonacular: no es JSON.');
-        }
-
-        if ($httpCode === 402) {
-            throw new RuntimeException('Límite diario de Spoonacular alcanzado (402).');
-        }
-
-        if ($httpCode >= 400) {
-            $message = $data['message'] ?? 'Error desconocido';
-            throw new RuntimeException("Spoonacular respondió {$httpCode}: {$message}");
-        }
-
-        $this->cache->set($cacheKey, $data);
-
-        return $data;
-    }
-
-    private function buildCacheKey(string $endpoint, array $params): string
-    {
-        return $endpoint . '?' . http_build_query($params);
+        throw new RuntimeException('Límite diario de Spoonacular alcanzado con todas las claves disponibles (402).');
     }
 
     private function maybeTranslateInput(array|string $input): array|string
