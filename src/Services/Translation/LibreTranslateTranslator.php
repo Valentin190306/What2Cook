@@ -82,14 +82,12 @@ class LibreTranslateTranslator implements TranslatorInterface
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
             if ($errno !== 0 || $body === false) {
-                curl_close($ch);
                 throw new RuntimeException("Error de red al llamar a LibreTranslate: cURL errno {$errno}");
             }
 
             $response = json_decode((string) $body, true);
 
             if ($httpCode >= 400) {
-                curl_close($ch);
                 $message = $response['error'] ?? 'Error desconocido';
                 throw new RuntimeException("LibreTranslate respondió {$httpCode}: {$message}");
             }
@@ -97,8 +95,6 @@ class LibreTranslateTranslator implements TranslatorInterface
             $translated = $response['translatedText'] ?? [];
             $allTranslated = array_merge($allTranslated, is_array($translated) ? $translated : [$translated]);
         }
-
-        curl_close($ch);
 
         return $allTranslated;
     }

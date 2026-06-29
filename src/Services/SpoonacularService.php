@@ -232,7 +232,6 @@ class SpoonacularService
             $body  = curl_exec($ch);
             $errno = curl_errno($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
 
             if ($errno !== 0 || $body === false) {
                 throw new RuntimeException("Error de red al llamar a Spoonacular: cURL errno {$errno}");
