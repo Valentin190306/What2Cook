@@ -311,6 +311,11 @@ section.ingredientes h2 {
 
 .btn-save-list svg {
   fill: currentColor;
+  transition: fill 0.2s;
+}
+
+.btn-save-list:hover svg {
+  fill: var(--color-white);
 }
 
 /* Contador de porciones */

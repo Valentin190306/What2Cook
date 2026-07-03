@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector('.search-bar');
     const applyBtn = document.querySelector('.btn-apply');
     const clearBtn = document.querySelector('.btn-clear');
+    const shareBtn = document.getElementById('btn-share-search');
     const paginationAnchors = document.querySelectorAll('.pagination-button:not(.disabled)');
     const recipeLinks = document.querySelectorAll('.recipe-link');
 
@@ -29,6 +30,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.filtros-opciones input[name="intolerances[]"]:checked').forEach((el) => params.append('intolerances[]', el.value));
 
         return params.toString();
+    }
+
+    function populateFiltersFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        
+        // Populate query input
+        const qInput = form ? form.querySelector('input[name="query"]') : null;
+        if (qInput) {
+            qInput.value = params.get('query') || '';
+        }
+
+        // Populate checkboxes
+        ['type', 'cuisine', 'diet', 'intolerances'].forEach(filterType => {
+            const values = params.getAll(filterType + '[]');
+            document.querySelectorAll(`.filtros-opciones input[name="${filterType}[]"]`).forEach(input => {
+                input.checked = values.includes(input.value);
+            });
+        });
+
+        updateLabelStates();
     }
 
     function updateLabelStates() {
@@ -79,12 +100,64 @@ document.addEventListener('DOMContentLoaded', () => {
         input.addEventListener('change', updateLabelStates);
     });
 
+    // Populate filters from URL on page load
+    populateFiltersFromUrl();
+
+    if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+            const currentUrl = window.location.href;
+            try {
+                await navigator.clipboard.writeText(currentUrl);
+                const originalText = shareBtn.innerHTML;
+                shareBtn.innerHTML = `
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    ¡Copiado!
+                `;
+                shareBtn.classList.add('copied');
+                setTimeout(() => {
+                    shareBtn.innerHTML = originalText;
+                    shareBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Error al copiar URL:', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentUrl;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const originalText = shareBtn.innerHTML;
+                    shareBtn.innerHTML = `
+                        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                        ¡Copiado!
+                    `;
+                    shareBtn.classList.add('copied');
+                    setTimeout(() => {
+                        shareBtn.innerHTML = originalText;
+                        shareBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (e) {
+                    console.error('Error en fallback de copia:', e);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+    }
+
     if (applyBtn) {
         applyBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const qs = buildQueryString();
             const url = '/recetas' + (qs ? '?' + qs : '');
             showLoading('Aplicando filtros...');
+            history.pushState({}, '', url);
             window.location.href = url;
         });
     }
@@ -93,7 +166,14 @@ document.addEventListener('DOMContentLoaded', () => {
         clearBtn.addEventListener('click', (e) => {
             e.preventDefault();
             document.querySelectorAll('.filtros-opciones input').forEach((i) => { i.checked = false; });
+            if (form) {
+                const qInput = form.querySelector('input[name="query"]');
+                if (qInput) qInput.value = '';
+            }
             updateLabelStates();
+            const url = '/recetas';
+            history.pushState({}, '', url);
+            window.location.href = url;
         });
     }
 
@@ -102,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (a.classList.contains('disabled')) return;
             e.preventDefault();
             showLoading('Cargando recetas...');
+            history.pushState({}, '', a.getAttribute('href'));
             window.location.href = a.getAttribute('href');
         });
     });
@@ -116,6 +197,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Show loader on form submit
     if (form) form.addEventListener('submit', () => showLoading('Buscando recetas...'));
+
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', () => {
+        populateFiltersFromUrl();
+    });
 
     // Initialize visual state
     updateLabelStates();

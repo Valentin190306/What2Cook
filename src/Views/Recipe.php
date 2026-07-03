@@ -110,9 +110,17 @@ $baseUrl = "{$scheme}://{$host}";
     <div class="receta-content">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <h1 style="margin: 0;"><?= htmlspecialchars($recipe['title']) ?></h1>
-            <button type="button" class="btn-save-list no-print" onclick="window.print()" style="margin: 0;">
-                Imprimir receta
-            </button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn-save-list no-print btn-share-recipe" id="btn-share-recipe" aria-label="Compartir receta">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                    </svg>
+                    Compartir
+                </button>
+                <button type="button" class="btn-save-list no-print" onclick="window.print()" style="margin: 0;">
+                    Imprimir receta
+                </button>
+            </div>
         </div>
 
         <!-- ── Meta ── -->
@@ -206,7 +214,7 @@ $baseUrl = "{$scheme}://{$host}";
                     <img src="https://img.spoonacular.com/ingredients_100x100/<?= htmlspecialchars($ing['image']) ?>" alt="<?= htmlspecialchars($ing['name']) ?>" width="40">
                 <?php endif; ?>
                 <span class="nombre"><?= htmlspecialchars(ucfirst($ing['name'])) ?></span>
-                <span class="cantidad" data-amount="<?= $ing['amount'] ?>">
+                <span class="cantidad" data-amount="<?= $ing['amount'] ?>" data-unit="<?= htmlspecialchars($ing['unit']) ?>">
                     <?= round($ing['amount'], 2) ?> <?= htmlspecialchars($ing['unit']) ?>
                 </span>
             </li>
@@ -230,31 +238,140 @@ $baseUrl = "{$scheme}://{$host}";
 </article>
 
 <script>
-// Ajuste de porciones
+document.addEventListener('DOMContentLoaded', function () {
+
+// Ajuste de porciones y conversión de unidades
 (function () {
     const baseServings = parseInt(document.getElementById('ingredients-list').dataset.baseServings, 10);
     let current = baseServings;
+    var currentUnitSystem = UnitPreferences.getPreferredSystem();
 
     const display = document.getElementById('servings-display');
-    const items   = document.querySelectorAll('#ingredients-list .cantidad');
+    const items = document.querySelectorAll('#ingredients-list .cantidad');
 
     function update() {
         display.textContent = current;
         const ratio = current / baseServings;
+
         items.forEach(item => {
             const base = parseFloat(item.dataset.amount);
-            const unit = item.textContent.trim().replace(/^[\d.]+\s*/, '');
-            item.textContent = (Math.round(base * ratio * 100) / 100) + ' ' + unit;
+            const originalUnit = item.dataset.unit || '';
+            const isVolume = UnitConversion.isVolumeUnit(originalUnit);
+            
+            const scaledAmount = base * ratio;
+            
+            const baseAmount = UnitConversion.convertToBase(scaledAmount, originalUnit);
+            const converted = UnitConversion.getBestUnit(baseAmount, currentUnitSystem, isVolume);
+            
+            item.textContent = UnitConversion.roundValue(converted.amount) + ' ' + converted.unit;
         });
     }
 
     document.getElementById('btn-menos').addEventListener('click', () => {
         if (current > 1) { current--; update(); }
     });
+
     document.getElementById('btn-mas').addEventListener('click', () => {
         current++;
         update();
     });
+
+    UnitPreferences.onSystemChange(function (system) {
+        currentUnitSystem = system;
+        update();
+    });
+
+    update();
+})();
+
+// Conversión de la tabla de macros (Información nutricional)
+(function () {
+    var system = UnitPreferences.getPreferredSystem();
+    var table = document.querySelector('.macros-table tbody tr');
+    if (!table) return;
+
+    var cells = table.querySelectorAll('td');
+    if (cells.length < 4) return;
+
+    var kcal = parseInt(cells[0].textContent) || 0;
+    var protein = parseFloat(cells[1].textContent) || 0;
+    var carbs = parseFloat(cells[2].textContent) || 0;
+    var fat = parseFloat(cells[3].textContent) || 0;
+
+    function updateNutrition(sys) {
+        if (sys === 'metric') {
+            cells[1].textContent = Math.round(protein) + 'g';
+            cells[2].textContent = Math.round(carbs) + 'g';
+            cells[3].textContent = Math.round(fat) + 'g';
+        } else {
+            var p = UnitConversion.convertAmount(protein, 'g', sys);
+            var c = UnitConversion.convertAmount(carbs, 'g', sys);
+            var f = UnitConversion.convertAmount(fat, 'g', sys);
+            cells[1].textContent = UnitConversion.roundValue(p.amount) + ' ' + p.unit;
+            cells[2].textContent = UnitConversion.roundValue(c.amount) + ' ' + c.unit;
+            cells[3].textContent = UnitConversion.roundValue(f.amount) + ' ' + f.unit;
+        }
+    }
+
+    updateNutrition(system);
+
+    UnitPreferences.onSystemChange(function (sys) {
+        updateNutrition(sys);
+    });
+})();
+
+});
+
+// Botón compartir receta
+(function () {
+    const shareBtn = document.getElementById('btn-share-recipe');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+            const currentUrl = window.location.href;
+            try {
+                await navigator.clipboard.writeText(currentUrl);
+                const originalText = shareBtn.innerHTML;
+                shareBtn.innerHTML = `
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    ¡Copiado!
+                `;
+                shareBtn.classList.add('copied');
+                setTimeout(() => {
+                    shareBtn.innerHTML = originalText;
+                    shareBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Error al copiar URL:', err);
+                // Fallback para navegadores antiguos
+                const textArea = document.createElement('textarea');
+                textArea.value = currentUrl;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const originalText = shareBtn.innerHTML;
+                    shareBtn.innerHTML = `
+                        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                        </svg>
+                        ¡Copiado!
+                    `;
+                    shareBtn.classList.add('copied');
+                    setTimeout(() => {
+                        shareBtn.innerHTML = originalText;
+                        shareBtn.classList.remove('copied');
+                    }, 2000);
+                } catch (e) {
+                    console.error('Error en fallback de copia:', e);
+                }
+                document.body.removeChild(textArea);
+            }
+        });
+    }
 })();
 </script>
 <?php endif; ?>
