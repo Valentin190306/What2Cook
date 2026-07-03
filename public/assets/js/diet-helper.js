@@ -54,6 +54,17 @@ document.addEventListener('DOMContentLoaded', () => {
             window.dietHelperPlanData.meta.plan_id = result.plan_id;
             updateDietPlanButtons();
             btnGuardar.textContent = '¡Guardado!';
+
+            // Notificar al Service Worker
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                const planTitle = `Plan ${result.plan_id}`;
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CACHE_PLAN',
+                    planId: result.plan_id,
+                    title: planTitle
+                });
+            }
+
             return result;
         } catch (err) {
             console.error('Error al guardar el plan:', err);
@@ -185,6 +196,13 @@ function renderDay(dayIndex) {
         return;
     }
 
+    var dhSys = UnitPreferences.getPreferredSystem();
+    function dhFmtMacro(val, unit) {
+        if (dhSys === 'metric') return Math.round(val) + 'g';
+        var conv = UnitConversion.convertAmount(val, 'g', dhSys);
+        return UnitConversion.roundValue(conv.amount) + ' ' + conv.unit;
+    }
+
     day.meals.forEach(meal => {
         const article = document.createElement('article');
         article.className = 'comida';
@@ -208,9 +226,9 @@ function renderDay(dayIndex) {
                     <tbody>
                         <tr>
                             <td>${Math.round(meal.calories)}</td>
-                            <td>${Math.round(meal.protein)}g</td>
-                            <td>${Math.round(meal.carbs)}g</td>
-                            <td>${Math.round(meal.fat)}g</td>
+                            <td>${dhFmtMacro(meal.protein)}</td>
+                            <td>${dhFmtMacro(meal.carbs)}</td>
+                            <td>${dhFmtMacro(meal.fat)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -230,9 +248,9 @@ function renderDay(dayIndex) {
                 <tbody>
                     <tr>
                         <td>${Math.round(day.total_calories)}</td>
-                        <td>${Math.round(day.total_protein)}g</td>
-                        <td>${Math.round(day.total_carbs)}g</td>
-                        <td>${Math.round(day.total_fat)}g</td>
+                        <td>${dhFmtMacro(day.total_protein)}</td>
+                        <td>${dhFmtMacro(day.total_carbs)}</td>
+                        <td>${dhFmtMacro(day.total_fat)}</td>
                     </tr>
                 </tbody>
             </table>

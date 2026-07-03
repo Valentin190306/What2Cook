@@ -155,6 +155,16 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '¡Guardado!';
             btn.classList.add('saved');
             success = true;
+
+            // Notificar al Service Worker
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                const listName = `Lista ${data.list_id}`;
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'CACHE_SHOPPING_LIST',
+                    listId: data.list_id,
+                    name: listName
+                });
+            }
             
         } catch (error) {
             console.error('Error de red al guardar lista de compras:', error);
@@ -225,6 +235,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (card) {
                     card.remove();
+
+                    // Notificar al Service Worker
+                    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage({
+                            type: 'UNCACHE_SHOPPING_LIST',
+                            listId: listId
+                        });
+                    }
 
                     // If no cards remain, reload to show empty state
                     const remainingCards = document.querySelectorAll('.shopping-list-card');

@@ -163,6 +163,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.classList.remove('favorited');
             }
 
+            // Notificar al Service Worker para meal prep
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                const mealPrepId = parseInt(btn.dataset.mealPrepId || '0', 10);
+                if (mealPrepId > 0) {
+                    if (favorited) {
+                        navigator.serviceWorker.controller.postMessage({
+                            type: 'CACHE_MEALPREP',
+                            mealPrepId: mealPrepId,
+                            title: `Meal Prep ${mealPrepId}`
+                        });
+                    } else {
+                        navigator.serviceWorker.controller.postMessage({
+                            type: 'UNCACHE_MEALPREP',
+                            mealPrepId: mealPrepId
+                        });
+                    }
+                }
+            }
+
             // Si estamos en la página de favoritos y desmarcar, removemos la tarjeta
             if (btn.hasAttribute('data-fav-remove-card') && !favorited) {
                 const card = btn.closest('article');
