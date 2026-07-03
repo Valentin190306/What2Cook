@@ -151,10 +151,27 @@ if (!function_exists('getRecipeDetailsForPrint')) {
                                         
                                         $ingredients = $fullRecipe['extendedIngredients'] ?? [];
                                         
+                                        $prefService = new \App\Services\UnitPreferenceService();
+                                        $convService = new \App\Services\UnitConversionService();
+                                        $unitSystem = $prefService->getPreferredSystem(\App\Core\Session::userId());
+                                        foreach ($ingredients as &$ing) {
+                                            $converted = $convService->convertUsingSpoonacularMeasures($ing, $unitSystem);
+                                            $ing['amount'] = $converted['amount'];
+                                            $ing['unit'] = $converted['unit'];
+                                        }
+                                        unset($ing);
+                                        
                                         $nutrients = $fullRecipe['nutrition']['nutrients'] ?? [];
                                         $nutriMap = [];
                                         foreach ($nutrients as $n) {
                                             $nutriMap[$n['name']] = $n;
+                                        }
+                                        foreach (['Protein', 'Carbohydrates', 'Fat'] as $nk) {
+                                            if (isset($nutriMap[$nk])) {
+                                                $convN = $convService->convertToSystem((float) $nutriMap[$nk]['amount'], 'g', $unitSystem);
+                                                $nutriMap[$nk]['amount'] = $convN['amount'];
+                                                $nutriMap[$nk]['unit'] = $convN['unit'];
+                                            }
                                         }
                                     ?>
                                         <article class="receta-detalle print-recipe-block">
@@ -223,9 +240,9 @@ if (!function_exists('getRecipeDetailsForPrint')) {
                                                             <tbody>
                                                                 <tr>
                                                                     <td><?= round($nutriMap['Calories']['amount']     ?? 0) ?></td>
-                                                                    <td><?= round($nutriMap['Protein']['amount']      ?? 0) ?>g</td>
-                                                                    <td><?= round($nutriMap['Carbohydrates']['amount']?? 0) ?>g</td>
-                                                                    <td><?= round($nutriMap['Fat']['amount']          ?? 0) ?>g</td>
+                                                                    <td><?= round($nutriMap['Protein']['amount']      ?? 0) ?><?= htmlspecialchars($nutriMap['Protein']['unit'] ?? 'g') ?></td>
+                                                                    <td><?= round($nutriMap['Carbohydrates']['amount']?? 0) ?><?= htmlspecialchars($nutriMap['Carbohydrates']['unit'] ?? 'g') ?></td>
+                                                                    <td><?= round($nutriMap['Fat']['amount']          ?? 0) ?><?= htmlspecialchars($nutriMap['Fat']['unit'] ?? 'g') ?></td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>

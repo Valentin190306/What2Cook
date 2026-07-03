@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Session;
 use App\Models\SavedShoppingList;
 use App\Models\Plan;
 use App\Models\ShoppingList;
+use App\Services\UnitConversionService;
+use App\Services\UnitPreferenceService;
 
 class ShoppingListController extends Controller
 {
@@ -62,9 +65,24 @@ class ShoppingListController extends Controller
         $savedListModel = new SavedShoppingList();
         $lists = $savedListModel->findAllByUser($userId);
         
+        $prefService = new UnitPreferenceService();
+        $convService = new UnitConversionService();
+        $unitSystem = $prefService->getPreferredSystem($userId);
+        
         foreach ($lists as &$list) {
             $listWithItems = $savedListModel->findWithItems((int) $list['id']);
-            $list['items'] = $listWithItems['items'] ?? [];
+            $items = $listWithItems['items'] ?? [];
+            foreach ($items as &$item) {
+                $amount = (float) ($item['amount'] ?? 0);
+                $unit = $item['unit'] ?? '';
+                if ($amount > 0 && $unit !== '') {
+                    $converted = $convService->convertToSystem($amount, $unit, $unitSystem);
+                    $item['amount'] = $converted['amount'];
+                    $item['unit'] = $converted['unit'];
+                }
+            }
+            unset($item);
+            $list['items'] = $items;
         }
         unset($list);
         

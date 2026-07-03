@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Core\Session;
 use App\Models\Favorite;
 use App\Models\MealPrepFavorite;
 use App\Models\RecipeTranslation;
 use App\Services\RecipeStorageService;
 use App\Services\Translation\DeferredTranslator;
+use App\Services\UnitConversionService;
+use App\Services\UnitPreferenceService;
 
 class FavoriteController extends Controller
 {
@@ -71,6 +74,26 @@ class FavoriteController extends Controller
         }
         
         $mealPrepFavorites = (new MealPrepFavorite())->findAllByUser($userId);
+        
+        $convService = new UnitConversionService();
+        $prefService = new UnitPreferenceService();
+        $unitSystem = $prefService->getPreferredSystem($userId);
+        foreach ($favorites as &$recipe) {
+            $nutrition = $recipe['nutrition']['nutrients'] ?? [];
+            $nutriMap = [];
+            foreach ($nutrition as $n) {
+                $nutriMap[$n['name']] = $n;
+            }
+            foreach (['Protein', 'Carbohydrates', 'Fat'] as $key) {
+                if (isset($nutriMap[$key])) {
+                    $converted = $convService->convertToSystem((float) $nutriMap[$key]['amount'], 'g', $unitSystem);
+                    $nutriMap[$key]['amount'] = $converted['amount'];
+                    $nutriMap[$key]['unit'] = $converted['unit'];
+                }
+            }
+            $recipe['nutrition']['nutrients'] = array_values($nutriMap);
+        }
+        unset($recipe);
         
         \App\Core\View::render('Favorites', [
             'favorites' => $favorites,

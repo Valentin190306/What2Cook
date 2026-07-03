@@ -122,6 +122,11 @@ ENABLE_OUTPUT_TRANSLATION=true
 RECIPES_TABLE_ENABLED=true
 TRANSLATION_DAILY_LIMIT=150
 TRANSLATION_SEARCH_TERMS=5
+
+# Google OAuth (opcional - para login con Google)
+GOOGLE_CLIENT_ID=tu_client_id_aqui
+GOOGLE_CLIENT_SECRET=tu_client_secret_aqui
+GOOGLE_REDIRECT_URI=https://tudominio.com/auth/google/callback
 ```
 
 ### 3. Construir las imágenes Docker
@@ -163,6 +168,7 @@ El sistema cuenta con medidas de seguridad robustas implementadas directamente e
    - **Selector:** Cadena aleatoria única que sirve para buscar el registro en la tabla `user_remember_tokens`.
    - **Validador:** Hash criptográfico SHA-256 verificado en la base de datos a partir del validador de la cookie, previniendo ataques de sincronización (*timing attacks*).
    - Las cookies de persistencia se configuran con flags de seguridad modernos: `HttpOnly` (previene robo vía JS), `SameSite=Lax` (protege contra CSRF) y `Secure` (si el canal de conexión es HTTPS).
+4. **Google OAuth (Opcional):** El sistema soporta autenticación con Google mediante OAuth 2.0. Si el email de la cuenta de Google coincide con un usuario existente y está verificado, se vincula automáticamente. Si no existe, se crea una nueva cuenta. Requiere configuración de variables de entorno `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` y `GOOGLE_REDIRECT_URI`.
 
 ---
 
@@ -189,19 +195,40 @@ Cuando un usuario consulta el detalle de una receta no indexada localmente, el c
 Para garantizar que el usuario pueda visualizar sus recetas favoritas incluso sin conectividad a internet, la aplicación integra un Service Worker avanzado (`public/sw.js` y `public/assets/js/sw-register.js`):
 
 ### Estrategias de Almacenamiento en Caché
-- **Stale-While-Revalidate:** Aplicado a los recursos del sistema (`/assets/*`) y las páginas de recetas individuales (`/receta/{id}`). Devuelve de inmediato el contenido en caché (si existe) y realiza una petición a la red en segundo plano para actualizar la caché.
+- **Stale-While-Revalidate:** Aplicado a los recursos del sistema (`/assets/*`), las páginas de recetas individuales (`/receta/{id}`), planes de dieta (`/api/diet-helper/plan/{id}`), meal-preps (`/api/meal-prep-favorites/{id}`) y listas de compras (`/api/shopping-lists`, `/api/diet-helper/shopping-list/{id}`). Devuelve de inmediato el contenido en caché (si existe) y realiza una petición a la red en segundo plano para actualizar la caché.
 - **Cache-First (con Límite):** Aplicado a las imágenes devueltas por Spoonacular. Reutiliza la imagen local para optimizar datos y mantiene un límite máximo de 60 imágenes en caché, descartando las más antiguas.
 - **Navegación Offline Fallback:** Si se navega a cualquier ruta sin conexión y esta no se encuentra cacheada, el SW intercepta la petición y responde con la interfaz amigable `public/offline.html`.
 
-### Sincronización y Reconciliación de Favoritos
-- Al iniciar la aplicación en línea, se desencadena un evento `RECONCILE` enviando un mensaje con los IDs de las recetas favoritas actuales al Service Worker.
-- El Service Worker realiza un barrido en background para **descargar** todas las recetas favoritas que falten en la caché de recetas y **eliminar** aquellas que el usuario haya quitado de sus favoritos, liberando almacenamiento del dispositivo.
-- Adicionalmente, el Service Worker genera y almacena un archivo JSON virtual en caché local (`/offline-favorites.json`) que sirve de índice dinámico para renderizar la lista de recetas favoritas cuando el dispositivo no tiene acceso a internet.
-- **Purga por Cierre de Sesión:** Cuando el usuario hace click en *Cerrar Sesión*, el Service Worker intercepta la petición POST de logout y purga de manera inmediata las cachés de imágenes y recetas, impidiendo que usuarios posteriores del navegador vean información privada.
+### Sincronización y Reconciliación
+- **Favoritos:** Al iniciar la aplicación en línea, se desencadena un evento `RECONCILE` enviando un mensaje con los IDs de las recetas favoritas actuales al Service Worker. El SW descarga las recetas que falten y elimina las que el usuario haya quitado de favoritos. Genera un índice JSON virtual (`/offline-favorites.json`) para renderizar la lista offline.
+- **Planes de Dieta:** El SW mantiene cachés separadas para planes (`PLANS_CACHE`) con su índice (`/offline-plans.json`). Al guardar un plan, el frontend notifica al SW mediante `postMessage` para cachearlo. Al eliminar, se descachea.
+- **Meal Preps:** Similar a los planes, con caché `MEALPREPS_CACHE` e índice (`/offline-mealpreps.json`). Sincronización automática al marcar/desmarcar como favorito.
+- **Listas de Compras:** Caché `SHOPPING_CACHE` con índice (`/offline-shopping.json`). Se cachean al guardar y se descachean al eliminar.
+- **Purga por Cierre de Sesión:** Cuando el usuario hace click en *Cerrar Sesión*, el SW intercepta la petición POST de logout y purga de manera inmediata todas las cachés (recetas, imágenes, planes, meal-preps, shopping lists), impidiendo que usuarios posteriores del navegador vean información privada.
 
 ---
 
-## 8. Dependencias PHP Incluidas
+## 8. Funcionalidades Adicionales
+
+### Conversor de Unidades de Ingredientes
+La aplicación incluye un conversor de unidades que permite a los usuarios visualizar las cantidades de ingredientes en diferentes sistemas de medición:
+- **Métrico:** Gramos (g), kilogramos (kg), mililitros (ml), litros (l)
+- **Imperial:** Onzas (oz), libras (lb), onzas líquidas (fl oz)
+- **US:** Tazas (cup), cucharadas (tbsp), cucharaditas (tsp)
+
+La preferencia del usuario se guarda en la base de datos y se aplica automáticamente al visitar cualquier receta. La conversión se realiza en tiempo real en el frontend sin necesidad de recargar la página.
+
+### Catálogo con Búsquedas Compartibles
+Los filtros del catálogo de recetas (tipo, cocina, dieta, intolerancias y búsqueda por texto) se sincronizan con la URL mediante la API History del navegador (`pushState` y `popstate`). Esto permite:
+- Compartir búsquedas específicas copiando la URL
+- Navegar hacia atrás/adelante sin perder los filtros aplicados
+- Mantener filtros al recargar la página
+
+El botón "Compartir búsqueda" copia la URL actual al portapapeles con feedback visual.
+
+---
+
+## 9. Dependencias PHP Incluidas
 
 Las siguientes dependencias principales se administran mediante Composer y forman parte de la arquitectura del proyecto:
 

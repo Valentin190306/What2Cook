@@ -14,6 +14,8 @@ use App\Models\Favorite;
 use App\Models\MealPrepFavorite;
 use App\Models\SavedShoppingList;
 use App\Services\UserPreferenceService;
+use App\Services\UnitPreferenceService;
+use App\Services\UnitConversionService;
 use App\Core\View;
 
 class ProfileController extends Controller
@@ -58,6 +60,7 @@ class ProfileController extends Controller
         $prefs = (new UserPreferenceService())->getPreferences($userId);
         $userDiet = $prefs['diet'];
         $userAllergies = $prefs['intolerances'];
+        $userUnitSystem = $prefs['unit_system'];
 
         $dietLabels = [
             '' => 'Sin dieta',
@@ -106,6 +109,7 @@ class ProfileController extends Controller
             'userDietLabel' => $dietLabels[$userDiet] ?? 'Sin dieta',
             'userAllergies' => $userAllergies,
             'userAllergyLabels' => array_map(fn($a) => $allergyLabels[$a] ?? $a, $userAllergies),
+            'userUnitSystem' => $userUnitSystem,
             'favoritesCount' => $favoritesCount,
             'plansCount' => $plansCount,
             'listsCount' => $listsCount,
@@ -168,8 +172,12 @@ class ProfileController extends Controller
         $userId = $this->requireAuthWeb();
         $user = (new User())->find($userId);
 
+        $prefs = (new UserPreferenceService())->getPreferences($userId);
+        $userUnitSystem = $prefs['unit_system'];
+
         View::render('ProfileEdit', [
             'user' => $user,
+            'userUnitSystem' => $userUnitSystem,
             'error' => Session::getFlash('error')
         ]);
     }
@@ -211,6 +219,11 @@ class ProfileController extends Controller
 
         $preferences = $diet;
         $allergies = json_encode(array_values($filteredIntolerances));
+
+        $unitSystem = Validator::inList($_POST['unit_system'] ?? null, ['metric', 'imperial', 'us']);
+        if ($unitSystem !== null) {
+            (new UnitPreferenceService())->setPreferredSystem($userId, $unitSystem);
+        }
 
         $currentPassword = $_POST['current_password'] ?? '';
         $newPassword = $_POST['new_password'] ?? '';
@@ -258,5 +271,42 @@ class ProfileController extends Controller
         $this->log('info', 'Perfil actualizado', ['user_id' => $userId]);
         Session::flash('success', 'Perfil actualizado.');
         $this->redirect('/perfil');
+    }
+
+    public function getPreferences(): void
+    {
+        $userId = $this->requireAuthApi();
+        $prefs = (new UserPreferenceService())->getPreferences($userId);
+        $this->json($prefs);
+    }
+
+    public function setUnitSystem(): void
+    {
+        $userId = $this->requireAuthApi();
+        $this->requireJson();
+        $body = $this->parseBody();
+
+        $unitSystem = Validator::inList($body['unit_system'] ?? null, ['metric', 'imperial', 'us']);
+        if ($unitSystem === null) {
+            $this->json(['error' => 'Sistema de unidades inválido.'], 422);
+            return;
+        }
+
+        $prefService = new UserPreferenceService();
+        $success = $prefService->setPreference($userId, 'unit_system', $unitSystem);
+
+        if ($success) {
+            $this->json(['success' => true, 'unit_system' => $unitSystem]);
+        } else {
+            $this->json(['error' => 'Error al guardar preferencia.'], 500);
+        }
+    }
+
+    public function getUnitSystem(): void
+    {
+        $userId = Session::userId();
+        $prefService = new UnitPreferenceService();
+        $unitSystem = $prefService->getPreferredSystem($userId);
+        $this->json(['unitSystem' => $unitSystem]);
     }
 }

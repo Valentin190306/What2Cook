@@ -79,7 +79,7 @@ $baseUrl = "{$scheme}://{$host}";
     <!-- Estilos de impresión -->
     <link rel="stylesheet" href="/assets/styles/print.css?v=<?= time() ?>" media="print">
 </head>
-<body>
+<body<?php if ($uid !== null): ?> data-user-authed<?php endif; ?>>
     <header>
         <a href="/"><img src="/assets/img/LogoW2C_1.png" alt="Logo W2C"></a>
         <!-- <strong>What2Cook</strong> -->
@@ -93,6 +93,13 @@ $baseUrl = "{$scheme}://{$host}";
                 <li><a href="/about">Nosotros</a></li>
                 <?php if ($uid === null): ?>
                     <li><a href="/login">Accedé</a></li>
+                    <li class="nav-unit-selector">
+                        <select id="nav-unit-system" aria-label="Sistema de unidades">
+                            <option value="metric">Métrico</option>
+                            <option value="imperial">Imperial</option>
+                            <option value="us">US</option>
+                        </select>
+                    </li>
                 <?php else: ?>
                     <li><a href="/favoritos">Favoritos</a></li>
                     <li><a href="/mis-planes">Mis Planes</a></li>
@@ -162,11 +169,32 @@ $baseUrl = "{$scheme}://{$host}";
             </a>
         </nav>
     </footer>
+    <script src="/assets/js/UnitPreferences.js?v=<?= time() ?>" defer></script>
+    <script src="/assets/js/UnitConversion.js?v=<?= time() ?>" defer></script>
     <?php if (isset($scripts)): ?>
         <?php foreach ($scripts as $script): ?>
             <script src="/assets/js/<?= $script ?>.js?v=<?= time() ?>" defer></script>
         <?php endforeach; ?>
     <?php endif; ?>
     <script src="/assets/js/sw-register.js" defer></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        UnitPreferences.syncFromServer();
+
+        var navSelector = document.getElementById('nav-unit-system');
+        if (navSelector) {
+            navSelector.value = UnitPreferences.getPreferredSystem();
+            navSelector.addEventListener('change', function (e) {
+                UnitPreferences.setPreferredSystem(e.target.value);
+            });
+        }
+
+        UnitPreferences.onSystemChange(function (system) {
+            if (navSelector) {
+                navSelector.value = system;
+            }
+        });
+    });
+    </script>
 </body>
 </html>

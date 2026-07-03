@@ -11,6 +11,8 @@ use App\Core\View;
 use App\Models\Favorite;
 use App\Models\RecipeTranslation;
 use App\Services\SpoonacularService;
+use App\Services\UnitConversionService;
+use App\Services\UnitPreferenceService;
 
 class CatalogueController extends Controller
 {
@@ -125,6 +127,29 @@ class CatalogueController extends Controller
             $favoriteRows = (new Favorite())->findAllByUser($userId);
             $favoriteIds = array_map(static fn(array $favorite): int => (int) $favorite['spoonacular_id'], $favoriteRows);
         }
+
+        $convService = new UnitConversionService();
+        $prefService = new UnitPreferenceService();
+        $unitSystem = $prefService->getPreferredSystem($userId);
+        foreach ($recipes as &$recipe) {
+            $nutrition = $recipe['nutrition']['nutrients'] ?? [];
+            $nutriMap = [];
+            foreach ($nutrition as $n) {
+                $nutriMap[$n['name']] = $n;
+            }
+            if (!empty($nutriMap)) {
+                foreach (['Protein', 'Carbohydrates', 'Fat'] as $key) {
+                    if (isset($nutriMap[$key])) {
+                        $converted = $convService->convertToSystem((float) $nutriMap[$key]['amount'], 'g', $unitSystem);
+                        $nutriMap[$key]['amount'] = $converted['amount'];
+                        $nutriMap[$key]['unit'] = $converted['unit'];
+                    }
+                }
+                // Rebuild nutrients array
+                $recipe['nutrition']['nutrients'] = array_values($nutriMap);
+            }
+        }
+        unset($recipe);
 
         View::render('Catalogue', [
             'query' => $query,

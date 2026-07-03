@@ -54,6 +54,12 @@ async function openMealPrepModal(mpId) {
         }
 
         if (data.recipes && data.recipes.length > 0) {
+            var mpModalSys = UnitPreferences.getPreferredSystem();
+            function mpModalMacro(val) {
+                if (mpModalSys === 'metric') return Math.round(val) + 'g';
+                var conv = UnitConversion.convertAmount(val || 0, 'g', mpModalSys);
+                return UnitConversion.roundValue(conv.amount) + ' ' + conv.unit;
+            }
             recipesEl.innerHTML = data.recipes.map(recipe => {
                 const id = recipe.id || 0;
                 const image = recipe.image || '/assets/img/placeholder_RecetaSinFoto.png';
@@ -80,9 +86,9 @@ async function openMealPrepModal(mpId) {
                             <thead><tr><th>Kcal</th><th>Proteína</th><th>Carbs</th><th>Grasa</th></tr></thead>
                             <tbody><tr>
                                 <td>${Math.round(nutrientMap['Calories'] ? nutrientMap['Calories'].amount : 0)}</td>
-                                <td>${Math.round(nutrientMap['Protein'] ? nutrientMap['Protein'].amount : 0)}g</td>
-                                <td>${Math.round(nutrientMap['Carbohydrates'] ? nutrientMap['Carbohydrates'].amount : 0)}g</td>
-                                <td>${Math.round(nutrientMap['Fat'] ? nutrientMap['Fat'].amount : 0)}g</td>
+                                <td>${mpModalMacro(nutrientMap['Protein'] ? nutrientMap['Protein'].amount : 0)}</td>
+                                <td>${mpModalMacro(nutrientMap['Carbohydrates'] ? nutrientMap['Carbohydrates'].amount : 0)}</td>
+                                <td>${mpModalMacro(nutrientMap['Fat'] ? nutrientMap['Fat'].amount : 0)}</td>
                             </tr></tbody>
                         </table>
                         <a class="recipe-link" href="/receta/${id}" aria-hidden="true" tabindex="-1"></a>

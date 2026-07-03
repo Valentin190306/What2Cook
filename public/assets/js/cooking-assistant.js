@@ -197,6 +197,13 @@ async function renderMealPrep(recipes) {
         return acc;
     }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
 
+    const mpSys = UnitPreferences.getPreferredSystem();
+    function fmtMacro(val, unit) {
+        if (mpSys === 'metric') return Math.round(val) + 'g';
+        var conv = UnitConversion.convertAmount(val, 'g', mpSys);
+        return UnitConversion.roundValue(conv.amount) + ' ' + conv.unit;
+    }
+
     // Banner de resumen
     const banner = document.createElement('div');
     banner.classList.add('mp-summary');
@@ -208,9 +215,9 @@ async function renderMealPrep(recipes) {
         <h2 class="mp-summary__title">Tu Meal Prep — ${recipes.length} recetas</h2>
         <div class="mp-summary__macros">
             <span><strong>${Math.round(totals.calories)}</strong> Kcal totales</span>
-            <span><strong>${Math.round(totals.protein)}g</strong> Proteína</span>
-            <span><strong>${Math.round(totals.carbs)}g</strong> Carbs</span>
-            <span><strong>${Math.round(totals.fat)}g</strong> Grasa</span>
+            <span><strong>${fmtMacro(totals.protein)}</strong> Proteína</span>
+            <span><strong>${fmtMacro(totals.carbs)}</strong> Carbs</span>
+            <span><strong>${fmtMacro(totals.fat)}</strong> Grasa</span>
         </div>
     `;
     
@@ -371,15 +378,29 @@ function buildCard(recipe) {
     // Tabla de macros
     if (recipe.nutrition) {
         const n = recipe.nutrition;
+        const sys = UnitPreferences.getPreferredSystem();
         const table = document.createElement('table');
         table.classList.add('ca-nutrition-table');
+        let proteinStr, carbsStr, fatStr;
+        if (sys === 'metric') {
+            proteinStr = Math.round(n.protein) + 'g';
+            carbsStr = Math.round(n.carbs) + 'g';
+            fatStr = Math.round(n.fat) + 'g';
+        } else {
+            var p = UnitConversion.convertAmount(n.protein || 0, 'g', sys);
+            var c = UnitConversion.convertAmount(n.carbs || 0, 'g', sys);
+            var f = UnitConversion.convertAmount(n.fat || 0, 'g', sys);
+            proteinStr = UnitConversion.roundValue(p.amount) + ' ' + p.unit;
+            carbsStr = UnitConversion.roundValue(c.amount) + ' ' + c.unit;
+            fatStr = UnitConversion.roundValue(f.amount) + ' ' + f.unit;
+        }
         table.innerHTML = `
             <thead><tr><th>Kcal</th><th>Proteína</th><th>Carbs</th><th>Grasa</th></tr></thead>
             <tbody><tr>
                 <td>${Math.round(n.calories)}</td>
-                <td>${Math.round(n.protein)}g</td>
-                <td>${Math.round(n.carbs)}g</td>
-                <td>${Math.round(n.fat)}g</td>
+                <td>${proteinStr}</td>
+                <td>${carbsStr}</td>
+                <td>${fatStr}</td>
             </tr></tbody>
         `;
         card.appendChild(table);
@@ -433,10 +454,20 @@ function renderModalContent(recipe) {
         ? `<p class="ca-modal-meta">⏱ <strong>${recipe.readyInMinutes} minutos</strong> de preparación</p>`
         : '';
 
+    const modalSys = UnitPreferences.getPreferredSystem();
+
     let ingredientsHtml = '';
     if (recipe.extendedIngredients && recipe.extendedIngredients.length > 0) {
         const items = recipe.extendedIngredients
-            .map(ing => `<li>${escapeHtml(ing.original || ing.name)}</li>`)
+            .map(function (ing) {
+                var amt = parseFloat(ing.amount) || 0;
+                var unit = (ing.unit || '').trim();
+                if (amt > 0 && unit) {
+                    var conv = UnitConversion.convertAmount(amt, unit, modalSys);
+                    return '<li>' + escapeHtml(ing.name || '') + ': ' + UnitConversion.roundValue(conv.amount) + ' ' + conv.unit + '</li>';
+                }
+                return '<li>' + escapeHtml(ing.original || ing.name) + '</li>';
+            })
             .join('');
         ingredientsHtml = `
             <h3 class="ca-modal-section-title">Ingredientes</h3>
@@ -464,12 +495,16 @@ function renderModalContent(recipe) {
 
         const rows = recipe.nutrition.nutrients
             .filter(n => targets.includes(n.name))
-            .map(n => `
-                <tr>
-                    <td>${escapeHtml(labels[n.name] || n.name)}</td>
-                    <td>${n.amount} ${escapeHtml(n.unit)}</td>
-                </tr>
-            `)
+            .map(function (n) {
+                var amount = n.amount;
+                var unit = escapeHtml(n.unit);
+                if (n.name !== 'Calories' && unit === 'g' && modalSys !== 'metric') {
+                    var conv = UnitConversion.convertAmount(parseFloat(n.amount) || 0, 'g', modalSys);
+                    amount = UnitConversion.roundValue(conv.amount);
+                    unit = conv.unit;
+                }
+                return '<tr><td>' + escapeHtml(labels[n.name] || n.name) + '</td><td>' + amount + ' ' + unit + '</td></tr>';
+            })
             .join('');
 
         if (rows) {

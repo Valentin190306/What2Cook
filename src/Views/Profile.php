@@ -53,6 +53,19 @@ $noindex = true;
             <?php endif; ?>
         </div>
     </aside>
+    <aside class="dietary-panel">
+        <h2>Preferencias de Usuario</h2>
+        <div class="dietary-info">
+            <div class="dietary-item">
+                <h3>Sistema de Unidades:</h3>
+                <p><?= htmlspecialchars([
+                    'metric' => 'Métrico (g, ml)',
+                    'imperial' => 'Imperial (oz, lb)',
+                    'us' => 'US (tazas, cucharadas)'
+                ][$userUnitSystem ?? 'metric'] ?? 'Métrico (g, ml)') ?></p>
+            </div>
+        </div>
+    </aside>
 </section>
 
 <section class="profile-layout">

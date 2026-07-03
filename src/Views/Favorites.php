@@ -73,9 +73,9 @@ $noindex = true;
                     <tbody>
                         <tr>
                             <td><?= round($nutritionMap['Calories']['amount'] ?? 0) ?></td>
-                            <td><?= round($nutritionMap['Protein']['amount'] ?? 0) ?>g</td>
-                            <td><?= round($nutritionMap['Carbohydrates']['amount'] ?? 0) ?>g</td>
-                            <td><?= round($nutritionMap['Fat']['amount'] ?? 0) ?>g</td>
+                            <td><?= round($nutritionMap['Protein']['amount'] ?? 0) ?><?= htmlspecialchars($nutritionMap['Protein']['unit'] ?? 'g') ?></td>
+                            <td><?= round($nutritionMap['Carbohydrates']['amount'] ?? 0) ?><?= htmlspecialchars($nutritionMap['Carbohydrates']['unit'] ?? 'g') ?></td>
+                            <td><?= round($nutritionMap['Fat']['amount'] ?? 0) ?><?= htmlspecialchars($nutritionMap['Fat']['unit'] ?? 'g') ?></td>
                         </tr>
                     </tbody>
                 </table>

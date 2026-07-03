@@ -95,6 +95,25 @@ if (!empty($user['allergies'])) {
             </div>
         </details>
 
+        <!-- Preferencias de usuario (plegable) -->
+        <details class="collapsible-section">
+            <summary>
+                <span>Preferencias de Usuario</span>
+                <span class="toggle-icon">▾</span>
+            </summary>
+            <div class="collapsible-content">
+                <div class="form-field">
+                    <label for="edit-unit-system">Sistema de Unidades</label>
+                    <select id="edit-unit-system">
+                        <option value="metric" <?= ($userUnitSystem ?? 'metric') === 'metric' ? 'selected' : '' ?>>Métrico (g, ml)</option>
+                        <option value="imperial" <?= ($userUnitSystem ?? 'metric') === 'imperial' ? 'selected' : '' ?>>Imperial (oz, lb)</option>
+                        <option value="us" <?= ($userUnitSystem ?? 'metric') === 'us' ? 'selected' : '' ?>>US (tazas, cucharadas)</option>
+                    </select>
+                    <input type="hidden" name="unit_system" id="unit-system-hidden" value="<?= htmlspecialchars($userUnitSystem ?? 'metric') ?>">
+                </div>
+            </div>
+        </details>
+
         <!-- Cambiar contraseña (plegable) -->
         <details class="collapsible-section">
             <summary>
@@ -132,3 +151,19 @@ if (!empty($user['allergies'])) {
         </div>
     </form>
 </section>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var unitSelect = document.getElementById('edit-unit-system');
+    var unitHidden = document.getElementById('unit-system-hidden');
+    if (unitSelect && unitHidden) {
+        unitSelect.addEventListener('change', function (e) {
+            unitHidden.value = e.target.value;
+            UnitPreferences.setPreferredSystem(e.target.value);
+        });
+        UnitPreferences.onSystemChange(function (system) {
+            unitSelect.value = system;
+            if (unitHidden) unitHidden.value = system;
+        });
+    }
+});
+</script>
