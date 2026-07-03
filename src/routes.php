@@ -24,6 +24,9 @@ $router->add('GET', '/lista-compras', 'ShoppingListController@index');
 $router->add('GET', '/perfil/editar', 'ProfileController@editForm');
 $router->add('POST', '/perfil/editar', 'ProfileController@update');
 $router->add('POST', '/api/profile/avatar', 'ProfileController@uploadAvatar');
+$router->add('GET', '/api/preferences', 'ProfileController@getPreferences');
+$router->add('GET', '/api/preferences/unit-system', 'ProfileController@getUnitSystem');
+$router->add('POST', '/api/preferences/unit-system', 'ProfileController@setUnitSystem');
 $router->add('GET', '/login', 'AuthController@loginForm');
 $router->add('GET', '/register', 'AuthController@registerForm');
 
@@ -31,6 +34,10 @@ $router->add('POST', '/login', 'AuthController@login');
 $router->add('POST', '/register', 'AuthController@register');
 $router->add('POST', '/logout', 'AuthController@logout');
 $router->add('POST', '/api/check-email', 'AuthController@checkEmail');
+
+// Google OAuth
+$router->add('GET', '/auth/google', 'AuthController@googleLogin');
+$router->add('GET', '/auth/google/callback', 'AuthController@googleCallback');
 
 // Rutas de API — Dishes
 $router->add('GET', '/api/dishes', 'DishController@all');

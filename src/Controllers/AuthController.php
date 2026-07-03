@@ -236,4 +236,204 @@ class AuthController extends Controller
         $user = (new User())->findByEmail($email);
         $this->json(['exists' => $user !== null]);
     }
+
+    public function googleLogin(): void
+    {
+        if (Session::isAuthenticated()) {
+            $this->redirect('/perfil');
+        }
+
+        $clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? null;
+        $redirectUri = $_ENV['GOOGLE_REDIRECT_URI'] ?? null;
+
+        if (!$clientId || !$redirectUri) {
+            $this->log('error', 'Google OAuth no configurado');
+            Session::flash('error', 'Google OAuth no está configurado.');
+            $this->redirect('/login');
+        }
+
+        // Generar state parameter CSRF
+        $state = bin2hex(random_bytes(32));
+        Session::flash('oauth_state', $state);
+
+        $scope = urlencode('openid profile email');
+        $authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" . http_build_query([
+            'client_id' => $clientId,
+            'redirect_uri' => $redirectUri,
+            'response_type' => 'code',
+            'scope' => $scope,
+            'state' => $state,
+            'access_type' => 'offline',
+            'prompt' => 'consent'
+        ]);
+
+        $this->redirect($authUrl);
+    }
+
+    public function googleCallback(): void
+    {
+        $code = $_GET['code'] ?? null;
+        $state = $_GET['state'] ?? null;
+        $error = $_GET['error'] ?? null;
+
+        if ($error) {
+            $this->log('warning', 'Google OAuth error', ['error' => $error]);
+            Session::flash('error', 'Error en la autenticación con Google.');
+            $this->redirect('/login');
+        }
+
+        if (!$code || !$state) {
+            $this->log('warning', 'Google OAuth callback sin code o state');
+            Session::flash('error', 'Error en la autenticación con Google.');
+            $this->redirect('/login');
+        }
+
+        // Validar state parameter
+        $savedState = Session::getFlash('oauth_state');
+        if (!$savedState || !hash_equals($savedState, $state)) {
+            $this->log('warning', 'Google OAuth state inválido');
+            Session::flash('error', 'Error de seguridad en la autenticación.');
+            $this->redirect('/login');
+        }
+
+        $clientId = $_ENV['GOOGLE_CLIENT_ID'] ?? null;
+        $clientSecret = $_ENV['GOOGLE_CLIENT_SECRET'] ?? null;
+        $redirectUri = $_ENV['GOOGLE_REDIRECT_URI'] ?? null;
+
+        if (!$clientId || !$clientSecret || !$redirectUri) {
+            $this->log('error', 'Google OAuth no configurado en callback');
+            Session::flash('error', 'Google OAuth no está configurado.');
+            $this->redirect('/login');
+        }
+
+        try {
+            // Intercambiar code por access_token
+            $tokenUrl = 'https://oauth2.googleapis.com/token';
+            $tokenData = [
+                'code' => $code,
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+                'redirect_uri' => $redirectUri,
+                'grant_type' => 'authorization_code'
+            ];
+
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $tokenUrl,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => http_build_query($tokenData),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+                CURLOPT_TIMEOUT => 30
+            ]);
+
+            $tokenResponse = curl_exec($ch);
+            $tokenError = curl_errno($ch);
+            curl_close($ch);
+
+            if ($tokenError || !$tokenResponse) {
+                throw new \RuntimeException('Error al obtener token de Google');
+            }
+
+            $tokenData = json_decode($tokenResponse, true);
+            if (!isset($tokenData['access_token'])) {
+                throw new \RuntimeException('Respuesta de token inválida de Google');
+            }
+
+            // Obtener perfil de usuario
+            $userInfoUrl = 'https://www.googleapis.com/oauth2/v3/userinfo';
+            $ch = curl_init();
+            curl_setopt_array($ch, [
+                CURLOPT_URL => $userInfoUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $tokenData['access_token']],
+                CURLOPT_TIMEOUT => 30
+            ]);
+
+            $userInfoResponse = curl_exec($ch);
+            $userError = curl_errno($ch);
+            curl_close($ch);
+
+            if ($userError || !$userInfoResponse) {
+                throw new \RuntimeException('Error al obtener perfil de Google');
+            }
+
+            $userInfo = json_decode($userInfoResponse, true);
+            $googleId = $userInfo['sub'] ?? null;
+            $email = $userInfo['email'] ?? null;
+            $name = $userInfo['name'] ?? null;
+            $avatarUrl = $userInfo['picture'] ?? null;
+            $emailVerified = $userInfo['email_verified'] ?? false;
+
+            if (!$googleId || !$email) {
+                throw new \RuntimeException('Datos de perfil incompletos de Google');
+            }
+
+            if (!$emailVerified) {
+                $this->log('warning', 'Google OAuth email no verificado', ['email' => $email]);
+                Session::flash('error', 'Por favor verificá tu email de Google antes de continuar.');
+                $this->redirect('/login');
+            }
+
+            $userModel = new User();
+            $existingUser = $userModel->findByEmail($email);
+
+            if ($existingUser) {
+                // Email existe, verificar si ya tiene google_id
+                if (!empty($existingUser['google_id'])) {
+                    // Ya vinculado, login normal
+                    Session::login((int) $existingUser['id']);
+                    $this->log('info', 'Login con Google exitoso (vinculado)', ['user_id' => (int) $existingUser['id'], 'email' => $email]);
+                    $this->redirect('/perfil');
+                } else {
+                    // Email existe sin google_id, vincular cuenta
+                    $db = \App\Core\Database::getInstance();
+                    $stmt = $db->prepare("UPDATE users SET google_id = :google_id, avatar_url = :avatar_url WHERE id = :id");
+                    $stmt->execute([
+                        'google_id' => $googleId,
+                        'avatar_url' => $avatarUrl,
+                        'id' => $existingUser['id']
+                    ]);
+                    Session::login((int) $existingUser['id']);
+                    $this->log('info', 'Cuenta vinculada con Google', ['user_id' => (int) $existingUser['id'], 'email' => $email]);
+                    $this->redirect('/perfil');
+                }
+            } else {
+                // Email no existe, crear nuevo usuario
+                $randomPassword = bin2hex(random_bytes(32));
+                try {
+                    $userModel->create([
+                        'name' => $name ?: 'Usuario',
+                        'email' => $email,
+                        'password' => $randomPassword,
+                        'preferences' => null,
+                        'allergies' => null
+                    ]);
+
+                    // Actualizar con google_id y avatar_url
+                    $newUser = $userModel->findByEmail($email);
+                    if ($newUser) {
+                        $db = \App\Core\Database::getInstance();
+                        $stmt = $db->prepare("UPDATE users SET google_id = :google_id, avatar_url = :avatar_url WHERE id = :id");
+                        $stmt->execute([
+                            'google_id' => $googleId,
+                            'avatar_url' => $avatarUrl,
+                            'id' => $newUser['id']
+                        ]);
+                        Session::login((int) $newUser['id']);
+                        $this->log('info', 'Usuario creado con Google', ['user_id' => (int) $newUser['id'], 'email' => $email]);
+                        $this->redirect('/perfil');
+                    }
+                } catch (\PDOException $e) {
+                    $this->log('error', 'Error creando usuario con Google', ['error' => $e->getMessage()]);
+                    Session::flash('error', 'Error al crear la cuenta con Google.');
+                    $this->redirect('/login');
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->log('error', 'Error en Google OAuth callback', ['error' => $e->getMessage()]);
+            Session::flash('error', 'Error en la autenticación con Google.');
+            $this->redirect('/login');
+        }
+    }
 }
