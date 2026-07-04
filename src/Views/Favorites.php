@@ -103,6 +103,7 @@ $noindex = true;
                             aria-label="Quitar de favoritos"
                             data-mp-fav-toggle
                             data-fav-remove-card
+                            data-meal-prep-id="<?= (int) $mp['id'] ?>"
                             data-meal-prep-data="<?= htmlspecialchars(json_encode([
                                 'ingredients' => $ingredients,
                                 'recipe_ids' => $recipeIds,

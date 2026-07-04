@@ -164,22 +164,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Notificar al Service Worker para meal prep
-            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            if (navigator.serviceWorker) {
                 const mealPrepId = parseInt(btn.dataset.mealPrepId || '0', 10);
+                console.log('[Frontend] Meal prep favorito:', favorited, 'ID:', mealPrepId);
                 if (mealPrepId > 0) {
-                    if (favorited) {
-                        navigator.serviceWorker.controller.postMessage({
-                            type: 'CACHE_MEALPREP',
-                            mealPrepId: mealPrepId,
-                            title: `Meal Prep ${mealPrepId}`
-                        });
+                    if (navigator.serviceWorker.controller) {
+                        if (favorited) {
+                            console.log('[Frontend] Enviando CACHE_MEALPREP al SW:', mealPrepId);
+                            navigator.serviceWorker.controller.postMessage({
+                                type: 'CACHE_MEALPREP',
+                                mealPrepId: mealPrepId,
+                                title: `Meal Prep ${mealPrepId}`
+                            });
+                        } else {
+                            console.log('[Frontend] Enviando UNCACHE_MEALPREP al SW:', mealPrepId);
+                            navigator.serviceWorker.controller.postMessage({
+                                type: 'UNCACHE_MEALPREP',
+                                mealPrepId: mealPrepId
+                            });
+                        }
                     } else {
-                        navigator.serviceWorker.controller.postMessage({
-                            type: 'UNCACHE_MEALPREP',
-                            mealPrepId: mealPrepId
+                        console.log('[Frontend] Service worker registrado pero no controla la página, esperando...');
+                        navigator.serviceWorker.ready.then((registration) => {
+                            console.log('[Frontend] Service worker listo, enviando mensaje de meal prep...');
+                            if (favorited) {
+                                registration.active.postMessage({
+                                    type: 'CACHE_MEALPREP',
+                                    mealPrepId: mealPrepId,
+                                    title: `Meal Prep ${mealPrepId}`
+                                });
+                            } else {
+                                registration.active.postMessage({
+                                    type: 'UNCACHE_MEALPREP',
+                                    mealPrepId: mealPrepId
+                                });
+                            }
+                        }).catch((err) => {
+                            console.error('[Frontend] Error esperando service worker:', err);
                         });
                     }
                 }
+            } else {
+                console.log('[Frontend] Service worker no soportado para meal prep');
             }
 
             // Si estamos en la página de favoritos y desmarcar, removemos la tarjeta

@@ -144,6 +144,303 @@
             font-style: italic;
             color: var(--color-text-muted);
         }
+
+        /* Para planes de dieta, usar layout en columna */
+        #offline-plans {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Meal Prep Card Styles */
+        .mealprep-card {
+            border: 1px solid var(--color-border);
+            background: var(--color-cream);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .mealprep-card:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 3px 3px 0px var(--color-border);
+        }
+
+        .mealprep-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--color-border);
+            background: #fff;
+        }
+
+        .mealprep-card__badge {
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-carrot);
+        }
+
+        .mealprep-card__body {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .mealprep-card__icon-wrapper {
+            margin-bottom: 0.5rem;
+        }
+
+        .mealprep-card__icon {
+            color: var(--color-spinach);
+        }
+
+        .mealprep-card__title {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+            color: var(--color-black);
+        }
+
+        .mealprep-card__date {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            margin: 0 0 1rem 0;
+        }
+
+        .mealprep-card__ingredients {
+            text-align: left;
+            margin-top: 1rem;
+        }
+
+        .mealprep-card__ingredients strong {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+
+        .mealprep-card__chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+        }
+
+        .mealprep-card__chip {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            background: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 2px;
+        }
+
+        .mealprep-card__footer {
+            padding: 0.75rem 1rem;
+            border-top: 1px solid var(--color-border);
+            background: #fff;
+            text-align: center;
+        }
+
+        .mealprep-card__link-text {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--color-carrot);
+            text-transform: uppercase;
+        }
+
+        /* Plan Card Styles */
+        .plan-card {
+            border: 2px solid var(--color-border);
+            background: #fff;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 2px 2px 0px var(--color-border);
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .plan-card-info h3 {
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+            color: var(--color-black);
+        }
+
+        .plan-card-info p {
+            font-size: 0.95rem;
+            color: var(--color-text-muted);
+            margin: 0.5rem 0;
+        }
+
+        .plan-card-info ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .plan-carousel-panel {
+            margin-top: 1rem;
+        }
+
+        .plan-carousel {
+            position: relative;
+        }
+
+        .carousel-slides {
+            display: flex;
+            overflow-x: auto;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+            scroll-snap-type: x mandatory;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            scroll-snap-align: start;
+        }
+
+        .carousel-slide header h2 {
+            font-family: var(--font-title);
+            font-size: 1rem;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+            color: var(--color-black);
+        }
+
+        .carousel-meals {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .meal-thumb {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .meal-thumb img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border: 1px solid var(--color-border);
+            background-color: #ddd;
+        }
+
+        .meal-title {
+            display: block;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+            color: var(--color-text);
+        }
+
+        /* Shopping List Card Styles */
+        .shopping-list-card {
+            border: 1px solid var(--color-border);
+            background: var(--color-cream);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .shopping-list-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #fff;
+            border-bottom: 1px solid var(--color-border);
+            cursor: pointer;
+        }
+
+        .shopping-list-card__header h3 {
+            font-family: var(--font-title);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            margin: 0;
+            color: var(--color-black);
+        }
+
+        .shopping-list-card__header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .shopping-list-card__date {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .shopping-list-card__items {
+            padding: 1rem;
+            display: none;
+        }
+
+        .shopping-list-card.is-expanded .shopping-list-card__items {
+            display: block;
+        }
+
+        .shopping-list-card__items ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .shopping-list-card__items li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .shopping-list-card__items li:last-child {
+            border-bottom: none;
+        }
+
+        .item-left-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-square {
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--color-border);
+            background: #fff;
+        }
+
+        .shopping-list-card__items li.is-checked .item-name {
+            text-decoration: line-through;
+            color: var(--color-text-muted);
+        }
+
+        .shopping-list-card__items li.is-checked .checkbox-square {
+            position: relative;
+        }
+
+        .shopping-list-card__items li.is-checked .checkbox-square::after {
+            content: '✕';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            line-height: 1;
+            color: var(--color-carrot);
+            font-weight: bold;
+        }
+
+        .item-amount {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
     </style>
 </head>
 <body>
@@ -160,6 +457,21 @@
         <h2 class="grid-title">Tus favoritos disponibles offline</h2>
         <div class="recipe-grid" id="offline-recipes">
             <p style="grid-column: 1 / -1; text-align: center;">Cargando recetas guardadas...</p>
+        </div>
+
+        <h2 class="grid-title">Planes de dieta disponibles offline</h2>
+        <div class="recipe-grid" id="offline-plans">
+            <p style="grid-column: 1 / -1; text-align: center;">Cargando planes guardados...</p>
+        </div>
+
+        <h2 class="grid-title">Meal preps disponibles offline</h2>
+        <div class="recipe-grid" id="offline-mealpreps">
+            <p style="grid-column: 1 / -1; text-align: center;">Cargando meal preps guardados...</p>
+        </div>
+
+        <h2 class="grid-title">Listas de compras disponibles offline</h2>
+        <div class="recipe-grid" id="offline-shopping">
+            <p style="grid-column: 1 / -1; text-align: center;">Cargando listas de compras guardadas...</p>
         </div>
     </div>
 
@@ -204,7 +516,266 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', loadOfflineRecipes);
+        async function loadOfflinePlans() {
+            const container = document.getElementById('offline-plans');
+            try {
+                const response = await fetch('/offline-plans.json');
+                if (!response.ok) {
+                    container.innerHTML = '<p class="no-recipes">No tenés planes guardados para ver offline todavía.</p>';
+                    return;
+                }
+
+                const plans = await response.json();
+                
+                if (plans.length === 0) {
+                    container.innerHTML = '<p class="no-recipes">No tenés planes guardados para ver offline todavía.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                plans.forEach((plan) => {
+                    const pid = plan.plan_id;
+                    const durationDays = plan.duration_days || 0;
+                    const dietType = plan.diet_type || 'Sin dieta específica';
+                    const targetCalories = plan.target_calories;
+                    const targetProtein = plan.target_protein;
+                    const targetCarbs = plan.target_carbs;
+                    const targetFat = plan.target_fat;
+                    const createdAt = plan.created_at ? new Date(plan.created_at).toLocaleDateString('es-AR') : 'Fecha desconocida';
+                    const days = plan.days || [];
+
+                    const card = document.createElement('article');
+                    card.className = 'plan-card';
+
+                    let goalsHtml = '';
+                    if (targetCalories || targetProtein || targetCarbs || targetFat) {
+                        goalsHtml = '<p><strong>Objetivos nutricionales:</strong><ul>';
+                        if (targetCalories) goalsHtml += `<li>Calorías: ${targetCalories} kcal</li>`;
+                        if (targetProtein) goalsHtml += `<li>Proteínas: ${targetProtein}g</li>`;
+                        if (targetCarbs) goalsHtml += `<li>Carbohidratos: ${targetCarbs}g</li>`;
+                        if (targetFat) goalsHtml += `<li>Grasas: ${targetFat}g</li>`;
+                        goalsHtml += '</ul></p>';
+                    }
+
+                    let carouselHtml = '';
+                    if (days.length > 0) {
+                        const dayNames = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo'];
+                        carouselHtml = `
+                            <div class="plan-carousel-panel">
+                                <div class="plan-carousel">
+                                    <div class="carousel-slides">
+                                        ${days.map((day, index) => {
+                                            const week = Math.ceil((index + 1) / 7);
+                                            const dayName = dayNames[index % 7];
+                                            const dayNameCapitalized = dayName.charAt(0).toUpperCase() + dayName.slice(1);
+                                            return `
+                                                <div class="carousel-slide">
+                                                    <header>
+                                                        <h2>${dayNameCapitalized} - Semana ${week}</h2>
+                                                    </header>
+                                                    <div class="carousel-meals">
+                                                        ${(day.meals || []).map(meal => `
+                                                            <a class="meal-thumb" href="/receta/${meal.spoonacular_id}">
+                                                                ${meal.image ? 
+                                                                    `<img src="${meal.image}" alt="${meal.title}" onerror="this.onerror=null;this.src='/assets/img/placeholder_RecetaSinFoto.png';">` :
+                                                                    `<img src="/assets/img/placeholder_RecetaSinFoto.png" alt="Sin imagen">`
+                                                                }
+                                                                <span class="meal-title">${meal.title}</span>
+                                                            </a>
+                                                        `).join('')}
+                                                    </div>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    card.innerHTML = `
+                        <div class="plan-card-info">
+                            <h3>Plan de ${durationDays} días</h3>
+                            <p><strong>Tipo de dieta:</strong> ${dietType}</p>
+                            ${goalsHtml}
+                            <p><strong>Creado el: ${createdAt}</strong></p>
+                        </div>
+                        ${carouselHtml}
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error('Error loading offline plans:', err);
+                container.innerHTML = '<p class="no-recipes">Error al cargar los planes guardados offline.</p>';
+            }
+        }
+
+        async function loadOfflineMealPreps() {
+            const container = document.getElementById('offline-mealpreps');
+            try {
+                const response = await fetch('/offline-mealpreps.json');
+                if (!response.ok) {
+                    container.innerHTML = '<p class="no-recipes">No tenés meal preps guardados para ver offline todavía.</p>';
+                    return;
+                }
+
+                const mealpreps = await response.json();
+                
+                if (mealpreps.length === 0) {
+                    container.innerHTML = '<p class="no-recipes">No tenés meal preps guardados para ver offline todavía.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                mealpreps.forEach((mp) => {
+                    const mpid = mp.meal_prep_id;
+                    const recipeIds = mp.recipe_ids || [];
+                    const ingredients = mp.ingredients || [];
+                    const recipeCount = recipeIds.length;
+                    const createdAt = mp.created_at ? new Date(mp.created_at).toLocaleDateString('es-AR') : 'Fecha desconocida';
+
+                    const card = document.createElement('article');
+                    card.className = 'mealprep-card';
+                    card.onclick = () => {
+                        // Mostrar las recetas del meal prep
+                        if (recipeIds.length > 0) {
+                            const recipesHtml = recipeIds.map(rid => 
+                                `<a href="/receta/${rid}" class="recipe-card" style="text-decoration: none; color: inherit;">
+                                    <div class="recipe-info">
+                                        <h3 class="recipe-name">Receta #${rid}</h3>
+                                    </div>
+                                </a>`
+                            ).join('');
+                            container.innerHTML = `
+                                <button onclick="loadOfflineMealPreps()" style="margin-bottom: 1rem; padding: 0.5rem 1rem; background: var(--color-carrot); color: white; border: 2px solid var(--color-border); cursor: pointer;">← Volver a Meal Preps</button>
+                                <h2 class="grid-title">Recetas del Meal Prep</h2>
+                                <div class="recipe-grid">${recipesHtml}</div>
+                            `;
+                        }
+                    };
+
+                    card.innerHTML = `
+                        <div class="mealprep-card__header">
+                            <span class="mealprep-card__badge">Meal Prep</span>
+                        </div>
+                        <div class="mealprep-card__body">
+                            <div class="mealprep-card__icon-wrapper">
+                                <svg class="mealprep-card__icon" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                            </div>
+                            <h3 class="mealprep-card__title">${recipeCount} ${recipeCount === 1 ? 'Receta' : 'Recetas'}</h3>
+                            <p class="mealprep-card__date">Guardado el ${createdAt}</p>
+                            ${ingredients.length > 0 ? `
+                                <div class="mealprep-card__ingredients">
+                                    <strong>Ingredientes:</strong>
+                                    <div class="mealprep-card__chips">
+                                        ${ingredients.map(ing => `<span class="mealprep-card__chip">${ing}</span>`).join('')}
+                                    </div>
+                                </div>
+                            ` : ''}
+                        </div>
+                        <div class="mealprep-card__footer">
+                            <span class="mealprep-card__link-text">Ver recetas →</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (err) {
+                console.error('Error loading offline meal preps:', err);
+                container.innerHTML = '<p class="no-recipes">Error al cargar los meal preps guardados offline.</p>';
+            }
+        }
+
+        async function loadOfflineShopping() {
+            const container = document.getElementById('offline-shopping');
+            try {
+                const response = await fetch('/offline-shopping.json');
+                if (!response.ok) {
+                    container.innerHTML = '<p class="no-recipes">No tenés listas de compras guardadas para ver offline todavía.</p>';
+                    return;
+                }
+
+                const lists = await response.json();
+                
+                if (lists.length === 0) {
+                    container.innerHTML = '<p class="no-recipes">No tenés listas de compras guardadas para ver offline todavía.</p>';
+                    return;
+                }
+
+                container.innerHTML = '';
+                lists.forEach((list) => {
+                    const lid = list.list_id;
+                    const name = list.name || 'Lista sin nombre';
+                    const sourceType = list.source_type || '';
+                    const createdAt = list.created_at ? new Date(list.created_at).toLocaleDateString('es-AR') : 'Fecha desconocida';
+                    const items = list.items || [];
+
+                    const itemsHtml = items.map(item => `
+                        <li data-item-check>
+                            <div class="item-left-group">
+                                <span class="checkbox-square"></span>
+                                <span class="item-name">${item.ingredient_name || item.name || 'Ingrediente'}</span>
+                            </div>
+                            <span class="item-amount">${round(item.amount || 0, 2)} ${item.unit || ''}</span>
+                        </li>
+                    `).join('');
+
+                    const card = document.createElement('article');
+                    card.className = 'shopping-list-card';
+                    card.innerHTML = `
+                        <div class="shopping-list-card__header" data-list-toggle>
+                            <h3>${name}</h3>
+                            <div class="shopping-list-card__header-right">
+                                <span class="shopping-list-card__date">${createdAt}</span>
+                                <svg class="expand-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="shopping-list-card__items">
+                            <ul>
+                                ${itemsHtml}
+                            </ul>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                // Event delegation para expandir listas
+                container.addEventListener('click', (e) => {
+                    const header = e.target.closest('[data-list-toggle]');
+                    if (header) {
+                        const card = header.closest('.shopping-list-card');
+                        if (card) {
+                            card.classList.toggle('is-expanded');
+                        }
+                    }
+
+                    const item = e.target.closest('[data-item-check]');
+                    if (item) {
+                        item.classList.toggle('is-checked');
+                    }
+                });
+            } catch (err) {
+                console.error('Error loading offline shopping lists:', err);
+                container.innerHTML = '<p class="no-recipes">Error al cargar las listas de compras guardadas offline.</p>';
+            }
+        }
+
+        function round(value, decimals) {
+            return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadOfflineRecipes();
+            loadOfflinePlans();
+            loadOfflineMealPreps();
+            loadOfflineShopping();
+        });
     </script>
 </body>
 </html>

@@ -103,6 +103,45 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Regla 2.1: GET a /offline-plans.json
+    if (url.origin === self.location.origin && url.pathname === '/offline-plans.json') {
+        event.respondWith(
+            caches.open(STATIC_CACHE).then(async (cache) => {
+                const matched = await cache.match('/offline-plans.json');
+                return matched || new Response(JSON.stringify([]), {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            })
+        );
+        return;
+    }
+
+    // Regla 2.2: GET a /offline-mealpreps.json
+    if (url.origin === self.location.origin && url.pathname === '/offline-mealpreps.json') {
+        event.respondWith(
+            caches.open(STATIC_CACHE).then(async (cache) => {
+                const matched = await cache.match('/offline-mealpreps.json');
+                return matched || new Response(JSON.stringify([]), {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            })
+        );
+        return;
+    }
+
+    // Regla 2.3: GET a /offline-shopping.json
+    if (url.origin === self.location.origin && url.pathname === '/offline-shopping.json') {
+        event.respondWith(
+            caches.open(STATIC_CACHE).then(async (cache) => {
+                const matched = await cache.match('/offline-shopping.json');
+                return matched || new Response(JSON.stringify([]), {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            })
+        );
+        return;
+    }
+
     // Regla 3: GET same-origin /assets/*
     if (url.origin === self.location.origin && url.pathname.startsWith('/assets/')) {
         event.respondWith(staleWhileRevalidate(request, STATIC_CACHE));
@@ -246,9 +285,9 @@ self.addEventListener('message', (event) => {
             event.waitUntil(reconcileMealPreps(mealpreps));
         }
     } else if (data.type === 'CACHE_SHOPPING_LIST') {
-        const { listId, name } = data;
+        const { listId, name, items } = data;
         if (listId) {
-            event.waitUntil(cacheShoppingList(listId, name));
+            event.waitUntil(cacheShoppingList(listId, name, items));
         }
     } else if (data.type === 'UNCACHE_SHOPPING_LIST') {
         const { listId } = data;
@@ -333,9 +372,15 @@ async function cacheRecipe(spoonacularId, title, imageUrl) {
 
         if (imageUrl) {
             const imageCache = await caches.open(IMAGES_CACHE);
-            const imgResponse = await fetch(imageUrl);
-            await imageCache.put(imageUrl, imgResponse);
-            await limitCacheItems(IMAGES_CACHE, 60);
+            try {
+                // Usar mode: 'no-cors' para evitar errores de CORS con imágenes externas
+                const imgResponse = await fetch(imageUrl, { mode: 'no-cors' });
+                await imageCache.put(imageUrl, imgResponse);
+                await limitCacheItems(IMAGES_CACHE, 60);
+            } catch (imgErr) {
+                console.warn('[SW] No se pudo cachear imagen (CORS):', imageUrl);
+                // Continuar sin la imagen - se usará placeholder en offline.html
+            }
         }
 
         // Actualizar índice JSON
@@ -472,17 +517,40 @@ async function cachePlan(planId, title) {
         const planCache = await caches.open(PLANS_CACHE);
         const response = await fetch(planUrl);
         if (response.status === 200) {
-            await planCache.put(planUrl, response);
-        }
+            const responseClone = response.clone();
+            const data = await response.json();
+            await planCache.put(planUrl, responseClone);
 
-        // Actualizar índice JSON
-        const list = await getOfflinePlansIndex();
-        if (!list.some((item) => item.plan_id === parseInt(planId, 10))) {
-            list.push({
-                plan_id: parseInt(planId, 10),
-                title: title
-            });
-            await updateOfflinePlansIndex(list);
+            // Actualizar índice JSON con datos completos
+            const list = await getOfflinePlansIndex();
+            if (!list.some((item) => item.plan_id === parseInt(planId, 10))) {
+                list.push({
+                    plan_id: parseInt(planId, 10),
+                    title: title,
+                    duration_days: data.duration_days || 0,
+                    diet_type: data.diet_type || '',
+                    target_calories: data.target_calories || null,
+                    target_protein: data.target_protein || null,
+                    target_carbs: data.target_carbs || null,
+                    target_fat: data.target_fat || null,
+                    created_at: data.created_at || new Date().toISOString(),
+                    days: data.days || []
+                });
+                await updateOfflinePlansIndex(list);
+
+                // Cachear las recetas individuales del plan
+                if (data.days && Array.isArray(data.days)) {
+                    for (const day of data.days) {
+                        if (day.meals && Array.isArray(day.meals)) {
+                            for (const meal of day.meals) {
+                                if (meal.spoonacular_id) {
+                                    await cacheRecipe(meal.spoonacular_id, meal.title, meal.image);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     } catch (err) {
         console.error('[SW] Error al cachear plan:', planId, err);
@@ -570,17 +638,29 @@ async function cacheMealPrep(mealPrepId, title) {
         const mealPrepCache = await caches.open(MEALPREPS_CACHE);
         const response = await fetch(mealPrepUrl);
         if (response.status === 200) {
-            await mealPrepCache.put(mealPrepUrl, response);
-        }
+            const responseClone = response.clone();
+            const data = await response.json();
+            console.log('[SW] Meal prep data:', data);
+            await mealPrepCache.put(mealPrepUrl, responseClone);
 
-        // Actualizar índice JSON
-        const list = await getOfflineMealPrepsIndex();
-        if (!list.some((item) => item.meal_prep_id === parseInt(mealPrepId, 10))) {
-            list.push({
-                meal_prep_id: parseInt(mealPrepId, 10),
-                title: title
-            });
-            await updateOfflineMealPrepsIndex(list);
+            // Actualizar índice JSON con datos completos
+            const list = await getOfflineMealPrepsIndex();
+            if (!list.some((item) => item.meal_prep_id === parseInt(mealPrepId, 10))) {
+                const mealPrepEntry = {
+                    meal_prep_id: parseInt(mealPrepId, 10),
+                    title: title,
+                    ingredients: data.ingredients || [],
+                    recipe_ids: data.recipe_ids || [],
+                    servings: data.servings || [],
+                    created_at: data.created_at || new Date().toISOString()
+                };
+                console.log('[SW] Guardando meal prep en índice:', mealPrepEntry);
+                list.push(mealPrepEntry);
+                await updateOfflineMealPrepsIndex(list);
+
+                // NO cachear las recetas individuales del meal prep
+                // Las recetas solo se mostrarán dentro del meal prep
+            }
         }
     } catch (err) {
         console.error('[SW] Error al cachear meal prep:', mealPrepId, err);
@@ -662,23 +742,29 @@ async function updateOfflineShoppingIndex(list) {
     }));
 }
 
-async function cacheShoppingList(listId, name) {
-    const listUrl = `/api/shopping-lists`;
+async function cacheShoppingList(listId, name, items) {
     try {
-        const shoppingCache = await caches.open(SHOPPING_CACHE);
-        const response = await fetch(listUrl);
-        if (response.status === 200) {
-            await shoppingCache.put(listUrl, response);
-        }
-
-        // Actualizar índice JSON
+        console.log('[SW] Cachear lista de compras:', listId, name, items);
+        // Actualizar índice JSON con datos completos
         const list = await getOfflineShoppingIndex();
         if (!list.some((item) => item.list_id === parseInt(listId, 10))) {
-            list.push({
+            const shoppingEntry = {
                 list_id: parseInt(listId, 10),
-                name: name
-            });
+                name: name,
+                source_type: '',
+                created_at: new Date().toISOString(),
+                items: items || []
+            };
+            console.log('[SW] Guardando lista de compras en índice:', shoppingEntry);
+            list.push(shoppingEntry);
             await updateOfflineShoppingIndex(list);
+        } else {
+            console.log('[SW] Lista de compras ya existe en índice, actualizando items');
+            const existingIndex = list.findIndex((item) => item.list_id === parseInt(listId, 10));
+            if (existingIndex !== -1 && items) {
+                list[existingIndex].items = items;
+                await updateOfflineShoppingIndex(list);
+            }
         }
     } catch (err) {
         console.error('[SW] Error al cachear lista de compras:', listId, err);

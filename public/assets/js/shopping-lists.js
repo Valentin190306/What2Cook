@@ -43,7 +43,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (sourceType === 'meal_prep') {
             // Get meal prep data from button
             const mealPrepData = JSON.parse(btn.dataset.mealPrepData || '{}');
-            itemsToSend = mealPrepData.shopping_list_items || [];
+            itemsToSend = (mealPrepData.shopping_list_items || []).map(item => ({
+                name: item.ingredient_name || item.name || 'Ingrediente',
+                amount: parseFloat(item.amount) || 0,
+                unit: item.unit || ''
+            }));
         } else if (sourceType === 'diet_plan') {
             // Get diet plan shopping list
             let planId = sourceId;
@@ -151,19 +155,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const data = await response.json();
-            
+
             btn.innerHTML = '¡Guardado!';
             btn.classList.add('saved');
             success = true;
 
+            console.log('[Frontend] Lista guardada exitosamente:', data);
+            console.log('[Frontend] itemsToSend:', itemsToSend);
+
             // Notificar al Service Worker
-            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+            if (navigator.serviceWorker) {
                 const listName = `Lista ${data.list_id}`;
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'CACHE_SHOPPING_LIST',
-                    listId: data.list_id,
-                    name: listName
-                });
+                if (navigator.serviceWorker.controller) {
+                    console.log('[Frontend] Service worker disponible, enviando mensaje...');
+                    console.log('[Frontend] Enviando lista de compras al SW:', listId, listName, itemsToSend);
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'CACHE_SHOPPING_LIST',
+                        listId: data.list_id,
+                        name: listName,
+                        items: itemsToSend
+                    });
+                } else {
+                    console.log('[Frontend] Service worker registrado pero no controla la página, esperando...');
+                    navigator.serviceWorker.ready.then((registration) => {
+                        console.log('[Frontend] Service worker listo, enviando mensaje...');
+                        registration.active.postMessage({
+                            type: 'CACHE_SHOPPING_LIST',
+                            listId: data.list_id,
+                            name: listName,
+                            items: itemsToSend
+                        });
+                    }).catch((err) => {
+                        console.error('[Frontend] Error esperando service worker:', err);
+                    });
+                }
+            } else {
+                console.log('[Frontend] Service worker no soportado');
             }
             
         } catch (error) {
