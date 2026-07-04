@@ -426,3 +426,38 @@ textarea:focus {
 .input-toggle-wrapper .btn-toggle-password:focus {
   outline: none !important;
 }
+
+/* ---------- Toast / Snackbar ---------- */
+.w2c-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(1rem);
+  min-width: 280px;
+  max-width: 90vw;
+  padding: 1rem 1.5rem;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-white);
+  background: var(--color-black);
+  border: 2px solid var(--color-black);
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.w2c-toast--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.w2c-toast--error {
+  background: var(--color-carrot);
+  border-color: var(--color-carrot);
+}

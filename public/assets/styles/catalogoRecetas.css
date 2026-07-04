@@ -449,11 +449,14 @@ fieldset.filtros .filtros-opciones label:focus-within {
 .btn-share svg {
   fill: currentColor;
   transition: fill 0.2s;
-  margin-right: 0.5rem;
 }
 
 .btn-share:hover svg {
   fill: var(--color-white);
+}
+
+.btn-share .share-svg {
+  margin-right: 0.5rem;
 }
 
 .results-summary,

@@ -103,53 +103,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Populate filters from URL on page load
     populateFiltersFromUrl();
 
-    if (shareBtn) {
-        shareBtn.addEventListener('click', async () => {
-            const currentUrl = window.location.href;
-            try {
-                await navigator.clipboard.writeText(currentUrl);
-                const originalText = shareBtn.innerHTML;
-                shareBtn.innerHTML = `
-                    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                    </svg>
-                    ¡Copiado!
-                `;
-                shareBtn.classList.add('copied');
-                setTimeout(() => {
-                    shareBtn.innerHTML = originalText;
-                    shareBtn.classList.remove('copied');
-                }, 2000);
-            } catch (err) {
-                console.error('Error al copiar URL:', err);
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = currentUrl;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-9999px';
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    const originalText = shareBtn.innerHTML;
-                    shareBtn.innerHTML = `
-                        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                        </svg>
-                        ¡Copiado!
-                    `;
-                    shareBtn.classList.add('copied');
-                    setTimeout(() => {
-                        shareBtn.innerHTML = originalText;
-                        shareBtn.classList.remove('copied');
-                    }, 2000);
-                } catch (e) {
-                    console.error('Error en fallback de copia:', e);
-                }
-                document.body.removeChild(textArea);
-            }
-        });
-    }
 
     if (applyBtn) {
         applyBtn.addEventListener('click', (e) => {

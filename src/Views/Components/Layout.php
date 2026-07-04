@@ -26,8 +26,12 @@ $baseUrl = "{$scheme}://{$host}";
     <meta property="og:description" content="<?= htmlspecialchars($ogDescription ?? $metaDescription ?? 'Planificá tus comidas semanales, buscá recetas por ingredientes con nuestro asistente inteligente y gestioná tus listas de compras en What2Cook.') ?>">
     <meta property="og:type" content="<?= htmlspecialchars($ogType ?? 'website') ?>">
     <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl) ?>">
-    <meta property="og:image" content="<?= htmlspecialchars($ogImage ?? $baseUrl . '/assets/img/LogoW2C_1.png') ?>">
+    <meta property="og:image" content="<?= htmlspecialchars($ogImage ?? $baseUrl . '/assets/img/LogoW2C_conFONDO_1.png') ?>">
+    <meta property="og:image:width" content="1019">
+    <meta property="og:image:height" content="679">
+    <meta property="og:image:type" content="image/png">
     <meta property="og:site_name" content="What2Cook">
+    <meta name="twitter:card" content="summary_large_image">
 
     <!-- Schema: WebSite + SearchAction -->
     <script type="application/ld+json">
@@ -169,6 +173,7 @@ $baseUrl = "{$scheme}://{$host}";
             </a>
         </nav>
     </footer>
+    <script src="/assets/js/utils.js?v=<?= time() ?>" defer></script>
     <script src="/assets/js/UnitPreferences.js?v=<?= time() ?>" defer></script>
     <script src="/assets/js/UnitConversion.js?v=<?= time() ?>" defer></script>
     <?php if (isset($scripts)): ?>

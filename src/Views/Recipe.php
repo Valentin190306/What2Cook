@@ -2,7 +2,7 @@
 
 $title  = isset($recipe['title']) ? "What2Cook - {$recipe['title']}" : "What2Cook - Receta";
 $styles = ['receta'];
-$scripts = ['favorites', 'shopping-lists'];
+$scripts = ['favorites', 'shopping-lists', 'share'];
 
 // Helpers
 $readyIn  = $recipe['readyInMinutes'] ?? null;
@@ -111,11 +111,20 @@ $baseUrl = "{$scheme}://{$host}";
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
             <h1 style="margin: 0;"><?= htmlspecialchars($recipe['title']) ?></h1>
             <div style="display: flex; gap: 0.5rem;">
-                <button type="button" class="btn-save-list no-print btn-share-recipe" id="btn-share-recipe" aria-label="Compartir receta">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                <button type="button" class="btn-save-list no-print btn-share-recipe" id="btn-share-recipe"
+                        aria-label="Compartir receta"
+                        data-share-title="<?= htmlspecialchars($recipe['title'] ?? '') ?>"
+                        data-share-text="<?= htmlspecialchars('¡Echa un vistazo a esta receta! "' . ($recipe['title'] ?? 'Receta') . '"' . "\n" . $baseUrl . '/receta/' . (int) ($recipe['id'] ?? 0)) ?>">
+                    <svg class="share-svg" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
                         <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
                     </svg>
                     Compartir
+                </button>
+                <button type="button" class="btn-save-list no-print btn-copy-share" id="btn-copy-recipe" aria-label="Copiar receta al portapapeles"
+                        data-copy-text="<?= htmlspecialchars($baseUrl . '/receta/' . (int) ($recipe['id'] ?? 0)) ?>">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
                 </button>
                 <button type="button" class="btn-save-list no-print" onclick="window.print()" style="margin: 0;">
                     Imprimir receta
@@ -322,56 +331,5 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-// Botón compartir receta
-(function () {
-    const shareBtn = document.getElementById('btn-share-recipe');
-    if (shareBtn) {
-        shareBtn.addEventListener('click', async () => {
-            const currentUrl = window.location.href;
-            try {
-                await navigator.clipboard.writeText(currentUrl);
-                const originalText = shareBtn.innerHTML;
-                shareBtn.innerHTML = `
-                    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                    </svg>
-                    ¡Copiado!
-                `;
-                shareBtn.classList.add('copied');
-                setTimeout(() => {
-                    shareBtn.innerHTML = originalText;
-                    shareBtn.classList.remove('copied');
-                }, 2000);
-            } catch (err) {
-                console.error('Error al copiar URL:', err);
-                // Fallback para navegadores antiguos
-                const textArea = document.createElement('textarea');
-                textArea.value = currentUrl;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-9999px';
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    const originalText = shareBtn.innerHTML;
-                    shareBtn.innerHTML = `
-                        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                        </svg>
-                        ¡Copiado!
-                    `;
-                    shareBtn.classList.add('copied');
-                    setTimeout(() => {
-                        shareBtn.innerHTML = originalText;
-                        shareBtn.classList.remove('copied');
-                    }, 2000);
-                } catch (e) {
-                    console.error('Error en fallback de copia:', e);
-                }
-                document.body.removeChild(textArea);
-            }
-        });
-    }
-})();
 </script>
 <?php endif; ?>
