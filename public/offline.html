@@ -441,6 +441,91 @@
             font-size: 0.9rem;
             color: var(--color-text-muted);
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay[aria-hidden="false"] {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #fff;
+            border: 2px solid var(--color-border);
+            box-shadow: 4px 4px 0px var(--color-border);
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-card--wide {
+            max-width: 800px;
+        }
+
+        .modal-card__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--color-border);
+            background: var(--color-cream);
+        }
+
+        .modal-card__header h2 {
+            margin: 0;
+            font-family: var(--font-title);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+        }
+
+        .btn-close-modal {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            color: var(--color-text);
+        }
+
+        .modal-card__body {
+            padding: 1.5rem;
+        }
+
+        .mp-ingredients {
+            margin-bottom: 1.5rem;
+        }
+
+        .mp-ingredients h3 {
+            font-family: var(--font-title);
+            font-size: 1rem;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .mp-ingredients .mealprep-card__chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .mp-ingredients .mealprep-card__chip {
+            background: var(--color-cream);
+            border: 1px solid var(--color-border);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
+        }
     </style>
 </head>
 <body>
@@ -472,6 +557,20 @@
         <h2 class="grid-title">Listas de compras disponibles offline</h2>
         <div class="recipe-grid" id="offline-shopping">
             <p style="grid-column: 1 / -1; text-align: center;">Cargando listas de compras guardadas...</p>
+        </div>
+    </div>
+
+    <!-- Modal de detalle de Meal Prep -->
+    <div class="modal-overlay" id="mp-modal" aria-hidden="true" role="dialog" aria-label="Detalle del Meal Prep">
+        <div class="modal-card modal-card--wide">
+            <div class="modal-card__header">
+                <h2 id="mp-modal-title">Meal Prep</h2>
+                <button type="button" class="btn-close-modal" id="mp-modal-close" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-card__body" id="mp-modal-body">
+                <div class="mp-ingredients" id="mp-ingredients"></div>
+                <div class="recipe-grid" id="mp-recipes"></div>
+            </div>
         </div>
     </div>
 
@@ -637,21 +736,7 @@
                     const card = document.createElement('article');
                     card.className = 'mealprep-card';
                     card.onclick = () => {
-                        // Mostrar las recetas del meal prep
-                        if (recipeIds.length > 0) {
-                            const recipesHtml = recipeIds.map(rid => 
-                                `<a href="/receta/${rid}" class="recipe-card" style="text-decoration: none; color: inherit;">
-                                    <div class="recipe-info">
-                                        <h3 class="recipe-name">Receta #${rid}</h3>
-                                    </div>
-                                </a>`
-                            ).join('');
-                            container.innerHTML = `
-                                <button onclick="loadOfflineMealPreps()" style="margin-bottom: 1rem; padding: 0.5rem 1rem; background: var(--color-carrot); color: white; border: 2px solid var(--color-border); cursor: pointer;">← Volver a Meal Preps</button>
-                                <h2 class="grid-title">Recetas del Meal Prep</h2>
-                                <div class="recipe-grid">${recipesHtml}</div>
-                            `;
-                        }
+                        openMealPrepModal(mp);
                     };
 
                     card.innerHTML = `
@@ -770,11 +855,66 @@
             return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
         }
 
+        function openMealPrepModal(mp) {
+            const modal = document.getElementById('mp-modal');
+            const modalTitle = document.getElementById('mp-modal-title');
+            const mpIngredients = document.getElementById('mp-ingredients');
+            const mpRecipes = document.getElementById('mp-recipes');
+
+            const recipeIds = mp.recipe_ids || [];
+            const ingredients = mp.ingredients || [];
+            const createdAt = mp.created_at ? new Date(mp.created_at).toLocaleDateString('es-AR') : 'Fecha desconocida';
+
+            modalTitle.textContent = `Meal Prep - Guardado el ${createdAt}`;
+
+            // Mostrar ingredientes
+            if (ingredients.length > 0) {
+                const ingredientsHtml = ingredients.map(ing =>
+                    `<span class="mealprep-card__chip">${ing}</span>`
+                ).join('');
+                mpIngredients.innerHTML = `
+                    <h3>Ingredientes:</h3>
+                    <div class="mealprep-card__chips">${ingredientsHtml}</div>
+                `;
+            } else {
+                mpIngredients.innerHTML = '';
+            }
+
+            // Mostrar recetas
+            if (recipeIds.length > 0) {
+                const recipesHtml = recipeIds.map(rid =>
+                    `<a href="/receta/${rid}" class="recipe-card" style="text-decoration: none; color: inherit;">
+                        <div class="recipe-info">
+                            <h3 class="recipe-name">Receta #${rid}</h3>
+                        </div>
+                    </a>`
+                ).join('');
+                mpRecipes.innerHTML = recipesHtml;
+            } else {
+                mpRecipes.innerHTML = '<p>No hay recetas en este meal prep.</p>';
+            }
+
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeMealPrepModal() {
+            const modal = document.getElementById('mp-modal');
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             loadOfflineRecipes();
             loadOfflinePlans();
             loadOfflineMealPreps();
             loadOfflineShopping();
+
+            // Event listener para cerrar modal de meal prep
+            document.getElementById('mp-modal-close').addEventListener('click', closeMealPrepModal);
+            document.getElementById('mp-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'mp-modal') {
+                    closeMealPrepModal();
+                }
+            });
         });
     </script>
 </body>
