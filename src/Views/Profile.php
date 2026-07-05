@@ -192,13 +192,13 @@ $noindex = true;
                                     <li>Calorías: <?= (int) $plan['target_calories'] ?> kcal</li>
                                 <?php endif; ?>
                                 <?php if ($plan['target_protein'] !== null): ?>
-                                    <li>Proteínas: <?= (int) $plan['target_protein'] ?>g</li>
+                                    <li>Proteínas: <span data-nutri-amount="<?= htmlspecialchars((string) $plan['target_protein']) ?>" data-nutri-unit="g"><?= (int) $plan['target_protein'] ?>g</span></li>
                                 <?php endif; ?>
                                 <?php if ($plan['target_carbs'] !== null): ?>
-                                    <li>Carbohidratos: <?= (int) $plan['target_carbs'] ?>g</li>
+                                    <li>Carbohidratos: <span data-nutri-amount="<?= htmlspecialchars((string) $plan['target_carbs']) ?>" data-nutri-unit="g"><?= (int) $plan['target_carbs'] ?>g</span></li>
                                 <?php endif; ?>
                                 <?php if ($plan['target_fat'] !== null): ?>
-                                    <li>Grasas: <?= (int) $plan['target_fat'] ?>g</li>
+                                    <li>Grasas: <span data-nutri-amount="<?= htmlspecialchars((string) $plan['target_fat']) ?>" data-nutri-unit="g"><?= (int) $plan['target_fat'] ?>g</span></li>
                                 <?php endif; ?>
                             </ul>
                             <p><strong>Creado el: <?= date('d/m/Y', strtotime($plan['created_at'])) ?></strong></p>

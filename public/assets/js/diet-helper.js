@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             status.style.display = 'none';
             updateDietPlanButtons();
             renderPlan(window.dietHelperPlanData);
+            applyUnitConversionToPage();
         } catch (err) {
             status.textContent = err.message;
             status.style.display = 'block';
@@ -226,9 +227,9 @@ function renderDay(dayIndex) {
                     <tbody>
                         <tr>
                             <td>${Math.round(meal.calories)}</td>
-                            <td>${dhFmtMacro(meal.protein)}</td>
-                            <td>${dhFmtMacro(meal.carbs)}</td>
-                            <td>${dhFmtMacro(meal.fat)}</td>
+                            <td data-nutri-amount="${escapeHtml((String)(meal.protein))}" data-nutri-unit="g">${dhFmtMacro(meal.protein)}</td>
+                            <td data-nutri-amount="${escapeHtml((String)(meal.carbs))}" data-nutri-unit="g">${dhFmtMacro(meal.carbs)}</td>
+                            <td data-nutri-amount="${escapeHtml((String)(meal.fat))}" data-nutri-unit="g">${dhFmtMacro(meal.fat)}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -248,12 +249,14 @@ function renderDay(dayIndex) {
                 <tbody>
                     <tr>
                         <td>${Math.round(day.total_calories)}</td>
-                        <td>${dhFmtMacro(day.total_protein)}</td>
-                        <td>${dhFmtMacro(day.total_carbs)}</td>
-                        <td>${dhFmtMacro(day.total_fat)}</td>
+                        <td data-nutri-amount="${escapeHtml((String)(day.total_protein))}" data-nutri-unit="g">${dhFmtMacro(day.total_protein)}</td>
+                        <td data-nutri-amount="${escapeHtml((String)(day.total_carbs))}" data-nutri-unit="g">${dhFmtMacro(day.total_carbs)}</td>
+                        <td data-nutri-amount="${escapeHtml((String)(day.total_fat))}" data-nutri-unit="g">${dhFmtMacro(day.total_fat)}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     `;
+    // Re-apply unit conversion to dynamic content
+    applyUnitConversionToPage();
 }

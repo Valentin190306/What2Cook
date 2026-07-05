@@ -126,15 +126,15 @@ $baseUrl = "{$scheme}://{$host}";
                     <input type="number" id="calorias" name="calorias" placeholder="ej: 2000" required min="500" max="5000">
                 </div>
                 <div class="form-field">
-                    <label for="proteinas">Proteínas (g) <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
+                    <label for="proteinas">Proteínas <span data-unit-label="g">(g)</span> <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
                     <input type="number" id="proteinas" name="proteinas" placeholder="ej: 150">
                 </div>
                 <div class="form-field">
-                    <label for="carbohidratos">Carbohidratos (g) <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
+                    <label for="carbohidratos">Carbohidratos <span data-unit-label="g">(g)</span> <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
                     <input type="number" id="carbohidratos" name="carbohidratos" placeholder="ej: 200">
                 </div>
                 <div class="form-field">
-                    <label for="grasas">Grasas (g) <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
+                    <label for="grasas">Grasas <span data-unit-label="g">(g)</span> <span style="font-size:0.75rem; color:var(--color-text-muted); font-weight:400">(opcional)</span></label>
                     <input type="number" id="grasas" name="grasas" placeholder="ej: 70">
                 </div>
             </div>

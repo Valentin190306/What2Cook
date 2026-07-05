@@ -19,9 +19,9 @@ class UserPreferenceService
             return ['diet' => '', 'intolerances' => [], 'unit_system' => 'metric'];
         }
 
-        $diet = $user['preferences'] ?? '';
+        $diet = '';
+        $unitSystem = 'metric';
         $intolerances = [];
-        $unitSystem = 'metric'; // Default
 
         if (!empty($user['allergies'])) {
             $decoded = json_decode($user['allergies'], true);
@@ -30,20 +30,27 @@ class UserPreferenceService
             }
         }
 
-        // Try to get unit_system from preferences JSON if it's stored there
         if (!empty($user['preferences'])) {
             $prefsDecoded = json_decode($user['preferences'], true);
-            if (is_array($prefsDecoded) && isset($prefsDecoded['unit_system'])) {
-                $unitSystem = $prefsDecoded['unit_system'];
+            if (is_array($prefsDecoded)) {
+                // New JSON format: { "diet": "...", "unit_system": "...", ... }
+                $diet = $prefsDecoded['diet'] ?? '';
+                if (isset($prefsDecoded['unit_system'])) {
+                    $unitSystem = $prefsDecoded['unit_system'];
+                }
+            } else {
+                // Legacy format: plain string with the diet value
+                $diet = $user['preferences'];
             }
         }
 
         return [
-            'diet' => $diet,
+            'diet'        => $diet,
             'intolerances' => $intolerances,
-            'unit_system' => in_array($unitSystem, ['metric', 'imperial', 'us'], true) ? $unitSystem : 'metric'
+            'unit_system' => in_array($unitSystem, ['metric', 'imperial', 'us'], true) ? $unitSystem : 'metric',
         ];
     }
+
 
     /**
      * Establece una preferencia individual para un usuario.
@@ -66,6 +73,9 @@ class UserPreferenceService
             $decoded = json_decode($user['preferences'], true);
             if (is_array($decoded)) {
                 $existingPrefs = $decoded;
+            } else {
+                // Legacy format: plain string is the diet value — preserve it
+                $existingPrefs = ['diet' => $user['preferences']];
             }
         }
 

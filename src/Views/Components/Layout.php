@@ -184,7 +184,9 @@ $baseUrl = "{$scheme}://{$host}";
     <script src="/assets/js/sw-register.js" defer></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        UnitPreferences.syncFromServer();
+        UnitPreferences.syncFromServer().then(function () {
+            applyUnitConversionToPage();
+        });
 
         var navSelector = document.getElementById('nav-unit-system');
         if (navSelector) {
@@ -194,10 +196,14 @@ $baseUrl = "{$scheme}://{$host}";
             });
         }
 
+        // Apply conversion immediately on load (before server sync completes)
+        applyUnitConversionToPage();
+
         UnitPreferences.onSystemChange(function (system) {
             if (navSelector) {
                 navSelector.value = system;
             }
+            applyUnitConversionToPage();
         });
     });
     </script>

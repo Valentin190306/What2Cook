@@ -39,7 +39,7 @@ $noindex = true;
                             <span class="checkbox-square"></span>
                             <span class="item-name"><?= htmlspecialchars($item['ingredient_name']) ?></span>
                         </div>
-                        <span class="item-amount"><?= round($item['amount'], 2) ?> <?= htmlspecialchars($item['unit'] ?? '') ?></span>
+                        <span class="item-amount" data-amount="<?= htmlspecialchars((string) round($item['amount'], 2)) ?>" data-unit="<?= htmlspecialchars($item['unit'] ?? '') ?>"><?= round($item['amount'], 2) ?> <?= htmlspecialchars($item['unit'] ?? '') ?></span>
                     </li>
                     <?php endforeach; ?>
                 </ul>

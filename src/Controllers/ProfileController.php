@@ -217,13 +217,18 @@ class ProfileController extends Controller
             $this->redirect('/perfil/editar');
         }
 
-        $preferences = $diet;
         $allergies = json_encode(array_values($filteredIntolerances));
 
+        // Save diet and unit_system both in the JSON preferences blob
         $unitSystem = Validator::inList($_POST['unit_system'] ?? null, ['metric', 'imperial', 'us']);
+        $prefService = new \App\Services\UserPreferenceService();
+        $prefService->setPreference($userId, 'diet', $diet ?? '');
         if ($unitSystem !== null) {
-            (new UnitPreferenceService())->setPreferredSystem($userId, $unitSystem);
+            $prefService->setPreference($userId, 'unit_system', $unitSystem);
         }
+        // Read the updated JSON blob to pass to updateProfile (so it doesn't overwrite with a plain string)
+        $freshUser = $userModel->find($userId);
+        $preferences = $freshUser['preferences'] ?? '';
 
         $currentPassword = $_POST['current_password'] ?? '';
         $newPassword = $_POST['new_password'] ?? '';
@@ -257,10 +262,12 @@ class ProfileController extends Controller
         }
 
         try {
+            // Pass the full JSON blob (already saved above) to avoid overwriting unit_system
+            $currentPrefs = $userModel->find($userId);
             $userModel->updateProfile($userId, [
                 'name' => $name,
                 'email' => $email,
-                'preferences' => $preferences,
+                'preferences' => $currentPrefs['preferences'] ?? $preferences,
                 'allergies' => $allergies
             ], $newPasswordVal);
         } catch (\PDOException $e) {
