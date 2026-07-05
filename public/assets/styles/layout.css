@@ -39,10 +39,11 @@ header > a:first-child img {
 header nav ul {
   display: flex;
   justify-content: center;
+  align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1rem;
-  padding-top: 0.5rem;
+  padding-top: 1.25rem;
   border-top: 1px solid var(--color-border);
 }
 
@@ -226,7 +227,7 @@ footer > nav.social svg {
    ============================================================ */
 @media (min-width: 900px) {
   header {
-    padding: 2rem;
+    padding: 2rem 2rem 1.5rem 2rem;
   }
 
   header > strong {
