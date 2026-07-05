@@ -60,14 +60,14 @@ if (!function_exists('getRecipeDetailsForPrint')) {
                                             <li>Calorías: <?= (int) $plan['target_calories'] ?> kcal</li>
                                         <?php endif; ?>
                                         <?php if ($plan['target_protein'] !== null): ?>
-                                            <li>Proteínas: <?= (int) $plan['target_protein'] ?>g</li>
-                                        <?php endif; ?>
-                                        <?php if ($plan['target_carbs'] !== null): ?>
-                                            <li>Carbohidratos: <?= (int) $plan['target_carbs'] ?>g</li>
-                                        <?php endif; ?>
-                                        <?php if ($plan['target_fat'] !== null): ?>
-                                            <li>Grasas: <?= (int) $plan['target_fat'] ?>g</li>
-                                        <?php endif; ?>
+                                             <li>Proteínas: <span data-nutri-amount="<?= htmlspecialchars((string) $plan['target_protein']) ?>" data-nutri-unit="g"><?= (int) $plan['target_protein'] ?>g</span></li>
+                                         <?php endif; ?>
+                                         <?php if ($plan['target_carbs'] !== null): ?>
+                                             <li>Carbohidratos: <span data-nutri-amount="<?= htmlspecialchars((string) $plan['target_carbs']) ?>" data-nutri-unit="g"><?= (int) $plan['target_carbs'] ?>g</span></li>
+                                         <?php endif; ?>
+                                         <?php if ($plan['target_fat'] !== null): ?>
+                                             <li>Grasas: <span data-nutri-amount="<?= htmlspecialchars((string) $plan['target_fat']) ?>" data-nutri-unit="g"><?= (int) $plan['target_fat'] ?>g</span></li>
+                                         <?php endif; ?>
                                     </ul>
                                 <?php endif; ?>
                                 <p style="margin-top: 1rem; font-size: 0.95rem; color: #555555; border-top: 1px solid #000000; padding-top: 0.5rem;">Creado el: <?= date('d/m/Y', strtotime($plan['created_at'])) ?></p>

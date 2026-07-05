@@ -86,15 +86,18 @@ async function openMealPrepModal(mpId) {
                             <thead><tr><th>Kcal</th><th>Proteína</th><th>Carbs</th><th>Grasa</th></tr></thead>
                             <tbody><tr>
                                 <td>${Math.round(nutrientMap['Calories'] ? nutrientMap['Calories'].amount : 0)}</td>
-                                <td>${mpModalMacro(nutrientMap['Protein'] ? nutrientMap['Protein'].amount : 0)}</td>
-                                <td>${mpModalMacro(nutrientMap['Carbohydrates'] ? nutrientMap['Carbohydrates'].amount : 0)}</td>
-                                <td>${mpModalMacro(nutrientMap['Fat'] ? nutrientMap['Fat'].amount : 0)}</td>
+                                <td data-nutri-amount="${escapeHtml((String)(nutrientMap['Protein'] ? nutrientMap['Protein'].amount : 0))}" data-nutri-unit="g">${mpModalMacro(nutrientMap['Protein'] ? nutrientMap['Protein'].amount : 0)}</td>
+                                <td data-nutri-amount="${escapeHtml((String)(nutrientMap['Carbohydrates'] ? nutrientMap['Carbohydrates'].amount : 0))}" data-nutri-unit="g">${mpModalMacro(nutrientMap['Carbohydrates'] ? nutrientMap['Carbohydrates'].amount : 0)}</td>
+                                <td data-nutri-amount="${escapeHtml((String)(nutrientMap['Fat'] ? nutrientMap['Fat'].amount : 0))}" data-nutri-unit="g">${mpModalMacro(nutrientMap['Fat'] ? nutrientMap['Fat'].amount : 0)}</td>
                             </tr></tbody>
                         </table>
                         <a class="recipe-link" href="/receta/${id}" aria-hidden="true" tabindex="-1"></a>
                     </article>
                 `;
             }).join('');
+            if (typeof applyUnitConversionToPage === 'function') {
+                applyUnitConversionToPage();
+            }
         } else {
             recipesEl.innerHTML = '<p style="text-align:center;padding:2rem;">No hay recetas en este meal prep.</p>';
         }

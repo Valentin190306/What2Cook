@@ -152,6 +152,9 @@ function renderResults(recipes) {
     } else {
         renderSingle(recipes);
     }
+    if (typeof applyUnitConversionToPage === 'function') {
+        applyUnitConversionToPage();
+    }
 }
 
 async function renderSingle(recipes) {
@@ -215,9 +218,9 @@ async function renderMealPrep(recipes) {
         <h2 class="mp-summary__title">Tu Meal Prep — ${recipes.length} recetas</h2>
         <div class="mp-summary__macros">
             <span><strong>${Math.round(totals.calories)}</strong> Kcal totales</span>
-            <span><strong>${fmtMacro(totals.protein)}</strong> Proteína</span>
-            <span><strong>${fmtMacro(totals.carbs)}</strong> Carbs</span>
-            <span><strong>${fmtMacro(totals.fat)}</strong> Grasa</span>
+            <span><strong data-nutri-amount="${escapeHtml((String)(totals.protein))}" data-nutri-unit="g">${fmtMacro(totals.protein)}</strong> Proteína</span>
+            <span><strong data-nutri-amount="${escapeHtml((String)(totals.carbs))}" data-nutri-unit="g">${fmtMacro(totals.carbs)}</strong> Carbs</span>
+            <span><strong data-nutri-amount="${escapeHtml((String)(totals.fat))}" data-nutri-unit="g">${fmtMacro(totals.fat)}</strong> Grasa</span>
         </div>
     `;
     
@@ -398,9 +401,9 @@ function buildCard(recipe) {
             <thead><tr><th>Kcal</th><th>Proteína</th><th>Carbs</th><th>Grasa</th></tr></thead>
             <tbody><tr>
                 <td>${Math.round(n.calories)}</td>
-                <td>${proteinStr}</td>
-                <td>${carbsStr}</td>
-                <td>${fatStr}</td>
+                <td data-nutri-amount="${escapeHtml((String)(n.protein || 0))}" data-nutri-unit="g">${proteinStr}</td>
+                <td data-nutri-amount="${escapeHtml((String)(n.carbs || 0))}" data-nutri-unit="g">${carbsStr}</td>
+                <td data-nutri-amount="${escapeHtml((String)(n.fat || 0))}" data-nutri-unit="g">${fatStr}</td>
             </tr></tbody>
         `;
         card.appendChild(table);
