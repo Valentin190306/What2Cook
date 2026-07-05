@@ -316,6 +316,31 @@ textarea:focus {
   text-decoration: none;
 }
 
+/* ---------- Google Auth Button ---------- */
+.btn-google {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.75rem;
+  font-family: var(--font-title);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 2px solid var(--color-black);
+  background: var(--color-cream);
+  color: var(--color-black);
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.btn-google:hover {
+  background: var(--color-black);
+  color: var(--color-white);
+}
+
 /* ---------- Collapsible Sections ---------- */
 .collapsible-section {
   border: 2px solid var(--color-black);
