@@ -68,6 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return result;
         } catch (err) {
             console.error('Error al guardar el plan:', err);
+            
+            if (err.message && err.message.includes('401')) {
+                window.location = '/login';
+                return;
+            }
+            
             alert('Error al guardar el plan. Por favor intentá de nuevo.');
             btnGuardar.disabled = false;
             btnGuardar.textContent = originalText;

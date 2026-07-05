@@ -951,7 +951,8 @@
     text-indent: -9999px;
   }
 
-  .recipe-grid article>button:hover {
+  .recipe-grid article>button:hover,
+  .recipe-grid article>button.favorited {
     background-color: var(--color-carrot);
     border-color: var(--color-carrot);
     transform: scale(1.1);
