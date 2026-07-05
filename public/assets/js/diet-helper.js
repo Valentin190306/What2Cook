@@ -99,12 +99,24 @@ document.addEventListener('DOMContentLoaded', () => {
         btnGenerar.disabled = true;
         panel.hidden = true;
 
+        var sys = UnitPreferences.getPreferredSystem();
+        var protVal = parseFloat(document.getElementById('proteinas').value) || 0;
+        var carbVal = parseFloat(document.getElementById('carbohidratos').value) || 0;
+        var fatVal  = parseFloat(document.getElementById('grasas').value) || 0;
+
+        if (sys !== 'metric') {
+            // Conversión inversa client-side: De la unidad actual (oz/lb) a base (gramos)
+            protVal = UnitConversion.convertToBase(protVal, 'oz');
+            carbVal = UnitConversion.convertToBase(carbVal, 'oz');
+            fatVal  = UnitConversion.convertToBase(fatVal, 'oz');
+        }
+
         const data = {
             duration_days: parseInt(document.getElementById('duracion').value),
             target_calories: parseInt(document.getElementById('calorias').value) || 0,
-            target_protein: parseInt(document.getElementById('proteinas').value) || 0,
-            target_carbs: parseInt(document.getElementById('carbohidratos').value) || 0,
-            target_fat: parseInt(document.getElementById('grasas').value) || 0,
+            target_protein: Math.round(protVal),
+            target_carbs: Math.round(carbVal),
+            target_fat: Math.round(fatVal),
             diet_type: document.getElementById('dieta').value || ''
         };
 

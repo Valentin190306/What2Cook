@@ -527,6 +527,9 @@
             font-size: 0.85rem;
         }
     </style>
+    <script src="/assets/js/utils.js" defer></script>
+    <script src="/assets/js/UnitPreferences.js" defer></script>
+    <script src="/assets/js/UnitConversion.js" defer></script>
 </head>
 <body>
     <div class="container">
@@ -650,9 +653,9 @@
                     if (targetCalories || targetProtein || targetCarbs || targetFat) {
                         goalsHtml = '<p><strong>Objetivos nutricionales:</strong><ul>';
                         if (targetCalories) goalsHtml += `<li>Calorías: ${targetCalories} kcal</li>`;
-                        if (targetProtein) goalsHtml += `<li>Proteínas: ${targetProtein}g</li>`;
-                        if (targetCarbs) goalsHtml += `<li>Carbohidratos: ${targetCarbs}g</li>`;
-                        if (targetFat) goalsHtml += `<li>Grasas: ${targetFat}g</li>`;
+                        if (targetProtein) goalsHtml += `<li>Proteínas: <span data-nutri-amount="${targetProtein}" data-nutri-unit="g">${targetProtein}g</span></li>`;
+                        if (targetCarbs) goalsHtml += `<li>Carbohidratos: <span data-nutri-amount="${targetCarbs}" data-nutri-unit="g">${targetCarbs}g</span></li>`;
+                        if (targetFat) goalsHtml += `<li>Grasas: <span data-nutri-amount="${targetFat}" data-nutri-unit="g">${targetFat}g</span></li>`;
                         goalsHtml += '</ul></p>';
                     }
 
@@ -805,7 +808,7 @@
                                 <span class="checkbox-square"></span>
                                 <span class="item-name">${item.ingredient_name || item.name || 'Ingrediente'}</span>
                             </div>
-                            <span class="item-amount">${round(item.amount || 0, 2)} ${item.unit || ''}</span>
+                            <span class="item-amount" data-amount="${item.amount || 0}" data-unit="${item.unit || ''}">${round(item.amount || 0, 2)} ${item.unit || ''}</span>
                         </li>
                     `).join('');
 
@@ -903,18 +906,29 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            loadOfflineRecipes();
-            loadOfflinePlans();
-            loadOfflineMealPreps();
-            loadOfflineShopping();
-
-            // Event listener para cerrar modal de meal prep
-            document.getElementById('mp-modal-close').addEventListener('click', closeMealPrepModal);
-            document.getElementById('mp-modal').addEventListener('click', (e) => {
-                if (e.target.id === 'mp-modal') {
-                    closeMealPrepModal();
+            Promise.all([
+                loadOfflineRecipes(),
+                loadOfflinePlans(),
+                loadOfflineMealPreps(),
+                loadOfflineShopping()
+            ]).then(() => {
+                if (typeof applyUnitConversionToPage === 'function') {
+                    applyUnitConversionToPage();
                 }
             });
+
+            if (typeof UnitPreferences !== 'undefined') {
+                UnitPreferences.syncFromServer().then(() => {
+                    if (typeof applyUnitConversionToPage === 'function') {
+                        applyUnitConversionToPage();
+                    }
+                });
+                UnitPreferences.onSystemChange(() => {
+                    if (typeof applyUnitConversionToPage === 'function') {
+                        applyUnitConversionToPage();
+                    }
+                });
+            }
         });
     </script>
 </body>
