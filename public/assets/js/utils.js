@@ -98,4 +98,21 @@ function applyUnitConversionToPage() {
             labelEl.textContent = '(' + baseUnit + ')';
         }
     });
+
+    // 4. Actualizar placeholders de ejemplo en /asistente-dieta
+    var pInput = document.getElementById('proteinas');
+    var cInput = document.getElementById('carbohidratos');
+    var fInput = document.getElementById('grasas');
+    if (pInput && cInput && fInput) {
+        if (system === 'metric') {
+            pInput.placeholder = 'ej: 150';
+            cInput.placeholder = 'ej: 200';
+            fInput.placeholder = 'ej: 70';
+        } else {
+            // Conversión de ejemplo aproximada: 150g -> ~5.3oz (redondeado a 4 | 6 | 2.5 según requerimiento del usuario)
+            pInput.placeholder = 'ej: 4';
+            cInput.placeholder = 'ej: 6';
+            fInput.placeholder = 'ej: 2.5';
+        }
+    }
 }
