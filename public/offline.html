@@ -88,6 +88,10 @@
                 grid-template-columns: 1fr 1fr;
             }
         }
+        /* Override for shopping lists to always show one per row */
+        #offline-shopping {
+            grid-template-columns: 1fr !important;
+        }
         .recipe-card {
             border: 1px solid var(--color-border);
             background: var(--color-cream);

@@ -8,7 +8,7 @@
  * 3. ?v=time() en Layout.php fuerza la re-descarga de assets en cada navegación (mitigado por ignoreSearch).
  */
 
-const STATIC_CACHE = 'static-v2';
+const STATIC_CACHE = 'static-v3';
 const RECIPES_CACHE = 'recipes-v1';
 const IMAGES_CACHE = 'images-v1';
 const PLANS_CACHE = 'plans-v1';
@@ -18,7 +18,12 @@ const SHOPPING_CACHE = 'shopping-v1';
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(STATIC_CACHE)
-            .then((cache) => cache.addAll(['/offline.html']))
+            .then((cache) => cache.addAll([
+                '/offline.html',
+                '/assets/js/utils.js',
+                '/assets/js/UnitPreferences.js',
+                '/assets/js/UnitConversion.js'
+            ]))
             .then(() => self.skipWaiting())
     );
 });
@@ -313,6 +318,9 @@ async function staleWhileRevalidate(request, cacheName) {
             await cache.put(request, networkResponse.clone());
         }
         return networkResponse;
+    }).catch((err) => {
+        console.warn('[SW] Fetch failed, returning cached if available:', err);
+        return null;
     });
 
     return cachedResponse || fetchPromise;
@@ -361,7 +369,7 @@ async function updateOfflineIndex(list) {
     }));
 }
 
-async function cacheRecipe(spoonacularId, title, imageUrl) {
+async function cacheRecipe(spoonacularId, title, imageUrl, addToFavorites = true) {
     const recipeUrl = `/receta/${spoonacularId}`;
     try {
         const recipeCache = await caches.open(RECIPES_CACHE);
@@ -383,15 +391,17 @@ async function cacheRecipe(spoonacularId, title, imageUrl) {
             }
         }
 
-        // Actualizar índice JSON
-        const list = await getOfflineIndex();
-        if (!list.some((item) => item.spoonacular_id === parseInt(spoonacularId, 10))) {
-            list.push({
-                spoonacular_id: parseInt(spoonacularId, 10),
-                title: title,
-                image: imageUrl
-            });
-            await updateOfflineIndex(list);
+        // Actualizar índice JSON solo si addToFavorites es true
+        if (addToFavorites) {
+            const list = await getOfflineIndex();
+            if (!list.some((item) => item.spoonacular_id === parseInt(spoonacularId, 10))) {
+                list.push({
+                    spoonacular_id: parseInt(spoonacularId, 10),
+                    title: title,
+                    image: imageUrl
+                });
+                await updateOfflineIndex(list);
+            }
         }
     } catch (err) {
         console.error('[SW] Error al cachear receta:', spoonacularId, err);
@@ -538,16 +548,29 @@ async function cachePlan(planId, title) {
                 });
                 await updateOfflinePlansIndex(list);
 
-                // Cachear las recetas individuales del plan
+                // Cachear las recetas individuales del plan (con límite para evitar colapso)
                 if (data.days && Array.isArray(data.days)) {
+                    let recipeCount = 0;
+                    const maxRecipes = 50; // Límite para evitar saturar el service worker
+                    
                     for (const day of data.days) {
                         if (day.meals && Array.isArray(day.meals)) {
                             for (const meal of day.meals) {
-                                if (meal.spoonacular_id) {
-                                    await cacheRecipe(meal.spoonacular_id, meal.title, meal.image);
+                                if (meal.spoonacular_id && recipeCount < maxRecipes) {
+                                    try {
+                                        await cacheRecipe(meal.spoonacular_id, meal.title, meal.image);
+                                        recipeCount++;
+                                    } catch (recipeErr) {
+                                        console.warn('[SW] Error al cachear receta del plan:', meal.spoonacular_id, recipeErr);
+                                        // Continuar con las demás recetas
+                                    }
                                 }
                             }
                         }
+                    }
+                    
+                    if (recipeCount >= maxRecipes) {
+                        console.warn('[SW] Se alcanzó el límite de recetas cacheadas para el plan:', planId);
                     }
                 }
             }
@@ -658,8 +681,19 @@ async function cacheMealPrep(mealPrepId, title) {
                 list.push(mealPrepEntry);
                 await updateOfflineMealPrepsIndex(list);
 
-                // NO cachear las recetas individuales del meal prep
-                // Las recetas solo se mostrarán dentro del meal prep
+                // Cachear las recetas individuales del meal prep
+                if (data.recipe_ids && Array.isArray(data.recipe_ids)) {
+                    for (const recipeId of data.recipe_ids) {
+                        try {
+                            // Necesitamos obtener los datos de la receta para cachearla
+                            // Como no tenemos título/imagen, usamos el ID
+                            // Pasamos false para no agregar a favoritos
+                            await cacheRecipe(recipeId, `Receta ${recipeId}`, null, false);
+                        } catch (recipeErr) {
+                            console.warn('[SW] Error al cachear receta del meal prep:', recipeId, recipeErr);
+                        }
+                    }
+                }
             }
         }
     } catch (err) {

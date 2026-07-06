@@ -166,25 +166,30 @@ document.addEventListener('DOMContentLoaded', () => {
             // Notificar al Service Worker
             if (navigator.serviceWorker) {
                 const listName = `Lista ${data.list_id}`;
+                let messageSent = false;
+                
                 if (navigator.serviceWorker.controller) {
                     console.log('[Frontend] Service worker disponible, enviando mensaje...');
-                    console.log('[Frontend] Enviando lista de compras al SW:', listId, listName, itemsToSend);
+                    console.log('[Frontend] Enviando lista de compras al SW:', data.list_id, listName, itemsToSend);
                     navigator.serviceWorker.controller.postMessage({
                         type: 'CACHE_SHOPPING_LIST',
                         listId: data.list_id,
                         name: listName,
                         items: itemsToSend
                     });
+                    messageSent = true;
                 } else {
                     console.log('[Frontend] Service worker registrado pero no controla la página, esperando...');
                     navigator.serviceWorker.ready.then((registration) => {
-                        console.log('[Frontend] Service worker listo, enviando mensaje...');
-                        registration.active.postMessage({
-                            type: 'CACHE_SHOPPING_LIST',
-                            listId: data.list_id,
-                            name: listName,
-                            items: itemsToSend
-                        });
+                        if (!messageSent) {
+                            console.log('[Frontend] Service worker listo, enviando mensaje...');
+                            registration.active.postMessage({
+                                type: 'CACHE_SHOPPING_LIST',
+                                listId: data.list_id,
+                                name: listName,
+                                items: itemsToSend
+                            });
+                        }
                     }).catch((err) => {
                         console.error('[Frontend] Error esperando service worker:', err);
                     });
