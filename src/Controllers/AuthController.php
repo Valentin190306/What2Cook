@@ -256,7 +256,7 @@ class AuthController extends Controller
         $state = bin2hex(random_bytes(32));
         Session::flash('oauth_state', $state);
 
-        $scope = urlencode('openid profile email');
+        $scope = 'openid profile email';
         $authUrl = "https://accounts.google.com/o/oauth2/v2/auth?" . http_build_query([
             'client_id' => $clientId,
             'redirect_uri' => $redirectUri,

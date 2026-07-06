@@ -12,7 +12,8 @@ COPY docker/nginx.k8s.conf /etc/nginx/http.d/default.conf
 COPY docker/supervisor.conf /etc/supervisor.conf
 COPY docker/entrypoint.k8s.sh /usr/local/bin/docker-entrypoint
 
-RUN chmod +x /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint \
+    && sed -i 's/\r$//' /usr/local/bin/docker-entrypoint
 
 WORKDIR /var/www/app
 COPY . .
