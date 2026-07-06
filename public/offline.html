@@ -156,7 +156,7 @@
             gap: 1.5rem;
         }
 
-        /* Meal Prep Card Styles */
+        /*
         .mealprep-card {
             border: 1px solid var(--color-border);
             background: var(--color-cream);
@@ -254,6 +254,7 @@
             color: var(--color-carrot);
             text-transform: uppercase;
         }
+        */
 
         /* Plan Card Styles */
         .plan-card {
@@ -556,10 +557,12 @@
             <p style="grid-column: 1 / -1; text-align: center;">Cargando planes guardados...</p>
         </div>
 
+        <!--
         <h2 class="grid-title">Meal preps disponibles offline</h2>
         <div class="recipe-grid" id="offline-mealpreps">
             <p style="grid-column: 1 / -1; text-align: center;">Cargando meal preps guardados...</p>
         </div>
+        -->
 
         <h2 class="grid-title">Listas de compras disponibles offline</h2>
         <div class="recipe-grid" id="offline-shopping">
@@ -567,7 +570,7 @@
         </div>
     </div>
 
-    <!-- Modal de detalle de Meal Prep -->
+    <!--
     <div class="modal-overlay" id="mp-modal" aria-hidden="true" role="dialog" aria-label="Detalle del Meal Prep">
         <div class="modal-card modal-card--wide">
             <div class="modal-card__header">
@@ -580,6 +583,7 @@
             </div>
         </div>
     </div>
+    -->
 
     <script>
         async function loadOfflineRecipes() {
@@ -716,6 +720,7 @@
             }
         }
 
+        /*
         async function loadOfflineMealPreps() {
             const container = document.getElementById('offline-mealpreps');
             try {
@@ -781,6 +786,7 @@
                 container.innerHTML = '<p class="no-recipes">Error al cargar los meal preps guardados offline.</p>';
             }
         }
+        */
 
         async function loadOfflineShopping() {
             const container = document.getElementById('offline-shopping');
@@ -862,6 +868,7 @@
             return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
         }
 
+        /*
         function openMealPrepModal(mp) {
             const modal = document.getElementById('mp-modal');
             const modalTitle = document.getElementById('mp-modal-title');
@@ -908,12 +915,12 @@
             const modal = document.getElementById('mp-modal');
             modal.setAttribute('aria-hidden', 'true');
         }
+        */
 
         document.addEventListener('DOMContentLoaded', () => {
             Promise.all([
                 loadOfflineRecipes(),
                 loadOfflinePlans(),
-                loadOfflineMealPreps(),
                 loadOfflineShopping()
             ]).then(() => {
                 if (typeof applyUnitConversionToPage === 'function') {

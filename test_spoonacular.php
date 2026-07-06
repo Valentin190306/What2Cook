@@ -1,6 +1,8 @@
 <?php
 require 'vendor/autoload.php';
 
+date_default_timezone_set('America/Buenos_Aires');
+
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 

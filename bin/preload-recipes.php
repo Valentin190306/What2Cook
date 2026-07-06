@@ -39,6 +39,8 @@ foreach ($autoloadPaths as $path) {
     }
 }
 
+date_default_timezone_set('America/Buenos_Aires');
+
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 $dotenv->required(['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD']);

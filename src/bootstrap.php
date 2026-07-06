@@ -16,16 +16,19 @@ $whoops = new Run();
 $whoops->pushHandler(new PrettyPageHandler());
 $whoops->register();
 
-// ── 2. Variables de entorno ──────────────────────────────────────────────────
+// ── 2. Zona horaria ──────────────────────────────────────────────────────────
+date_default_timezone_set('America/Buenos_Aires');
+
+// ── 3. Variables de entorno ──────────────────────────────────────────────────
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
 $dotenv->load();
 
 $dotenv->required(['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD']);
 
-// ── 3. Logger ────────────────────────────────────────────────────────────────
+// ── 4. Logger ────────────────────────────────────────────────────────────────
 $logger = new \App\Core\Log\FileLogger(__DIR__ . '/../log/app.log');
 
-// ── 4. Base de datos ─────────────────────────────────────────────────────────
+// ── 5. Base de datos ─────────────────────────────────────────────────────────
 try {
     $pdo = Database::getInstance();
 } catch (Exception $e) {
