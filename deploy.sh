@@ -52,7 +52,7 @@ REGION="us-central1"
 ZONE="us-central1-a"
 CLUSTER_NAME="what2cook-cluster"
 IMAGE_REPO="${REGION}-docker.pkg.dev/${PROJECT_ID}/what2cook/app"
-TAG="latest"
+TAG=$(git rev-parse --short HEAD)
 IMAGE="${IMAGE_REPO}:${TAG}"
 
 echo "Deploying to project: ${PROJECT_ID}"
