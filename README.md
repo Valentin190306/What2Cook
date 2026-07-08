@@ -210,25 +210,164 @@ Para garantizar que el usuario pueda visualizar sus recetas favoritas incluso si
 
 ## 8. Funcionalidades Adicionales
 
-### Conversor de Unidades de Ingredientes
-La aplicación incluye un conversor de unidades que permite a los usuarios visualizar las cantidades de ingredientes en diferentes sistemas de medición:
+### Sistema Global de Conversión de Unidades
+La aplicación implementa un sistema transversal de conversión de unidades con arquitectura desacoplada, consumido por todos los módulos (Recetas, Diet Helper, Meal Prep, Shopping Lists, Catálogo):
+
+**Arquitectura de Servicios:**
+- **UnitPreferenceService:** Gestión de preferencias de unidades (metric, imperial, us)
+- **UnitConversionService:** Servicio puro de conversión matemática
+- **UnitConversionTrait:** Tabla de conversión con 50+ unidades (volumen, peso, US customary)
+
+**Persistencia Dual:**
+- **Usuario No Autenticado:** `localStorage` con clave `preferredUnitSystem`
+- **Usuario Autenticado:** Columna `unit_system` en tabla `users`
+- **Sincronización:** Al login, la preferencia de la DB prevalece sobre localStorage
+
+**Sistemas Soportados:**
 - **Métrico:** Gramos (g), kilogramos (kg), mililitros (ml), litros (l)
 - **Imperial:** Onzas (oz), libras (lb), onzas líquidas (fl oz)
 - **US:** Tazas (cup), cucharadas (tbsp), cucharaditas (tsp)
 
-La preferencia del usuario se guarda en la base de datos y se aplica automáticamente al visitar cualquier receta. La conversión se realiza en tiempo real en el frontend sin necesidad de recargar la página.
+La conversión es 100% nativa e independiente de la API Spoonacular, aplicándose en tiempo real sin recarga de página.
 
-### Catálogo con Búsquedas Compartibles
+### Catálogo con Búsquedas Compartibles y Multimedia
 Los filtros del catálogo de recetas (tipo, cocina, dieta, intolerancias y búsqueda por texto) se sincronizan con la URL mediante la API History del navegador (`pushState` y `popstate`). Esto permite:
 - Compartir búsquedas específicas copiando la URL
 - Navegar hacia atrás/adelante sin perder los filtros aplicados
 - Mantener filtros al recargar la página
 
-El botón "Compartir búsqueda" copia la URL actual al portapapeles con feedback visual.
+**Botones de Compartir:**
+- **Share Native:** Utiliza `navigator.share()` para compartir vía apps nativas (WhatsApp, Instagram, etc)
+- **Copy to Clipboard:** Copia la URL al portapapeles con fallback para navegadores antiguos
+- **Toast Notifications:** Feedback visual al copiar/enlace compartido
+
+**Query Strings:**
+- Catálogo: `?query=pasta&diet=vegetarian&type=main course`
+- Recetas: `?id=12345&servings=4`
 
 ---
 
-## 9. Dependencias PHP Incluidas
+## 9. Despliegue en Producción (GCP)
+
+Para despliegues en producción, el proyecto cuenta con infraestructura como código en Google Cloud Platform:
+
+### Stack de Producción
+- **Infraestructura:** Terraform (IaC) para GCP resources
+- **Orquestación:** Google Kubernetes Engine (GKE)
+- **Contenedores:** Docker con imágenes optimizadas para K8s
+- **Ingress:** NGINX Ingress Controller con SSL/TLS automático
+- **SSL/TLS:** cert-manager + Let's Encrypt
+- **Base de Datos:** PostgreSQL 16 en StatefulSet con persistencia
+- **Servicios:** LibreTranslate para traducción local
+
+### Estructura de Infraestructura
+```
+infra/              # Terraform modules
+├── main.tf         # Habilitación de APIs GCP
+├── gke.tf          # Configuración de cluster GKE
+├── vpc.tf          # VPC y subredes
+├── storage.tf      # Artifact Registry
+└── variables.tf    # Variables parametrizables
+
+k8s/                # Kubernetes manifests
+├── app/            # Deployment y Service de la app
+├── postgres/       # StatefulSet de PostgreSQL
+├── libretranslate/ # Servicio de traducción
+├── cert-manager/   # ClusterIssuer Let's Encrypt
+└── configmap.yaml  # Configuración no sensible
+```
+
+### Script de Deploy Automatizado
+El script `deploy.sh` automatiza todo el proceso:
+1. Pre-flight checks (gcloud auth, project config)
+2. Deploy infraestructura Terraform
+3. Build y push de imagen Docker
+4. Configuración de GKE credentials
+5. Instalación de Helm charts (NGINX Ingress, cert-manager)
+6. Generación de manifiestos K8s con variables
+7. Aplicación de manifests (namespace, secrets, deployments)
+8. Ejecución de migraciones Phinx
+9. Configuración de Ingress con SSL
+
+### Comando de Deploy
+```bash
+./deploy.sh
+```
+
+**Requisitos:**
+- gcloud CLI autenticado
+- Archivo `infra/terraform.tfvars` configurado
+- Variables de entorno en `.env` (API keys, secrets)
+
+### Costos Estimados
+- GKE Cluster (e2-standard-4, 1 nodo): ~$40-50/mes
+- Persistent Disk (10Gi SSD): ~$1.50/mes
+- Static IP + Load Balancer: ~$21/mes
+- **Total estimado:** ~$70-80/mes (bajo tráfico)
+
+### SSL/TLS Automático
+El sistema utiliza cert-manager con Let's Encrypt para provisión automática de certificados SSL:
+- **ClusterIssuer:** Configurado para desafío HTTP-01
+- **Ingress:** Annotation `cert-manager.io/cluster-issuer: letsencrypt-prod`
+- **Provisión:** Certificados se emiten automáticamente al aplicar Ingress
+- **Tiempo:** 2-5 minutos tras deploy para que el certificado esté activo
+
+### Escalabilidad
+El cluster GKE está configurado para escalar horizontalmente:
+```bash
+# Escalar app a 3 réplicas
+kubectl scale deployment app -n what2cook --replicas=3
+
+# Configurar Horizontal Pod Autoscaler
+kubectl autoscale deployment app -n what2cook --cpu-percent=70 --min=1 --max=5
+```
+
+### Comandos Útiles de Producción
+```bash
+# Ver logs de la app en producción
+kubectl logs -n what2cook deployment/app -f
+
+# Ver estado de pods
+kubectl get pods -n what2cook
+
+# Ver estado de servicios
+kubectl get svc -n what2cook
+
+# Restart de deployment
+kubectl rollout restart deployment/app -n what2cook
+
+# Ejecutar migraciones en pod existente
+kubectl exec -n what2cook <pod-name> -- php vendor/bin/phinx migrate -e production
+```
+
+### Troubleshooting Básico
+```bash
+# Si un pod está en CrashLoopBackOff
+kubectl describe pod -n what2cook <pod-name>
+kubectl logs -n what2cook <pod-name>
+
+# Si el certificado SSL no se emite
+kubectl describe certificate -n what2cook app-tls
+kubectl logs -n cert-manager deployment/cert-manager
+
+# Si PostgreSQL no conecta
+kubectl exec -n what2cook <app-pod> -- nc -zv postgres 5432
+kubectl logs -n what2cook statefulset/postgres
+```
+
+### Seguridad en Producción
+El despliegue en GCP incluye múltiples capas de seguridad:
+- **Red Aislada:** VPC dedicada con subred privada (10.0.0.0/24)
+- **Firewall Rules:** Solo tráfico necesario permitido (health checks GCP + tráfico interno)
+- **Secrets Management:** Kubernetes Secrets para datos sensibles (API keys, passwords)
+- **Service Accounts:** SA dedicada para nodos GKE con permisos mínimos necesarios
+- **SSL/TLS:** Certificados Let's Encrypt automáticos para todo el tráfico HTTPS
+- **Workload Identity:** Habilitado para integración segura con servicios GCP
+- **Imágenes Oficiales:** Solo imágenes Docker oficiales y verificadas
+
+---
+
+## 11. Dependencias PHP Incluidas
 
 Las siguientes dependencias principales se administran mediante Composer y forman parte de la arquitectura del proyecto:
 
