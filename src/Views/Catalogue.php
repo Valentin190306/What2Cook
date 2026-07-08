@@ -14,8 +14,8 @@ $baseUrl = "{$scheme}://{$host}";
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"},
-        {"@type": "ListItem", "position": 2, "name": "Catálogo de Recetas", "item": "<?= $baseUrl ?>/recetas"}
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= htmlspecialchars($baseUrl) ?>/"},
+        {"@type": "ListItem", "position": 2, "name": "Catálogo de Recetas", "item": "<?= htmlspecialchars($baseUrl) ?>/recetas"}
     ]
 }
 </script>
@@ -31,8 +31,8 @@ $baseUrl = "{$scheme}://{$host}";
         {
             "@type": "ListItem",
             "position": <?= ($page - 1) * $perPage + $i + 1 ?>,
-            "url": "<?= $baseUrl ?>/receta/<?= (int) ($recipe['id'] ?? 0) ?>",
-            "name": <?= json_encode($recipe['title'] ?? '', JSON_UNESCAPED_UNICODE) ?>
+            "url": "<?= htmlspecialchars($baseUrl) ?>/receta/<?= (int) ($recipe['id'] ?? 0) ?>",
+            "name": <?= json_encode($recipe['title'] ?? '', JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>
         }<?= $i < count($recipes) - 1 ? ',' : '' ?>
         <?php endforeach; ?>
     ]

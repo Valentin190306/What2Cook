@@ -26,7 +26,7 @@ $baseUrl = "{$scheme}://{$host}";
     <meta property="og:description" content="<?= htmlspecialchars($ogDescription ?? $metaDescription ?? 'Planificá tus comidas semanales, buscá recetas por ingredientes con nuestro asistente inteligente y gestioná tus listas de compras en What2Cook.') ?>">
     <meta property="og:type" content="<?= htmlspecialchars($ogType ?? 'website') ?>">
     <meta property="og:url" content="<?= htmlspecialchars($canonicalUrl) ?>">
-    <meta property="og:image" content="<?= htmlspecialchars($ogImage ?? $baseUrl . '/assets/img/LogoW2C_conFONDO_1.png') ?>">
+    <meta property="og:image" content="<?= htmlspecialchars($ogImage ?? htmlspecialchars($baseUrl) . '/assets/img/LogoW2C_conFONDO_1.png') ?>">
     <meta property="og:image:width" content="1019">
     <meta property="og:image:height" content="679">
     <meta property="og:image:type" content="image/png">
@@ -39,12 +39,12 @@ $baseUrl = "{$scheme}://{$host}";
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "What2Cook",
-        "url": "<?= $baseUrl ?>",
+        "url": "<?= htmlspecialchars($baseUrl) ?>",
         "potentialAction": {
             "@type": "SearchAction",
             "target": {
                 "@type": "EntryPoint",
-                "urlTemplate": "<?= $baseUrl ?>/recetas?query={search_term_string}"
+                "urlTemplate": "<?= htmlspecialchars($baseUrl) ?>/recetas?query={search_term_string}"
             },
             "query-input": "required name=search_term_string"
         }
@@ -57,8 +57,8 @@ $baseUrl = "{$scheme}://{$host}";
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "What2Cook",
-        "url": "<?= $baseUrl ?>",
-        "logo": "<?= $baseUrl ?>/assets/img/LogoW2C_1.png",
+        "url": "<?= htmlspecialchars($baseUrl) ?>",
+        "logo": "<?= htmlspecialchars($baseUrl) ?>/assets/img/LogoW2C_1.png",
         "description": "Tu plataforma de recetas y planificación de comidas",
         "address": {
             "@type": "PostalAddress",

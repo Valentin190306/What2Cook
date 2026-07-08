@@ -14,8 +14,8 @@ $baseUrl = "{$scheme}://{$host}";
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"},
-        {"@type": "ListItem", "position": 2, "name": "Asistente de Cocina", "item": "<?= $baseUrl ?>/asistente-cocina"}
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= htmlspecialchars($baseUrl) ?>/"},
+        {"@type": "ListItem", "position": 2, "name": "Asistente de Cocina", "item": "<?= htmlspecialchars($baseUrl) ?>/asistente-cocina"}
     ]
 }
 </script>

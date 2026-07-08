@@ -108,7 +108,7 @@ $noindex = true;
                                 'ingredients' => $ingredients,
                                 'recipe_ids' => $recipeIds,
                                 'servings' => $servings
-                            ])) ?>"
+                            ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT)) ?>"
                             data-favorited="true">♥</button>
                 </div>
                 

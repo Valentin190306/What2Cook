@@ -13,7 +13,7 @@ $baseUrl = "{$scheme}://{$host}";
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"}
+        {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= htmlspecialchars($baseUrl) ?>/"}
     ]
 }
 </script>

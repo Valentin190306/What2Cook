@@ -53,9 +53,9 @@ $baseUrl = "{$scheme}://{$host}";
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": [
-            {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= $baseUrl ?>/"},
-            {"@type": "ListItem", "position": 2, "name": "Catálogo", "item": "<?= $baseUrl ?>/recetas"},
-            {"@type": "ListItem", "position": 3, "name": <?= json_encode($recipe['title'] ?? 'Receta', JSON_UNESCAPED_UNICODE) ?>, "item": "<?= $baseUrl ?>/receta/<?= (int) ($recipe['id'] ?? 0) ?>"}
+            {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "<?= htmlspecialchars($baseUrl) ?>/"},
+            {"@type": "ListItem", "position": 2, "name": "Catálogo", "item": "<?= htmlspecialchars($baseUrl) ?>/recetas"},
+            {"@type": "ListItem", "position": 3, "name": <?= json_encode($recipe['title'] ?? 'Receta', JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>, "item": "<?= htmlspecialchars($baseUrl) ?>/receta/<?= (int) ($recipe['id'] ?? 0) ?>"}
         ]
     }
     </script>
@@ -65,13 +65,13 @@ $baseUrl = "{$scheme}://{$host}";
     {
         "@context": "https://schema.org",
         "@type": "Recipe",
-        "name": <?= json_encode($recipe['title'] ?? '', JSON_UNESCAPED_UNICODE) ?>,
-        "image": <?= json_encode($image, JSON_UNESCAPED_UNICODE) ?>,
-        "description": <?= json_encode(mb_substr($summary, 0, 400), JSON_UNESCAPED_UNICODE) ?>,
-        <?php if ($readyIn): ?>"totalTime": "PT<?= $readyIn ?>M",<?php endif; ?>
-        <?php if ($servings): ?>"recipeYield": "<?= $servings ?>",<?php endif; ?>
-        <?php if (!empty($cuisines)): ?>"recipeCuisine": <?= json_encode($cuisines, JSON_UNESCAPED_UNICODE) ?>,<?php endif; ?>
-        "recipeCategory": <?= json_encode($dishTypes, JSON_UNESCAPED_UNICODE) ?>,
+        "name": <?= json_encode($recipe['title'] ?? '', JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>,
+        "image": <?= json_encode($image, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>,
+        "description": <?= json_encode(mb_substr($summary, 0, 400), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>,
+        <?php if ($readyIn): ?>"totalTime": "PT<?= (int) $readyIn ?>M",<?php endif; ?>
+        <?php if ($servings): ?>"recipeYield": "<?= (int) $servings ?>",<?php endif; ?>
+        <?php if (!empty($cuisines)): ?>"recipeCuisine": <?= json_encode($cuisines, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>,<?php endif; ?>
+        "recipeCategory": <?= json_encode($dishTypes, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>,
         "nutrition": {
             "@type": "NutritionInformation",
             "calories": "<?= round($nutriMap['Calories']['amount'] ?? 0) ?>",
@@ -79,12 +79,12 @@ $baseUrl = "{$scheme}://{$host}";
             "carbohydrateContent": "<?= round($nutriMap['Carbohydrates']['amount'] ?? 0) ?> g",
             "fatContent": "<?= round($nutriMap['Fat']['amount'] ?? 0) ?> g"
         },
-        "recipeIngredient": <?= json_encode(array_map(fn($i) => $i['original'] ?? $i['name'], $ingredients), JSON_UNESCAPED_UNICODE) ?>,
+        "recipeIngredient": <?= json_encode(array_map(fn($i) => $i['original'] ?? $i['name'], $ingredients), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>,
         "recipeInstructions": <?= json_encode(array_map(fn($s, $i) => [
             '@type' => 'HowToStep',
             'position' => $i + 1,
             'text' => $s['step']
-        ], $steps, array_keys($steps)), JSON_UNESCAPED_UNICODE) ?>
+        ], $steps, array_keys($steps)), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_QUOT) ?>
     }
     </script>
 
